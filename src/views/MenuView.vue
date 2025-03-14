@@ -6,16 +6,55 @@
     </div>
     <div class="menu-content">
       <p>Salve salve! Pag inicialmente vazia.</p>
+      <button @click="testApi" :disabled="loading">
+        {{ loading ? 'Loading...' : 'Test API Call' }}
+      </button>
+      <p v-if="apiResponse">API Response: {{ apiResponse }}</p>
+      <p v-if="error" style="color: red;">{{ error }}</p>
     </div>
   </div>
 </template>
 
 <script>
+import axios from 'axios'
+
 export default {
+  data() {
+    return {
+      apiResponse: '',
+      error: '',
+      loading: false
+    }
+  },
   methods: {
     logout() {
       localStorage.setItem('authenticated', 'false');
       this.$router.push('/');
+    },
+    async testApi() {
+      this.loading = true
+      this.error = ''
+      this.apiResponse = ''
+
+      try {
+        const response = await axios.get('/api/cargos', {
+          auth: {
+            username: 'admin',
+            password: '12345'
+          },
+          withCredentials: true,
+          headers: {
+            'Accept': 'application/json',
+            'Content-Type': 'application/json'
+          }
+        })
+        this.apiResponse = response.data
+      } catch (error) {
+        console.error('API Error:', error)
+        this.error = `Error: ${error.response?.data?.message || error.message}`
+      } finally {
+        this.loading = false
+      }
     }
   },
   created() {
