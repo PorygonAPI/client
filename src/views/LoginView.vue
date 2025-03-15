@@ -1,7 +1,8 @@
 <template>
   <div class="login-container">
     <div class="login-card">
-      <h2>Login</h2>
+      <h2>Bem-vindo(a)</h2>
+      <img src="../assets/imagens/1200px-Logo_Visiona.png" alt="Logo Visiona" width="100%" >
       <form @submit.prevent="handleLogin">
         <div class="form-group">
           <label for="username">Usuário:</label>
@@ -71,6 +72,10 @@ export default {
   justify-content: center;
   align-items: center;
   height: 100vh;
+  background-image: url("../assets/imagens/slide-visiona-vcub.jpg");
+  background-position: center;
+  background-repeat: no-repeat;
+  background-size: cover;
 }
 
 .login-card {
@@ -110,7 +115,7 @@ export default {
 .login-button {
   width: 100%;
   padding: 0.8rem;
-  background-color: #4285f4;
+  background-color: #FFAD00;
   color: white;
   border: none;
   border-radius: 4px;
@@ -122,11 +127,11 @@ export default {
 }
 
 .login-button:hover {
-  background-color: #3367d6;
+  background-color: #FF6E00;
 }
 
 .login-button:disabled {
-  background-color: #92b5f8;
+  background-color: #FED8B1;
   cursor: not-allowed;
 }
 
