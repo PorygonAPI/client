@@ -2,17 +2,11 @@
   <div class="login-container">
     <div class="login-card">
       <h2>Bem-vindo(a)</h2>
-      <img src="../assets/imagens/1200px-Logo_Visiona.png" alt="Logo Visiona" width="100%" >
+      <img src="../assets/imagens/1200px-Logo_Visiona.png" alt="Logo Visiona" width="100%" />
       <form @submit.prevent="handleLogin">
         <div class="form-group">
-          <label for="username">Usuário:</label>
-          <input
-            type="text"
-            id="username"
-            v-model="username"
-            required
-            autocomplete="username"
-          />
+          <label for="email">E-mail:</label>
+          <input type="text" id="email" v-model="email" required autocomplete="email" />
         </div>
         <div class="form-group">
           <label for="password">Senha:</label>
@@ -40,29 +34,54 @@
 export default {
   data() {
     return {
-      username: '',
+      email: '',
       password: '',
       isLoading: false,
-      errorMessage: ''
+      errorMessage: '',
     }
   },
   methods: {
+    validateFields() {
+      if (this.email === '' || this.password === '') {
+        this.errorMessage = 'Preencha todos os campos'
+        return false
+      }
+      const emailRegex = /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,6}$/
+      if (!emailRegex.test(this.email)) {
+        this.errorMessage = 'Um e-mail válido é necessário'
+        return false
+      }
+      return true
+    },
     handleLogin() {
-      this.isLoading = true;
-      this.errorMessage = '';
+      this.isLoading = true
+      this.errorMessage = ''
 
-      setTimeout(() => {
-        if (this.username === 'teste' && this.password === 'senha') {
-          localStorage.setItem('authenticated', 'true');
-          this.$router.push('/menu');
-        } else {
-          this.errorMessage = 'Usuário ou senha incorretos';
-          localStorage.setItem('authenticated', 'false');
-        }
-        this.isLoading = false;
-      }, 1500);
-    }
-  }
+      const isValid = this.validateFields()
+      if (!isValid) {
+        this.isLoading = false
+        return
+      }
+
+      this.$axios
+        .post('/auth/login', {
+          email: this.email,
+          senha: this.password,
+        })
+        .then((response) => {
+          localStorage.setItem('token', response.data)
+          this.$router.push('/menu')
+        })
+        .catch((error) => {
+          console.error('API Error:', error)
+          this.errorMessage = 'Erro ao tentar fazer login'
+          this.isLoading = false
+        })
+        .finally(() => {
+          this.isLoading = false
+        })
+    },
+  },
 }
 </script>
 
@@ -72,7 +91,7 @@ export default {
   justify-content: center;
   align-items: center;
   height: 100vh;
-  background-image: url("../assets/imagens/slide-visiona-vcub.jpg");
+  background-image: url('../assets/imagens/slide-visiona-vcub.jpg');
   background-position: center;
   background-repeat: no-repeat;
   background-size: cover;
@@ -115,7 +134,7 @@ export default {
 .login-button {
   width: 100%;
   padding: 0.8rem;
-  background-color: #FFAD00;
+  background-color: #ffad00;
   color: white;
   border: none;
   border-radius: 4px;
@@ -127,11 +146,11 @@ export default {
 }
 
 .login-button:hover {
-  background-color: #FF6E00;
+  background-color: #ff6e00;
 }
 
 .login-button:disabled {
-  background-color: #FED8B1;
+  background-color: #fed8b1;
   cursor: not-allowed;
 }
 
@@ -146,13 +165,15 @@ export default {
   display: inline-block;
   width: 20px;
   height: 20px;
-  border: 3px solid rgba(255,255,255,0.3);
+  border: 3px solid rgba(255, 255, 255, 0.3);
   border-radius: 50%;
   border-top-color: #fff;
   animation: spin 1s ease-in-out infinite;
 }
 
 @keyframes spin {
-  to { transform: rotate(360deg); }
+  to {
+    transform: rotate(360deg);
+  }
 }
 </style>
