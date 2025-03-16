@@ -28,7 +28,7 @@ export default {
   },
   methods: {
     logout() {
-      localStorage.setItem('authenticated', 'false');
+      localStorage.removeItem('token')
       this.$router.push('/');
     },
     async testApi() {
@@ -55,11 +55,6 @@ export default {
       } finally {
         this.loading = false
       }
-    }
-  },
-  created() {
-    if (localStorage.getItem('authenticated') !== 'true') {
-      this.$router.push('/');
     }
   }
 }
