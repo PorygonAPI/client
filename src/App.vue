@@ -7,6 +7,7 @@ import { RouterView } from 'vue-router'
 </template>
 
 <style>
+@layer{
 * {
   margin: 0;
   padding: 0;
@@ -16,5 +17,6 @@ import { RouterView } from 'vue-router'
 
 body {
   background-color: #f5f5f5;
+}
 }
 </style>
