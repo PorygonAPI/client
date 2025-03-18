@@ -1,7 +1,11 @@
 <script setup lang="ts">
 import { RouterLink } from 'vue-router';
 import { ref } from 'vue';
+import { useRouter } from 'vue-router';
+import { useRoute } from 'vue-router';
 
+const route = useRoute();
+const router = useRouter();
 const nome = ref('Teste');
 const showPopUp = ref(false);
 const showMobileMenu = ref(false);
@@ -15,14 +19,15 @@ const toggleMobileMenu = () => {
 };
 
 const logoff = () => {
-  alert('Você saiu!');
   showPopUp.value = false;
   showMobileMenu.value = false;
+  localStorage.removeItem('token');
+  router.push('/');
 };
 </script>
 
 <template>
-  <nav class="grid grid-cols-6 absolute w-screen h-8 md:h-10 z-50 bg-white drop-shadow-md">
+  <nav v-if="route.path !== '/'" class="grid grid-cols-6 absolute w-screen h-8 md:h-10 z-50 bg-white drop-shadow-md">
     <div class="w-fit h-8 md:h-10 p-0.5 col-span-1">
       <RouterLink to="/home">
         <img src="../assets/logo-preta-completa.svg" alt="logoVisiona.svg" class="h-full w-auto object-contain">
