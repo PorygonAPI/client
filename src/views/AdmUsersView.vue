@@ -40,28 +40,11 @@
 
       <hr class="border-gray-200 my-4">
 
-      <div class="overflow-y-auto max-h-80 border-t border-r border-l rounded shadow-md">
-        <table class="w-full">
-          <thead class="bg-gray-100 border-b">
-            <tr>
-              <th class="p-2 text-center">Nome</th>
-              <th class="p-2 text-center">Cargo</th>
-              <th class="p-2 text-center">Ações</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr v-for="(usuario, index) in usuarios" :key="index" class="border-b">
-              <td class="p-2 text-center">{{ usuario.nome }}</td>
-              <td class="p-2 text-center">{{ usuario.cargo }}</td>
-              <td class="p-2 flex justify-center gap-2">
-                <button class="bg-gray-200 border px-3 py-1 rounded shadow hover:bg-yellow-100
-                  hover:text-yellow-600 transition">Editar</button>
-                <button class="bg-gray-200 border px-3 py-1 rounded shadow hover:bg-red-400
-                  hover:text-red-800 transition">Excluir</button>
-              </td>
-            </tr>
-          </tbody>
-        </table>
+      <div class="p-3 bg-white rounded-2xl shadow">
+        <DataTable :value="usuarios" tableStyle="min-width: 50rem">
+          <DataTableColumn field="nome" header="Nome" />
+          <DataTableColumn field="cargo" header="Cargo" />
+        </DataTable>
       </div>
     </div>
 
