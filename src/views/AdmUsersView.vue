@@ -11,7 +11,7 @@
             <input v-model="search" type="text" placeholder="Pesquisar" class="w-full outline-none bg-transparent ml-1">
           </div>
           <div class="lg:my-0 flex flex-col justify-center lg:justify-start">
-            <Button label="Cadastrar Usuário" class="bg-white text-black p-1 px-2 m-1 rounded-lg shadow border-gray-200 hover:bg-gray-200 transition flex items-center justify-center " />
+            <Button label="Cadastrar Usuário" class=" p-1 px-2 m-1 rounded-lg shadow text-white border-gray-200 bg-orange-400 hover:bg-orange-300 transition flex items-center justify-center " />
           </div>
         </div>
         <DataTable :value="filteredUsuarios" removableSort paginator :rows="15" stripedRows class="p-datatable-gridlines">
@@ -25,11 +25,11 @@
               <span class="text-gray-600 flex justify-start px-0.5 lg:pl-1">{{ slotProps.data.cargo }}</span>
             </template>
           </Column>
-          <Column class="p-1 ">
+          <Column class="p-1" header="Ações">
             <template #body="slotProps">
               <div class="flex justify-center lg:gap-2">
-                <button class="m-1 p-1 lg:w-16 bg-gray-400 text-white rounded shadow  hover:bg-gray-300 transition">Editar</button>
-                <button class="m-1 p-1 lg:w-16 bg-orange-400 text-white rounded shadow hover:bg-orange-300 transition">Excluir</button>
+                <button class="cursor-pointer m-1 p-1 lg:w-16 bg-gray-400 text-white rounded shadow  hover:bg-gray-300 transition">Editar</button>
+                <button class="cursor-pointer m-1 p-1 lg:w-16 bg-orange-400 text-white rounded shadow hover:bg-orange-300 transition">Excluir</button>
               </div>
             </template>
           </Column>
