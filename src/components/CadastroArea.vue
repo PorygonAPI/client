@@ -1,6 +1,11 @@
 <script setup>
 import { ref, computed } from "vue";
 
+// Função para substituir vírgula por ponto
+const formatNumber = (value) => {
+  return value ? value.replace(',', '.') : '';
+}
+
 // Definição do formulário
 const form = ref({
   nomeFazenda: "",
@@ -43,28 +48,24 @@ const errors = ref({});
 const validateForm = () => {
   errors.value = {};
 
-
-if (!form.value.nomeFazenda) errors.value.nomeFazenda = "Campo obrigatório.";
-if (!form.value.cultura) errors.value.cultura = "Campo obrigatório.";
-if (!form.value.produtividade || isNaN(form.value.produtividade) || form.value.produtividade <= 0)
-  errors.value.produtividade = "Campo obrigatório.";
-if (!form.value.area || isNaN(form.value.area) || form.value.area <= 0)
-  errors.value.area = "Campo obrigatório.";
-if (!form.value.tipoSolo) errors.value.tipoSolo = "Campo obrigatório.";
-if (!form.value.cidade) errors.value.cidade = "Campo obrigatório.";
-if (!form.value.estado) errors.value.estado = "Campo obrigatório.";
-if (!form.value.status) errors.value.status = "Campo obrigatório.";
-if (!form.value.vetorRaiz) errors.value.vetorRaiz = "Campo obrigatório.";
-
-
-
+  if (!form.value.nomeFazenda) errors.value.nomeFazenda = "Campo obrigatório.";
+  if (!form.value.cultura) errors.value.cultura = "Campo obrigatório.";
+  if (!form.value.produtividade || isNaN(form.value.produtividade) || form.value.produtividade <= 0)
+    errors.value.produtividade = "Campo obrigatório.";
+  if (!form.value.area || isNaN(form.value.area) || form.value.area <= 0)
+    errors.value.area = "Campo obrigatório.";
+  if (!form.value.tipoSolo) errors.value.tipoSolo = "Campo obrigatório.";
+  if (!form.value.cidade) errors.value.cidade = "Campo obrigatório.";
+  if (!form.value.estado) errors.value.estado = "Campo obrigatório.";
+  if (!form.value.status) errors.value.status = "Campo obrigatório.";
+  if (!form.value.vetorRaiz) errors.value.vetorRaiz = "Campo obrigatório.";
 
   // Validação do arquivo (se enviado)
   if (form.value.arquivo) {
     const allowedTypes = ["image/jpeg", "image/png", "application/pdf"];
     if (!allowedTypes.includes(form.value.arquivo.type)) {
       errors.value.arquivo = "Formato de arquivo inválido. Apenas JPG, PNG e PDF são permitidos.";
-    }a
+    }
   }
 
   return Object.keys(errors.value).length === 0;
@@ -98,10 +99,11 @@ const submitForm = () => {
         tipoSolo: 'Tipo de Solo', cidade: 'Cidade', vetorRaiz: 'Vetor Raiz'
       }" :key="field">
         <label class="block text-gray-700">{{ label }}</label>
-        <input v-model="form[field]" :type="['produtividade', 'area'].includes(field) ? 'number' : 'text'"
+        <input v-model="form[field]" :type="['produtividade', 'area'].includes(field) ? 'text' : 'text'"
                class="w-full p-2 border border-gray-300 rounded-md"
                :placeholder="label"
-               :class="{ 'border-red-500': errors[field] }" />
+               :class="{ 'border-red-500': errors[field] }"
+               @input="form[field] = formatNumber(form[field])" />
         <p v-if="errors[field]" class="text-red-500 text-sm">{{ errors[field] }}</p>
       </div>
 
