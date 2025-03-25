@@ -11,7 +11,7 @@
             <input v-model="search" type="text" placeholder="Pesquisar" class="w-full outline-none bg-transparent ml-1">
           </div>
           <div class="lg:my-0 flex flex-col justify-center lg:justify-start">
-            <Button label="Cadastrar Usuário" class=" p-1 px-2 m-1 rounded-lg shadow text-white border-gray-200 bg-orange-400 hover:bg-orange-300 transition flex items-center justify-center " />
+            <Button label="Cadastrar Usuário" class=" p-1 px-2 m-1 rounded-lg shadow text-white border-gray-300 bg-gray-400 hover:bg-gray-300 transition flex items-center justify-center " />
           </div>
         </div>
         <DataTable :value="filteredUsuarios" removableSort paginator :rows="15" stripedRows class="p-datatable-gridlines">
