@@ -5,32 +5,31 @@
         <p class="text-4xl font-semibold text-gray-800">Gerenciamento de Usuários</p>
       </div>
       <hr class="border-gray-300 mb-4">
-      <div class="p-5 bg-white rounded-xl shadow">
-        <div class="flex  items-center lg:justify-between gap-5 lg:gap-5 mb-4">
-          <div class="flex gap-2 items-center border border-gray-300 rounded-lg w-44 lg:w-96 p-2 focus-within:ring focus-within:ring-orange-200">
-            <i class="pi pi-search text-gray-500"></i>
-            <input v-model="search" type="text" placeholder="Pesquisar" class="w-full outline-none bg-transparent">
+      <div class="p-5 py-3 bg-white rounded-xl shadow">
+        <div class="flex  items-center lg:justify-between gap-5 lg:gap-5 mb-2">
+          <div class="flex gap-2 items-center border border-gray-300 rounded-lg w-44 lg:w-96 p-1 focus-within:ring focus-within:ring-orange-200">
+            <input v-model="search" type="text" placeholder="Pesquisar" class="w-full outline-none bg-transparent ml-1">
           </div>
           <div class="lg:my-0 flex flex-col justify-center lg:justify-start">
-            <Button label="Cadastrar Usuário" class="bg-white text-black p-2 rounded-lg shadow border-gray-200 hover:bg-gray-200 transition flex items-center justify-center " />
+            <Button label="Cadastrar Usuário" class="bg-white text-black p-1 px-2 m-1 rounded-lg shadow border-gray-200 hover:bg-gray-200 transition flex items-center justify-center " />
           </div>
         </div>
-        <DataTable :value="filteredUsuarios" removableSort paginator :rows="15" stripedRows class="p-datatable-gridlines ">
-          <Column field="nome" header="Nome" sortable class="text-center p-1">
+        <DataTable :value="filteredUsuarios" removableSort paginator :rows="15" stripedRows class="p-datatable-gridlines">
+          <Column field="nome" header="Nome" sortable class="text-center p-1 col-span-2 w-1/3 lg:w-3/5">
             <template #body="slotProps">
-              <span class="text-gray-700 font-medium flex justify-start pl-1">{{ slotProps.data.nome }}</span>
+              <span class="text-gray-700 font-medium flex justify-start lg:pl-1">{{ slotProps.data.nome }}</span>
             </template>
           </Column>
-          <Column field="cargo" header="Cargo" sortable class="text-center p-1">
+          <Column field="cargo" header="Cargo" sortable class="text-center p-1 lg:w-1/5">
             <template #body="slotProps">
-              <span class="text-gray-600 flex justify-start pl-1">{{ slotProps.data.cargo }}</span>
+              <span class="text-gray-600 flex justify-start px-0.5 lg:pl-1">{{ slotProps.data.cargo }}</span>
             </template>
           </Column>
-          <Column class="p-1">
+          <Column class="p-1 ">
             <template #body="slotProps">
-              <div class="flex justify-center gap-2">
-                <button class="m-1 p-1 bg-yellow-300 text-black rounded shadow  hover:bg-yellow-200 transition">Editar</button>
-                <button class="m-1 p-1 bg-red-400 text-black rounded shadow hover:bg-red-300 transition">Excluir</button>
+              <div class="flex justify-center lg:gap-2">
+                <button class="m-1 p-1 lg:w-16 bg-gray-400 text-white rounded shadow  hover:bg-gray-300 transition">Editar</button>
+                <button class="m-1 p-1 lg:w-16 bg-orange-400 text-white rounded shadow hover:bg-orange-300 transition">Excluir</button>
               </div>
             </template>
           </Column>
