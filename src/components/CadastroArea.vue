@@ -1,10 +1,10 @@
 <script setup>
-import { ref, computed } from "vue";
+import { ref } from "vue";
 
 // Função para substituir vírgula por ponto
 const formatNumber = (value) => {
   return value ? value.replace(',', '.') : '';
-}
+};
 
 // Definição do formulário
 const form = ref({
@@ -44,6 +44,9 @@ const statusOptions = ref(["Ativo", "Inativo", "Em Análise"]);
 // Mensagens de erro
 const errors = ref({});
 
+// Input de arquivo
+const fileInput = ref(null);
+
 // Função de validação
 const validateForm = () => {
   errors.value = {};
@@ -73,7 +76,12 @@ const validateForm = () => {
 
 // Função para capturar o arquivo
 const handleFileUpload = (event) => {
-  form.value.arquivo = event.target.files[0];
+  const file = event.target.files[0];
+  if (file) {
+    form.value.arquivo = file;
+  } else {
+    console.warn("Nenhum arquivo selecionado.");
+  }
 };
 
 // Submissão do formulário
@@ -99,7 +107,7 @@ const submitForm = () => {
         tipoSolo: 'Tipo de Solo', cidade: 'Cidade', vetorRaiz: 'Vetor Raiz'
       }" :key="field">
         <label class="block text-gray-700">{{ label }}</label>
-        <input v-model="form[field]" :type="['produtividade', 'area'].includes(field) ? 'text' : 'text'"
+        <input v-model="form[field]" type="text"
                class="w-full p-2 border border-gray-300 rounded-md"
                :placeholder="label"
                :class="{ 'border-red-500': errors[field] }"
@@ -127,10 +135,11 @@ const submitForm = () => {
         <p v-if="errors.status" class="text-red-500 text-sm">{{ errors.status }}</p>
       </div>
 
+      <!-- Upload do Arquivo -->
       <div class="flex flex-col items-center border-2 border-dashed border-gray-400 p-4 rounded-md">
         <label class="block text-gray-700">Upload do Arquivo</label>
-        <input type="file" class="hidden" id="fileUpload" @change="handleFileUpload" />
-        <button type="button" @click="document.getElementById('fileUpload').click()" class="mt-2 bg-gray-200 p-2 rounded-md hover:bg-gray-300">
+        <input type="file" ref="fileInput" class="hidden" @change="handleFileUpload" />
+        <button type="button" @click="fileInput?.click()" class="mt-2 bg-gray-200 p-2 rounded-md hover:bg-gray-300">
           📤 Selecionar Arquivo
         </button>
         <p v-if="form.arquivo" class="text-sm text-gray-600 mt-2">{{ form.arquivo.name }}</p>
