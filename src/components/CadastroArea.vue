@@ -38,7 +38,7 @@ const estados = ref([
 ]);
 
 // Enum para Status (valores conforme o banco)
-const statusOptions = ref(["Ativo", "Inativo", "Em Análise"]);
+const statusOptions = ref(["Aprovado", "Reprovado", "Pendente"]);
 
 // Mensagens de erro
 const errors = ref({});
