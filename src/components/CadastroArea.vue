@@ -15,7 +15,6 @@ const form = ref({
   tipoSolo: "",
   cidade: "",
   estado: "",
-  vetorRaiz: "",
   status: "",
   arquivo: null,
 });
@@ -61,14 +60,11 @@ const validateForm = () => {
   if (!form.value.cidade) errors.value.cidade = "Campo obrigatório.";
   if (!form.value.estado) errors.value.estado = "Campo obrigatório.";
   if (!form.value.status) errors.value.status = "Campo obrigatório.";
-  if (!form.value.vetorRaiz) errors.value.vetorRaiz = "Campo obrigatório.";
+  if (!form.value.arquivo) errors.value.arquivo = "É necessário fazer upload de um arquivo JSON.";
 
-  // Validação do arquivo (se enviado)
-  if (form.value.arquivo) {
-    const allowedTypes = ["image/jpeg", "image/png", "application/pdf"];
-    if (!allowedTypes.includes(form.value.arquivo.type)) {
-      errors.value.arquivo = "Formato de arquivo inválido. Apenas JPG, PNG e PDF são permitidos.";
-    }
+  // Validação do arquivo (deve ser JSON)
+  if (form.value.arquivo && form.value.arquivo.type !== "application/json") {
+    errors.value.arquivo = "Formato de arquivo inválido. Apenas JSON é permitido.";
   }
 
   return Object.keys(errors.value).length === 0;
@@ -84,6 +80,22 @@ const handleFileUpload = (event) => {
   }
 };
 
+// Função para limpar o formulário
+const resetForm = () => {
+  form.value = {
+    nomeFazenda: "",
+    cultura: "",
+    produtividade: "",
+    area: "",
+    tipoSolo: "",
+    cidade: "",
+    estado: "",
+    status: "",
+    arquivo: null,
+  };
+  fileInput.value.value = null;  // Limpa o input de arquivo
+};
+
 // Submissão do formulário
 const submitForm = () => {
   if (!validateForm()) {
@@ -93,6 +105,9 @@ const submitForm = () => {
 
   console.log("Dados do formulário:", form.value);
   alert("Cadastro enviado com sucesso!");
+
+  // Limpa o formulário após a submissão
+  resetForm();
 };
 </script>
 
@@ -104,7 +119,7 @@ const submitForm = () => {
       <div v-for="(label, field) in {
         nomeFazenda: 'Nome da Fazenda', cultura: 'Cultura',
         produtividade: 'Produtividade por Ano', area: 'Área',
-        tipoSolo: 'Tipo de Solo', cidade: 'Cidade', vetorRaiz: 'Vetor Raiz'
+        tipoSolo: 'Tipo de Solo', cidade: 'Cidade'
       }" :key="field">
         <label class="block text-gray-700">{{ label }}</label>
         <input v-model="form[field]" type="text"
@@ -135,9 +150,8 @@ const submitForm = () => {
         <p v-if="errors.status" class="text-red-500 text-sm">{{ errors.status }}</p>
       </div>
 
-      <!-- Upload do Arquivo -->
       <div class="flex flex-col items-center border-2 border-dashed border-gray-400 p-4 rounded-md">
-        <label class="block text-gray-700">Upload do Arquivo</label>
+        <label class="block text-gray-700">Upload do Arquivo JSON</label>
         <input type="file" ref="fileInput" class="hidden" @change="handleFileUpload" />
         <button type="button" @click="fileInput?.click()" class="mt-2 bg-gray-200 p-2 rounded-md hover:bg-gray-300">
           📤 Selecionar Arquivo
