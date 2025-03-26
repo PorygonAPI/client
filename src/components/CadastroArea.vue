@@ -99,8 +99,7 @@ const resetForm = () => {
 // Submissão do formulário
 const submitForm = () => {
   if (!validateForm()) {
-    alert("Corrija os erros antes de enviar.");
-    return;
+    return; // Não faz nada se houver erro
   }
 
   console.log("Dados do formulário:", form.value);
