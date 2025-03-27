@@ -60,11 +60,11 @@ const validateForm = () => {
   if (!form.value.cidade) errors.value.cidade = "Campo obrigatório.";
   if (!form.value.estado) errors.value.estado = "Campo obrigatório.";
   if (!form.value.status) errors.value.status = "Campo obrigatório.";
-  if (!form.value.arquivo) errors.value.arquivo = "É necessário fazer upload de um arquivo JSON.";
+  if (!form.value.arquivo) errors.value.arquivo = "É necessário fazer upload de um arquivo.";
 
-  // Validação do arquivo (deve ser JSON)
-  if (form.value.arquivo && form.value.arquivo.type !== "application/json") {
-    errors.value.arquivo = "Formato de arquivo inválido. Apenas JSON é permitido.";
+  // Validação do arquivo (deve ser JSON ou GeoJSON)
+  if (form.value.arquivo && !["application/json", "application/geo+json"].includes(form.value.arquivo.type)) {
+    errors.value.arquivo = "Formato de arquivo inválido. Apenas JSON e GeoJSON são permitidos.";
   }
 
   return Object.keys(errors.value).length === 0;
@@ -183,8 +183,8 @@ const removeFile = () => {
       </div>
 
       <div class="flex flex-col items-center border-2 border-dashed border-gray-400 p-4 rounded-md">
-        <label class="block text-gray-700">Upload do Arquivo JSON</label>
-        <input type="file" ref="fileInput" class="hidden" @change="handleFileUpload" accept=".json" />
+        <label class="block text-gray-700">Upload do Arquivo JSON ou GeoJSON</label>
+        <input type="file" ref="fileInput" class="hidden" @change="handleFileUpload" accept=".json, .geojson" />
         <button type="button" @click="fileInput?.click()" class="mt-2 bg-gray-200 p-2 rounded-md hover:bg-gray-300">
           📤 Selecionar Arquivo
         </button>
@@ -193,7 +193,7 @@ const removeFile = () => {
           <button type="button" @click="removeFile" class="text-red-500 text-sm ml-2">Remover</button>
         </p>
         <p v-if="errors.arquivo" class="text-red-500 text-sm">{{ errors.arquivo }}</p>
-        <p class="text-sm text-gray-600 mt-2">Apenas arquivos .json são permitidos.</p> <!-- Texto informativo -->
+        <p class="text-sm text-gray-600 mt-2">Apenas arquivos .json e .geojson são permitidos.</p> <!-- Texto informativo -->
       </div>
 
       <button type="submit" class="w-full bg-blue-600 text-white p-2 rounded-md hover:bg-blue-700">
