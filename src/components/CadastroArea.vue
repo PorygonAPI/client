@@ -80,6 +80,25 @@ const handleFileUpload = (event) => {
   }
 };
 
+// Função de validação por campo
+const validateField = (field, value) => {
+  if (field === 'produtividade' || field === 'area') {
+    // Validar apenas se for número
+    if (isNaN(value) || value <= 0) {
+      errors.value[field] = "Digite um número válido.";
+    } else {
+      errors.value[field] = null;
+    }
+  } else if (field === 'nomeFazenda' || field === 'cultura' || field === 'tipoSolo' || field === 'cidade') {
+    // Para campos de string, apenas verificar se está vazio
+    if (!value) {
+      errors.value[field] = "Campo obrigatório.";
+    } else {
+      errors.value[field] = null;
+    }
+  }
+};
+
 // Função para limpar o formulário
 const resetForm = () => {
   form.value = {
@@ -108,6 +127,19 @@ const submitForm = () => {
   // Limpa o formulário após a submissão
   resetForm();
 };
+
+// Função chamada quando o campo perde o foco
+const handleBlur = (field) => {
+  if (!form.value[field]) {
+    errors.value[field] = null;
+  }
+};
+
+// Função para remover o arquivo carregado
+const removeFile = () => {
+  form.value.arquivo = null;
+  fileInput.value.value = null;  // Limpa o input de arquivo
+};
 </script>
 
 <template>
@@ -125,7 +157,8 @@ const submitForm = () => {
                class="w-full p-2 border border-gray-300 rounded-md"
                :placeholder="label"
                :class="{ 'border-red-500': errors[field] }"
-               @input="form[field] = formatNumber(form[field])" />
+               @input="form[field] = formatNumber(form[field]); validateField(field, form[field])"
+               @blur="handleBlur(field)" />
         <p v-if="errors[field]" class="text-red-500 text-sm">{{ errors[field] }}</p>
       </div>
 
@@ -151,12 +184,16 @@ const submitForm = () => {
 
       <div class="flex flex-col items-center border-2 border-dashed border-gray-400 p-4 rounded-md">
         <label class="block text-gray-700">Upload do Arquivo JSON</label>
-        <input type="file" ref="fileInput" class="hidden" @change="handleFileUpload" />
+        <input type="file" ref="fileInput" class="hidden" @change="handleFileUpload" accept=".json" />
         <button type="button" @click="fileInput?.click()" class="mt-2 bg-gray-200 p-2 rounded-md hover:bg-gray-300">
           📤 Selecionar Arquivo
         </button>
-        <p v-if="form.arquivo" class="text-sm text-gray-600 mt-2">{{ form.arquivo.name }}</p>
+        <p v-if="form.arquivo" class="text-sm text-gray-600 mt-2">
+          {{ form.arquivo.name }}
+          <button type="button" @click="removeFile" class="text-red-500 text-sm ml-2">Remover</button>
+        </p>
         <p v-if="errors.arquivo" class="text-red-500 text-sm">{{ errors.arquivo }}</p>
+        <p class="text-sm text-gray-600 mt-2">Apenas arquivos .json são permitidos.</p> <!-- Texto informativo -->
       </div>
 
       <button type="submit" class="w-full bg-blue-600 text-white p-2 rounded-md hover:bg-blue-700">
