@@ -1,11 +1,24 @@
+<template>
+  <div class="menu-container">
+    <div class="menu-header">
+      <h1>Menu Principal</h1>
+      <button class="logout-button" @click="logout">Sair</button>
+    </div>
+    <div class="menu-content">
+      <p>Salve salve! Pag inicialmente vazia.</p>
+      <button @click="testApi" :disabled="loading">
+        {{ loading ? 'Loading...' : 'Test API Call' }}
+      </button>
+      <p v-if="apiResponse">API Response: {{ apiResponse }}</p>
+      <p v-if="error" style="color: red;">{{ error }}</p>
+    </div>
+  </div>
+</template>
+
 <script>
 import axios from 'axios'
-import CadastroArea from "@/components/CadastroArea.vue"; // Importação do componente
 
 export default {
-  components: {
-    CadastroArea, // Registro do componente para uso no template
-  },
   data() {
     return {
       apiResponse: '',
@@ -46,19 +59,6 @@ export default {
   }
 }
 </script>
-
-<template>
-  <div class="menu-container">
-    <div class="menu-header">
-      <button class="logout-button" @click="logout">Sair</button>
-    </div>
-    <div class="menu-content">
-
-      <!-- Adicionando o componente CadastroArea -->
-      <CadastroArea />
-    </div>
-  </div>
-</template>
 
 <style scoped>
 .menu-container {

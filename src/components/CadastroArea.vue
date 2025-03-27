@@ -1,12 +1,10 @@
 <script setup>
 import { ref } from "vue";
 
-// Função para substituir vírgula por ponto
 const formatNumber = (value) => {
   return value ? value.replace(',', '.') : '';
 };
 
-// Definição do formulário
 const form = ref({
   nomeFazenda: "",
   cultura: "",
@@ -19,7 +17,6 @@ const form = ref({
   arquivo: null,
 });
 
-// Lista de estados (siglas conforme o banco)
 const estados = ref([
   { nome: "Acre", sigla: "AC" }, { nome: "Alagoas", sigla: "AL" },
   { nome: "Amapá", sigla: "AP" }, { nome: "Amazonas", sigla: "AM" },
@@ -37,16 +34,12 @@ const estados = ref([
   { nome: "Tocantins", sigla: "TO" }
 ]);
 
-// Enum para Status (valores conforme o banco)
 const statusOptions = ref(["Aprovado", "Reprovado", "Pendente"]);
 
-// Mensagens de erro
 const errors = ref({});
 
-// Input de arquivo
 const fileInput = ref(null);
 
-// Função de validação
 const validateForm = () => {
   errors.value = {};
 
@@ -62,7 +55,6 @@ const validateForm = () => {
   if (!form.value.status) errors.value.status = "Campo obrigatório.";
   if (!form.value.arquivo) errors.value.arquivo = "É necessário fazer upload de um arquivo.";
 
-  // Validação do arquivo (deve ser JSON ou GeoJSON)
   if (form.value.arquivo && !["application/json", "application/geo+json"].includes(form.value.arquivo.type)) {
     errors.value.arquivo = "Formato de arquivo inválido. Apenas JSON e GeoJSON são permitidos.";
   }
@@ -70,7 +62,6 @@ const validateForm = () => {
   return Object.keys(errors.value).length === 0;
 };
 
-// Função para capturar o arquivo
 const handleFileUpload = (event) => {
   const file = event.target.files[0];
   if (file) {
@@ -80,7 +71,6 @@ const handleFileUpload = (event) => {
   }
 };
 
-// Função de validação por campo
 const validateField = (field, value) => {
   if (field === 'produtividade' || field === 'area') {
     // Validar apenas se for número
@@ -99,7 +89,6 @@ const validateField = (field, value) => {
   }
 };
 
-// Função para limpar o formulário
 const resetForm = () => {
   form.value = {
     nomeFazenda: "",
@@ -112,33 +101,29 @@ const resetForm = () => {
     status: "",
     arquivo: null,
   };
-  fileInput.value.value = null;  // Limpa o input de arquivo
+  fileInput.value.value = null;
 };
 
-// Submissão do formulário
 const submitForm = () => {
   if (!validateForm()) {
-    return; // Não faz nada se houver erro
+    return;
   }
 
   console.log("Dados do formulário:", form.value);
   alert("Cadastro enviado com sucesso!");
 
-  // Limpa o formulário após a submissão
   resetForm();
 };
 
-// Função chamada quando o campo perde o foco
 const handleBlur = (field) => {
   if (!form.value[field]) {
     errors.value[field] = null;
   }
 };
 
-// Função para remover o arquivo carregado
 const removeFile = () => {
   form.value.arquivo = null;
-  fileInput.value.value = null;  // Limpa o input de arquivo
+  fileInput.value.value = null;
 };
 </script>
 
@@ -193,7 +178,7 @@ const removeFile = () => {
           <button type="button" @click="removeFile" class="text-red-500 text-sm ml-2">Remover</button>
         </p>
         <p v-if="errors.arquivo" class="text-red-500 text-sm">{{ errors.arquivo }}</p>
-        <p class="text-sm text-gray-600 mt-2">Apenas arquivos .json e .geojson são permitidos.</p> <!-- Texto informativo -->
+        <p class="text-sm text-gray-600 mt-2">Apenas arquivos .json e .geojson são permitidos.</p>
       </div>
 
       <button type="submit" class="w-full bg-blue-600 text-white p-2 rounded-md hover:bg-blue-700">
