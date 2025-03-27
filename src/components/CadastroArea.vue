@@ -149,7 +149,7 @@ const removeFile = () => {
     <form @submit.prevent="submitForm" class="space-y-4">
       <div v-for="(label, field) in {
         nomeFazenda: 'Nome da Fazenda', cultura: 'Cultura',
-        produtividade: 'Produtividade por Ano', area: 'Área',
+        produtividade: 'Produtividade Anual', area: 'Área',
         tipoSolo: 'Tipo de Solo', cidade: 'Cidade'
       }" :key="field">
         <label class="block text-gray-700">{{ label }}</label>
