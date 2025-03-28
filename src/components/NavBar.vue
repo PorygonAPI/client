@@ -56,7 +56,7 @@ const logoff = () => {
 <template>
   <nav v-if="route.path !== '/'" class="grid grid-cols-6 sticky w-screen h-8 md:h-10 z-50 bg-white drop-shadow-md">
     <div class="w-fit h-8 md:h-10 p-0.5 col-span-1">
-      <RouterLink to="/menu">
+      <RouterLink to="/home">
         <img src="../assets/logo-preta-completa.svg" alt="logoVisiona.svg" class="h-full w-auto object-contain">
       </RouterLink>
     </div>
