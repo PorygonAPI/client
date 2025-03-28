@@ -1,8 +1,9 @@
 <template>
+  <Toast />
   <div class="register-container">
     <div class="register-card">
       <div class="card-header">
-        <button class="back-button" type="button">
+        <button class="back-button" type="button" @click="retornar">
           <span>&larr;</span>
         </button>
         <h2>Cadastro de Usuário</h2>
@@ -40,9 +41,14 @@
 
 <script>
 import axios from 'axios'
+import { useToast } from "primevue/usetoast";
+import Toast from 'primevue/toast';
 
 export default {
   name: 'UserRegisterForm',
+  components:{
+    Toast
+  },
   data() {
     return {
       formData: {
@@ -67,22 +73,31 @@ export default {
             'Content-Type': 'application/json'
           }
         });
-        console.log(response)
         this.formData = await response.json();
       } catch (error) {
         error.value = 'Erro ao carregar os dados';
       } 
     };
 
-    console.log(this.$route.query.id)
-
     if (this.$route.query.id > 0)
     {
       fetchData()
     }
 
+    this.$toast = useToast();
+
   },
   methods: {
+    retornar()
+    {
+      this.$router.push('/usuario')
+    },
+
+    showToast(strSeverity,strMensagem) 
+   {
+    this.$toast.add({ severity: strSeverity, summary: 'Informando:', detail: strMensagem, life: 5000 })
+   },
+
     handleRegister() {
       console.log('Form data submitted:', this.formData)
 
@@ -113,10 +128,14 @@ export default {
           },
           method: 'POST',
           body: JSON.stringify(this.formData)
-        });
-        console.log(response)
+        }).then((response) => {
+          this.showToast('success', 'Cadastro realizado com sucesso')
+        }).catch((response) => {
+          this.showToast('error','Erro ao cadastrar os dados')
+        })
+        
       } catch (error) {
-        error.value = 'Erro ao carregar os dados';
+        error.value = 'Erro ao cadastrar os dados';
       } 
    },
    async alterarUsuario()
@@ -136,10 +155,13 @@ export default {
           },
           method: 'PUT',
           body: JSON.stringify(this.formData)
-        });
-        console.log(response)
+        }).then((response) => {
+          this.showToast('success', 'Atualização realizada com sucesso')
+        }).catch((response) => {
+          this.showToast('error','Erro ao atualizar os dados')
+        })
       } catch (error) {
-        error.value = 'Erro ao carregar os dados';
+        error.value = 'Erro ao atualizar os dados';
       } 
    }
   }

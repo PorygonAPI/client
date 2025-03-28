@@ -1,4 +1,5 @@
 <template>
+  <Toast />
   <div class="h-full w-[90%] ml-[5%] mr-[5%]">
     <div class="flex flex-col">
       <div class="text-center p-2 mt-4 lg:mb-3 mb-1">
@@ -47,16 +48,19 @@
 
 <script>
 import { ref, computed } from 'vue';
+import { useToast } from "primevue/usetoast";
 import Button from 'primevue/button';
 import DataTable from 'primevue/datatable';
 import Column from 'primevue/column';
+import Toast from 'primevue/toast';
 import axios from 'axios'
 
 export default {
   components: {
     Button,
     DataTable,
-    Column
+    Column,
+    Toast,
   },
   setup() {
 
@@ -81,7 +85,6 @@ export default {
             'Content-Type': 'application/json'
           }
         });
-        console.log(response)
         usuarios.value = await response.json();
       } catch (error) {
         error.value = 'Erro ao carregar os dados';
@@ -89,8 +92,6 @@ export default {
     };
 
     fetchData()
-
-    console.log('value: ' + usuarios.value)
 
     const search = ref("");
 
@@ -119,17 +120,27 @@ export default {
             'Content-Type': 'application/json'
           },
           method: 'DELETE'
-        });
-        console.log(response)
+        }).then((response => {
+          window.location.reload();
+          this.showToast('success','Exclusão realizada com sucesso')
+        })).catch((response) => {
+          this.showToast('error','Erro ao excluir registro')
+        }) 
       } catch (error) {
-        error.value = 'Erro ao carregar os dados';
+        error.value = 'Erro ao excluir registro';
       } 
    },
 
    cadastrarOuEditarUsuario(id)
    {
     this.$router.push({ path: 'cadastroUsuario', query: { id: id } })
+   },
+
+   showToast(strSeverity,strMensagem) 
+   {
+    this.$toast.add({ severity: strSeverity, summary: 'Informando:', detail: strMensagem, life: 5000 })
    }
+}
   }
-};
+
 </script>
