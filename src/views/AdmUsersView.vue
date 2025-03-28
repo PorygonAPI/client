@@ -48,7 +48,6 @@
 
 <script>
 import { ref, computed } from 'vue';
-import { useToast } from "primevue/usetoast";
 import Button from 'primevue/button';
 import DataTable from 'primevue/datatable';
 import Column from 'primevue/column';
@@ -64,13 +63,8 @@ export default {
   },
   setup() {
 
-    const usuarios = ref([
-      { nome: "Joselito", cargoNome: "Administrador", id: "" },
-      { nome: "Maria", cargoNome: "Analista", id: "" },
-      { nome: "Ana", cargoNome: "Analista" , id: ""},
-      { nome: "Cassio", cargoNome: "Consultor" , id: ""},
-      { nome: "José", cargoNome: "Consultor" , id: ""}
-    ]);
+
+    const usuarios = ref();
 
     const fetchData = async () => {
       try {
@@ -99,7 +93,7 @@ export default {
       if (!search.value) return usuarios.value;
       return usuarios.value.filter(user =>
         user.nome.toLowerCase().includes(search.value.toLowerCase()) ||
-        user.cargo.toLowerCase().includes(search.value.toLowerCase())
+        user.cargoNome.toLowerCase().includes(search.value.toLowerCase())
       );
     });
 
