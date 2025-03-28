@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { RouterLink } from 'vue-router';
-import { ref } from 'vue';
+import { ref, onMounted } from 'vue';
 import { useRouter } from 'vue-router';
 import { useRoute } from 'vue-router';
 
@@ -9,6 +9,33 @@ const router = useRouter();
 const nome = ref('Teste');
 const showPopUp = ref(false);
 const showMobileMenu = ref(false);
+
+const userRole = ref(false);
+const vectorRole = ref(false);
+const areaRole = ref(false);
+const dashboardRole = ref(false);
+
+const verifyRole = (role) =>{
+  if (role == 'admin'){
+    userRole.value = true;
+    vectorRole.value = true;
+    areaRole.value = true;
+    dashboardRole.value = true;
+  }
+  if (role == 'consultor'){
+    areaRole.value = true;
+    dashboardRole.value = true;
+  }
+  if (role == 'analista'){
+    areaRole.value = true;
+    vectorRole.value = true;
+  }
+}
+
+onMounted(()=>{
+  const role = localStorage.getItem('role');
+  verifyRole(role)
+})
 
 const togglePopup = () => {
   showPopUp.value = !showPopUp.value;
@@ -36,10 +63,10 @@ const logoff = () => {
 
     <div class="h-8 md:h-10 col-span-3 md:col-span-4">
       <ul class="h-full w-full hidden md:flex gap-7 justify-end items-center pr-10">
-        <li><RouterLink to="/usuario" class="hover:text-orange-400 transition">Usuários</RouterLink></li>
-        <li><RouterLink to="" class="hover:text-orange-400 transition">Áreas Agrícolas</RouterLink></li>
-        <li><RouterLink to="" class="hover:text-orange-400 transition">Vetores</RouterLink></li>
-        <li><RouterLink to="" class="hover:text-orange-400 transition">Dashboard</RouterLink></li>
+        <li v-show="userRole"><RouterLink to="/usuario" class="hover:text-orange-400 transition">Usuários</RouterLink></li>
+        <li v-show="areaRole"><RouterLink to="/areasagro" class="hover:text-orange-400 transition">Áreas Agrícolas</RouterLink></li>
+        <li v-show="vectorRole"><RouterLink to="/vetor" class="hover:text-orange-400 transition">Vetores</RouterLink></li>
+        <li v-show="dashboardRole"><RouterLink to="/dashboard" class="hover:text-orange-400 transition">Dashboard</RouterLink></li>
       </ul>
     </div>
 
@@ -63,10 +90,10 @@ const logoff = () => {
   </nav>
 
   <div v-if="showMobileMenu" class="absolute top-8 left-0 w-full bg-white shadow-md md:hidden p-4 flex flex-col gap-3 border-t border-gray-200">
-    <RouterLink to="" class="hover:text-orange-400 transition" @click="toggleMobileMenu">Usuários</RouterLink>
-    <RouterLink to="" class="hover:text-orange-400 transition" @click="toggleMobileMenu">Áreas Agrícolas</RouterLink>
-    <RouterLink to="" class="hover:text-orange-400 transition" @click="toggleMobileMenu">Vetores</RouterLink>
-    <RouterLink to="" class="hover:text-orange-400 transition" @click="toggleMobileMenu">Dashboard</RouterLink>
+    <RouterLink v-show="userRole" to="/usuario" class="hover:text-orange-400 transition" @click="toggleMobileMenu">Usuários</RouterLink>
+    <RouterLink v-show="areaRole" to="/areasagro" class="hover:text-orange-400 transition" @click="toggleMobileMenu">Áreas Agrícolas</RouterLink>
+    <RouterLink v-show="vectorRole" to="/vetor" class="hover:text-orange-400 transition" @click="toggleMobileMenu">Vetores</RouterLink>
+    <RouterLink v-show="dashboardRole" to="/dashboard" class="hover:text-orange-400 transition" @click="toggleMobileMenu">Dashboard</RouterLink>
     <button @click="logoff" class="w-full bg-red-500 text-white py-1 text-sm rounded hover:bg-red-600">Logoff</button>
   </div>
 </template>
