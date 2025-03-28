@@ -37,7 +37,7 @@ export default {
       this.apiResponse = ''
 
       try {
-        const response = await axios.get('/api/cargos', {
+        const response = await axios.get('api/usuarios', {
           auth: {
             username: 'admin',
             password: '12345'
@@ -49,6 +49,7 @@ export default {
           }
         })
         this.apiResponse = response.data
+        console.log(this.apiResponse)
       } catch (error) {
         console.error('API Error:', error)
         this.error = `Error: ${error.response?.data?.message || error.message}`

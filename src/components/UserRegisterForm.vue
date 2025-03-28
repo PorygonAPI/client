@@ -10,7 +10,7 @@
       <form @submit.prevent="handleRegister">
         <div class="form-group">
           <label for="fullName">Nome completo:</label>
-          <input type="text" id="fullName" v-model="formData.fullName" required />
+          <input type="text" id="fullName" v-model="formData.nome" required />
         </div>
 
         <div class="form-group">
@@ -20,7 +20,7 @@
 
         <div class="form-group">
           <label for="password">Senha:</label>
-          <input type="password" id="password" v-model="formData.password" required />
+          <input type="password" id="password" v-model="formData.senha" required />
         </div>
 
         <div class="form-group">
@@ -31,7 +31,7 @@
         </div>
 
         <div class="button-container">
-          <button type="submit" class="register-button">Cadastrar</button>
+          <button type="submit" class="register-button" >Cadastrar</button>
         </div>
       </form>
     </div>
@@ -39,22 +39,109 @@
 </template>
 
 <script>
+import axios from 'axios'
+
 export default {
   name: 'UserRegisterForm',
   data() {
     return {
       formData: {
-        fullName: '',
+        nome: '',
         email: '',
-        password: '',
-        role: ''
+        senha: '',
+        cargoId: '1'
       }
     }
+  },
+  mounted(){
+    const fetchData = async () => {
+      try {
+        const response = await fetch('api/usuarios/' + this.$route.query.id , {
+          auth: {
+            username: 'admin',
+            password: '12345'
+          },
+          withCredentials: true,
+          headers: {
+            'Accept': 'application/json',
+            'Content-Type': 'application/json'
+          }
+        });
+        console.log(response)
+        this.formData = await response.json();
+      } catch (error) {
+        error.value = 'Erro ao carregar os dados';
+      } 
+    };
+
+    console.log(this.$route.query.id)
+
+    if (this.$route.query.id > 0)
+    {
+      fetchData()
+    }
+
   },
   methods: {
     handleRegister() {
       console.log('Form data submitted:', this.formData)
+
+      if (this.$route.query.id > 0)
+    {
+      this.alterarUsuario()
     }
+    else
+    {
+      this.inserirUsuario()
+    }
+    },
+
+    async inserirUsuario()
+   {
+      try {
+        const response = await fetch('/api/usuarios', {
+          auth: {
+            username: 'admin',
+            password: '12345'
+          },
+          withCredentials: true,
+          headers: {
+            'Accept': 'application/json',
+            'Content-Type': 'application/json',
+            'Access-Control-Allow-Origin': '*',
+            'origin':'*'
+          },
+          method: 'POST',
+          body: JSON.stringify(this.formData)
+        });
+        console.log(response)
+      } catch (error) {
+        error.value = 'Erro ao carregar os dados';
+      } 
+   },
+   async alterarUsuario()
+   {
+      try {
+        const response = await fetch('/api/usuarios/' + this.$route.query.id, {
+          auth: {
+            username: 'admin',
+            password: '12345'
+          },
+          withCredentials: true,
+          headers: {
+            'Accept': 'application/json',
+            'Content-Type': 'application/json',
+            'Access-Control-Allow-Origin': '*',
+            'origin':'*'
+          },
+          method: 'PUT',
+          body: JSON.stringify(this.formData)
+        });
+        console.log(response)
+      } catch (error) {
+        error.value = 'Erro ao carregar os dados';
+      } 
+   }
   }
 }
 </script>
