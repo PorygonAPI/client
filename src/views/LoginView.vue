@@ -70,7 +70,7 @@ export default {
         })
         .then((response) => {
           localStorage.setItem('token', response.data)
-          this.$router.push('/menu')
+          this.$router.push('/home')
         })
         .catch((error) => {
           console.error('API Error:', error)

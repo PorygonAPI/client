@@ -33,8 +33,8 @@ const verifyRole = (role) =>{
 }
 
 onMounted(()=>{
-  const role = localStorage.getItem('role');
-  verifyRole(role)
+  // const role = localStorage.getItem('role');
+  verifyRole('admin')
 })
 
 const togglePopup = () => {
