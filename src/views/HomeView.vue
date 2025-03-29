@@ -9,18 +9,18 @@ const dashboardRole = ref(false);
 const margin = ref(0);
 
 const verifyRole = (role) =>{
-  if (role == 'admin'){
+  if (role == 'Administrador'){
     userRole.value = true;
     vectorRole.value = true;
     areaRole.value = true;
     dashboardRole.value = true;
   }
-  if (role == 'consultor'){
+  if (role == 'Consultor'){
     areaRole.value = true;
     dashboardRole.value = true;
     margin.value = 40;
   }
-  if (role == 'analista'){
+  if (role == 'Analista'){
     areaRole.value = true;
     vectorRole.value = true;
     margin.value = 40;

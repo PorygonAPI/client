@@ -74,8 +74,9 @@ export default {
         })
       })
         .then((data) => {
-          console.log(data)
           localStorage.setItem('token',data.token)
+          localStorage.setItem('role',data.role)
+          localStorage.setItem('nome',data.nome)
           this.$router.push('/home')
         })
         .catch((error) => {

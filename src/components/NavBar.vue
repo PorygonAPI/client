@@ -1,12 +1,12 @@
 <script setup lang="ts">
 import { RouterLink } from 'vue-router';
-import { ref, onMounted } from 'vue';
+import { ref, onMounted } from 'vue'
 import { useRouter } from 'vue-router';
 import { useRoute } from 'vue-router';
 
 const route = useRoute();
 const router = useRouter();
-const nome = ref('Teste');
+const nome = ref('User');
 const showPopUp = ref(false);
 const showMobileMenu = ref(false);
 
@@ -16,26 +16,25 @@ const areaRole = ref(false);
 const dashboardRole = ref(false);
 
 const verifyRole = (role) =>{
-  if (role == 'admin'){
+  if (role == 'Administrador'){
     userRole.value = true;
     vectorRole.value = true;
     areaRole.value = true;
     dashboardRole.value = true;
   }
-  if (role == 'consultor'){
+  if (role == 'Consultor'){
+    userRole.value = false;
+    vectorRole.value = false;
     areaRole.value = true;
     dashboardRole.value = true;
   }
-  if (role == 'analista'){
+  if (role == 'Analista'){
+    userRole.value = false;
+    dashboardRole.value = false;
     areaRole.value = true;
     vectorRole.value = true;
   }
 }
-
-onMounted(()=>{
-  const role = localStorage.getItem('role');
-  verifyRole(role)
-})
 
 const togglePopup = () => {
   showPopUp.value = !showPopUp.value;
@@ -49,12 +48,45 @@ const logoff = () => {
   showPopUp.value = false;
   showMobileMenu.value = false;
   localStorage.removeItem('token');
+  localStorage.removeItem('role');
+  localStorage.removeItem('nome');
   router.push('/');
 };
+
+onMounted(()=>{
+  const role = localStorage.getItem('role');
+  nome.value = localStorage.getItem('nome') || 'User';
+  if (role) {
+    console.log(role);
+    verifyRole(role);
+  } else {
+    userRole.value = false;
+    vectorRole.value = false;
+    areaRole.value = false;
+    dashboardRole.value = false;
+  }
+});
+
+router.beforeEach((to, from, next) => {
+  if (to.path === '/home') {
+    const role = localStorage.getItem('role');
+    nome.value = localStorage.getItem('nome') || 'User';
+    if (role) {
+      console.log(role);
+      verifyRole(role);
+    } else {
+      userRole.value = false;
+      vectorRole.value = false;
+      areaRole.value = false;
+      dashboardRole.value = false;
+    }
+  }
+  next(); // Permitir a navegação
+});
 </script>
 
 <template>
-  <nav v-if="route.path !== '/'" class="grid grid-cols-6 sticky w-screen h-8 md:h-10 z-50 bg-white drop-shadow-md">
+  <nav v-if="route.path !== '/'" class=" w-full grid grid-cols-6 sticky h-8 md:h-10 z-50 bg-white drop-shadow-md">
     <div class="w-fit h-8 md:h-10 p-0.5 col-span-1">
       <RouterLink to="/home">
         <img src="../assets/logo-preta-completa.svg" alt="logoVisiona.svg" class="h-full w-auto object-contain">
@@ -63,10 +95,10 @@ const logoff = () => {
 
     <div class="h-8 md:h-10 col-span-3 md:col-span-4">
       <ul class="h-full w-full hidden md:flex gap-7 justify-end items-center pr-10">
-        <li v-show="userRole"><RouterLink to="/usuario" class="hover:text-orange-400 transition">Usuários</RouterLink></li>
-        <li v-show="areaRole"><RouterLink to="/areasagro" class="hover:text-orange-400 transition">Áreas Agrícolas</RouterLink></li>
-        <li v-show="vectorRole"><RouterLink to="/vetor" class="hover:text-orange-400 transition">Vetores</RouterLink></li>
-        <li v-show="dashboardRole"><RouterLink to="/dashboard" class="hover:text-orange-400 transition">Dashboard</RouterLink></li>
+        <li v-if="userRole"><RouterLink to="/usuario" class="hover:text-orange-400 transition">Usuários</RouterLink></li>
+        <li v-if="areaRole"><RouterLink to="/areasagro" class="hover:text-orange-400 transition">Áreas Agrícolas</RouterLink></li>
+        <li v-if="vectorRole"><RouterLink to="/vetor" class="hover:text-orange-400 transition">Vetores</RouterLink></li>
+        <li v-if="dashboardRole"><RouterLink to="/dashboard" class="hover:text-orange-400 transition">Dashboard</RouterLink></li>
       </ul>
     </div>
 
