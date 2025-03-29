@@ -9,6 +9,7 @@ import PrimeVue from 'primevue/config';
 import DataTable from 'primevue/datatable';
 import Column from 'primevue/column';
 import Aura from '@primeuix/themes/aura';
+import ToastService from 'primevue/toastservice';
 
 const app = createApp(App)
 app.use(router)
@@ -24,6 +25,8 @@ app.use(PrimeVue, {
       darkModeSelector: ".dark",
     },
   },
-});app.component('DataTable', DataTable);
+});
+app.use(ToastService);
+app.component('DataTable', DataTable);
 app.component('DataTableColumn', Column);
 app.mount('#app')

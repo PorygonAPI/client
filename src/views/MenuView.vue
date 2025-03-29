@@ -37,7 +37,7 @@ export default {
       this.apiResponse = ''
 
       try {
-        const response = await axios.get('/api/cargos', {
+        const response = await axios.get('api/cargos', {
           auth: {
             username: 'admin',
             password: '12345'
