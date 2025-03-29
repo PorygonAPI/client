@@ -20,7 +20,6 @@ const router = createRouter({
       path: '/menu',
       name: 'menu',
       component: MenuView,
-      meta: { requiresAuth: true }
     },
     {
       path: '/error',
@@ -31,6 +30,7 @@ const router = createRouter({
       path:'/home',
       name:'home',
       component: HomeView,
+      meta: { requiresAuth: true }
     },
     {
       path:'/usuario',
