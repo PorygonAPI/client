@@ -133,6 +133,10 @@ export default {
           body: JSON.stringify(this.formData)
         }).then((response) => {
           this.showToast('success', 'Cadastro realizado com sucesso')
+          this.formData.cargoId = '',
+          this.formData.email = '',
+          this.formData.senha = '',
+          this.formData.nome = ''
         }).catch((response) => {
           this.showToast('error','Erro ao cadastrar os dados')
         })
