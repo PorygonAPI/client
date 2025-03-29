@@ -4,6 +4,9 @@ import MenuView from '../views/MenuView.vue'
 import ErrorView from '../views/ErrorView.vue'
 import HomeView from '@/views/HomeView.vue'
 import AdmUsersView from '@/views/AdmUsersView.vue'
+import AreasAgricolasView from '@/views/AreasAgricolasView.vue'
+import VetoresView from '@/views/VetoresView.vue'
+import DashboardView from '@/views/DashboardView.vue'
 import UserRegisterForm from '@/components/UserRegisterForm.vue'
 
 const router = createRouter({
@@ -18,7 +21,6 @@ const router = createRouter({
       path: '/menu',
       name: 'menu',
       component: MenuView,
-      meta: { requiresAuth: true }
     },
     {
       path: '/error',
@@ -29,11 +31,27 @@ const router = createRouter({
       path:'/home',
       name:'home',
       component: HomeView,
+      meta: { requiresAuth: true }
     },
     {
       path:'/usuario',
       name:'usuario',
       component:AdmUsersView,
+    },
+    {
+      path:'/areasagro',
+      name:'areasagro',
+      component:AreasAgricolasView,
+    },
+    {
+      path:'/vetor',
+      name:'vetor',
+      component:VetoresView,
+    },
+    {
+      path:'/dashboard',
+      name:'dashboard',
+      component:DashboardView,
     },
     {
       path: '/cadastroUsuario',
