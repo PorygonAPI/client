@@ -19,7 +19,7 @@
           <input type="email" id="email" v-model="formData.email" required />
         </div>
 
-        <div class="form-group">
+        <div v-if="flagSenha" class="form-group">
           <label for="password">Senha:</label>
           <input type="password" id="password" v-model="formData.senha" required />
         </div>
@@ -35,7 +35,7 @@
         </div>
 
         <div class="button-container">
-          <button type="submit" class="register-button" >Cadastrar</button>
+          <button type="submit" class="register-button"> {{btnLabel}}</button>
         </div>
       </form>
     </div>
@@ -46,6 +46,8 @@
 import axios from 'axios'
 import { useToast } from "primevue/usetoast";
 import Toast from 'primevue/toast';
+import { ref } from 'vue';
+
 
 export default {
   name: 'UserRegisterForm',
@@ -59,7 +61,9 @@ export default {
         email: '',
         senha: '',
         cargoId: ''
-      }
+      },
+      flagSenha: ref(true),
+      btnLabel: 'Cadastrar'
     }
   },
   mounted(){
@@ -86,6 +90,8 @@ export default {
     if (this.$route.query.id > 0)
     {
       fetchData()
+      this.flagSenha = false
+      this.btnLabel = 'Editar'
     }
 
     this.$toast = useToast();
