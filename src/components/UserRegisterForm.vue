@@ -48,6 +48,7 @@ import { useToast } from "primevue/usetoast";
 import Toast from 'primevue/toast';
 import { ref } from 'vue';
 
+const TOKEN =  localStorage.getItem('token')
 
 export default {
   name: 'UserRegisterForm',
@@ -71,14 +72,10 @@ export default {
     const fetchData = async () => {
       try {
         const response = await fetch('api/usuarios/' + this.$route.query.id , {
-          auth: {
-            username: 'admin',
-            password: '12345'
-          },
-          withCredentials: true,
           headers: {
             'Accept': 'application/json',
-            'Content-Type': 'application/json'
+            'Content-Type': 'application/json',
+            'Authorization': 'Bearer '+ TOKEN
           }
         });
         this.formData = await response.json();
@@ -125,14 +122,10 @@ export default {
    {
       try {
         const response = await fetch('/api/usuarios', {
-          auth: {
-            username: 'admin',
-            password: '12345'
-          },
-          withCredentials: true,
           headers: {
             'Accept': 'application/json',
             'Content-Type': 'application/json',
+            'Authorization': 'Bearer '+ TOKEN,
             'Access-Control-Allow-Origin': '*',
             'origin':'*'
           },
@@ -152,14 +145,10 @@ export default {
    {
       try {
         const response = await fetch('/api/usuarios/' + this.$route.query.id, {
-          auth: {
-            username: 'admin',
-            password: '12345'
-          },
-          withCredentials: true,
           headers: {
             'Accept': 'application/json',
             'Content-Type': 'application/json',
+            'Authorization': 'Bearer '+ TOKEN,
             'Access-Control-Allow-Origin': '*',
             'origin':'*'
           },

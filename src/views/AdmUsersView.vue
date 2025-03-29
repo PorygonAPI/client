@@ -54,6 +54,8 @@ import Column from 'primevue/column';
 import Toast from 'primevue/toast';
 import axios from 'axios'
 
+const TOKEN =  localStorage.getItem('token')
+
 export default {
   components: {
     Button,
@@ -69,14 +71,10 @@ export default {
     const fetchData = async () => {
       try {
         const response = await fetch('api/usuarios', {
-          auth: {
-            username: 'admin',
-            password: '12345'
-          },
-          withCredentials: true,
           headers: {
             'Accept': 'application/json',
-            'Content-Type': 'application/json'
+            'Content-Type': 'application/json',
+            'Authorization': 'Bearer '+ TOKEN
           }
         });
         usuarios.value = await response.json();
@@ -104,14 +102,10 @@ export default {
    {
       try {
         const response = await fetch('/api/usuarios/' + id, {
-          auth: {
-            username: 'admin',
-            password: '12345'
-          },
-          withCredentials: true,
           headers: {
             'Accept': 'application/json',
-            'Content-Type': 'application/json'
+            'Content-Type': 'application/json',
+            'Authorization': 'Bearer '+ TOKEN
           },
           method: 'DELETE'
         }).then((response => {
