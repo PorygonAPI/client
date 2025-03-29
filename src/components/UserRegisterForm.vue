@@ -26,8 +26,11 @@
 
         <div class="form-group">
           <label for="role">Cargo:</label>
-          <select id="role" v-model="formData.role">
+          <select id="role" v-model="formData.cargoId" required>
             <option value="" disabled selected>Selecione um cargo</option>
+            <option value="1" > Consultor</option>
+            <option value="2"> Analista</option>
+            <option value="3"> Administrador</option>
           </select>
         </div>
 
@@ -47,7 +50,7 @@ import Toast from 'primevue/toast';
 export default {
   name: 'UserRegisterForm',
   components:{
-    Toast
+    Toast,
   },
   data() {
     return {
@@ -55,11 +58,12 @@ export default {
         nome: '',
         email: '',
         senha: '',
-        cargoId: '1'
+        cargoId: ''
       }
     }
   },
   mounted(){
+  
     const fetchData = async () => {
       try {
         const response = await fetch('api/usuarios/' + this.$route.query.id , {
