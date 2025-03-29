@@ -28,14 +28,14 @@
           <label for="role">Cargo:</label>
           <select id="role" v-model="formData.cargoId" required>
             <option value="" disabled selected>Selecione um cargo</option>
-            <option value="1" > Consultor</option>
+            <option value="1"> Consultor</option>
             <option value="2"> Analista</option>
             <option value="3"> Administrador</option>
           </select>
         </div>
 
         <div class="button-container">
-          <button type="submit" class="register-button"> {{btnLabel}}</button>
+          <button type="submit" class="register-button"> {{ btnLabel }}</button>
         </div>
       </form>
     </div>
@@ -48,11 +48,11 @@ import { useToast } from "primevue/usetoast";
 import Toast from 'primevue/toast';
 import { ref } from 'vue';
 
-const TOKEN =  localStorage.getItem('token')
+const TOKEN = localStorage.getItem('token')
 
 export default {
   name: 'UserRegisterForm',
-  components:{
+  components: {
     Toast,
   },
   data() {
@@ -67,25 +67,24 @@ export default {
       btnLabel: 'Cadastrar'
     }
   },
-  mounted(){
-  
+  mounted() {
+
     const fetchData = async () => {
       try {
-        const response = await fetch('api/usuarios/' + this.$route.query.id , {
+        const response = await fetch('api/usuarios/' + this.$route.query.id, {
           headers: {
             'Accept': 'application/json',
             'Content-Type': 'application/json',
-            'Authorization': 'Bearer '+ TOKEN
+            'Authorization': 'Bearer ' + TOKEN
           }
         });
         this.formData = await response.json();
       } catch (error) {
         error.value = 'Erro ao carregar os dados';
-      } 
+      }
     };
 
-    if (this.$route.query.id > 0)
-    {
+    if (this.$route.query.id > 0) {
       fetchData()
       this.flagSenha = false
       this.btnLabel = 'Editar'
@@ -95,78 +94,84 @@ export default {
 
   },
   methods: {
-    retornar()
-    {
+    retornar() {
       this.$router.push('/usuario')
     },
 
-    showToast(strSeverity,strMensagem) 
-   {
-    this.$toast.add({ severity: strSeverity, summary: 'Informando:', detail: strMensagem, life: 5000 })
-   },
+    showToast(strSeverity, strMensagem) {
+      this.$toast.add({ severity: strSeverity, summary: 'Informando:', detail: strMensagem, life: 5000 })
+    },
 
     handleRegister() {
       console.log('Form data submitted:', this.formData)
 
-      if (this.$route.query.id > 0)
-    {
-      this.alterarUsuario()
-    }
-    else
-    {
-      this.inserirUsuario()
-    }
+      if (this.$route.query.id > 0) {
+        this.alterarUsuario()
+      }
+      else {
+        this.inserirUsuario()
+      }
     },
 
-    async inserirUsuario()
-   {
+    async inserirUsuario() {
       try {
         const response = await fetch('/api/usuarios', {
           headers: {
             'Accept': 'application/json',
             'Content-Type': 'application/json',
-            'Authorization': 'Bearer '+ TOKEN,
+            'Authorization': 'Bearer ' + TOKEN,
             'Access-Control-Allow-Origin': '*',
-            'origin':'*'
+            'origin': '*'
           },
           method: 'POST',
           body: JSON.stringify(this.formData)
         }).then((response) => {
-          this.showToast('success', 'Cadastro realizado com sucesso')
-          this.formData.cargoId = '',
-          this.formData.email = '',
-          this.formData.senha = '',
-          this.formData.nome = ''
+
+          if (response.status == 200) {
+            this.showToast('success', 'Cadastro realizado com sucesso')
+            this.formData.cargoId = '',
+              this.formData.email = '',
+              this.formData.senha = '',
+              this.formData.nome = ''
+          }
+          else {
+            this.showToast('error', 'Erro ao cadastrar os dados')
+          }
         }).catch((response) => {
-          this.showToast('error','Erro ao cadastrar os dados')
+          this.showToast('error', 'Erro ao cadastrar os dados')
         })
-        
+
       } catch (error) {
         error.value = 'Erro ao cadastrar os dados';
-      } 
-   },
-   async alterarUsuario()
-   {
+      }
+    },
+    async alterarUsuario() {
       try {
         const response = await fetch('/api/usuarios/' + this.$route.query.id, {
           headers: {
             'Accept': 'application/json',
             'Content-Type': 'application/json',
-            'Authorization': 'Bearer '+ TOKEN,
+            'Authorization': 'Bearer ' + TOKEN,
             'Access-Control-Allow-Origin': '*',
-            'origin':'*'
+            'origin': '*'
           },
           method: 'PUT',
           body: JSON.stringify(this.formData)
         }).then((response) => {
-          this.showToast('success', 'Atualização realizada com sucesso')
+          if (response.status == 200) {
+            this.showToast('success', 'Atualização realizada com sucesso')
+          }
+          else {
+            this.showToast('error', 'Erro ao atualizar os dados')
+          }
+
         }).catch((response) => {
-          this.showToast('error','Erro ao atualizar os dados')
+          this.showToast('error', 'Erro ao atualizar os dados')
         })
       } catch (error) {
         error.value = 'Erro ao atualizar os dados';
-      } 
-   }
+      }
+    }
   }
 }
 </script>
