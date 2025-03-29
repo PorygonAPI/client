@@ -63,13 +63,19 @@ export default {
         return
       }
 
-      this.$axios
-        .post('/auth/login', {
+      this.$fetch('/auth/login', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json', // Informando que o corpo está em formato JSON
+        },
+        body: JSON.stringify({
           email: this.email,
           senha: this.password,
         })
-        .then((response) => {
-          localStorage.setItem('token', response.data)
+      })
+        .then((data) => {
+          console.log(data)
+          localStorage.setItem('token',data.token)
           this.$router.push('/menu')
         })
         .catch((error) => {
