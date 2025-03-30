@@ -1,4 +1,5 @@
 <script setup>
+import axios from 'axios'
 import { ref } from 'vue'
 
 const formatNumber = (value) => {
@@ -131,23 +132,21 @@ const postForm = async () => {
   }
 
   try {
-    const response = await fetch('http://localhost:8080/areas-agricolas', {
-      method: 'POST',
+    const response = await axios.post('/api/areas-agricolas', {
+      nome_fazenda: form.value.nomeFazenda,
+      cultura: form.value.cultura,
+      produtividade_ano: form.value.produtividade,
+      area: form.value.area,
+      tipo_solo: form.value.tipoSolo,
+      cidade: form.value.cidade,
+      estado: form.value.estado,
+      status: form.value.status,
+    }, {
       headers: {
-        'Content-Type': 'application/json', // Informando que o corpo está em formato JSON
+        'Content-Type': 'application/json',
         allowCredentials: true,
         Authorization: `Bearer ${localStorage.getItem('token')}`,
       },
-      body: JSON.stringify({
-        nome_fazenda: form.value.nomeFazenda,
-        cultura: form.value.cultura,
-        produtividade_ano: form.value.produtividade,
-        area: form.value.area,
-        tipo_solo: form.value.tipoSolo,
-        cidade: form.value.cidade,
-        estado: form.value.estado,
-        status: form.value.status,
-      }),
     })
 
     if (response.ok) {
