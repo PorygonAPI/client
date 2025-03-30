@@ -1,6 +1,8 @@
 <script setup>
 import axios from 'axios'
 import { ref } from 'vue'
+import Toast from 'primevue/toast';
+import { useToast } from "primevue/usetoast";
 
 const formatNumber = (value) => {
   return value ? value.replace(',', '.') : ''
@@ -14,7 +16,6 @@ const form = ref({
   tipoSolo: '',
   cidade: '',
   estado: '',
-  status: '',
   arquivo: null,
 })
 
@@ -48,7 +49,7 @@ const estados = ref([
   { nome: 'Tocantins', sigla: 'TO' },
 ])
 
-const statusOptions = ref(['Aprovado', 'Reprovado', 'Pendente'])
+const vetorRaiz = ref('')
 
 const errors = ref({})
 
@@ -66,7 +67,6 @@ const validateForm = () => {
   if (!form.value.tipoSolo) errors.value.tipoSolo = 'Campo obrigatório.'
   if (!form.value.cidade) errors.value.cidade = 'Campo obrigatório.'
   if (!form.value.estado) errors.value.estado = 'Campo obrigatório.'
-  if (!form.value.status) errors.value.status = 'Campo obrigatório.'
   if (!form.value.arquivo) errors.value.arquivo = 'É necessário fazer upload de um arquivo.'
 
   if (
@@ -83,6 +83,12 @@ const handleFileUpload = (event) => {
   const file = event.target.files[0]
   if (file) {
     form.value.arquivo = file
+
+    const reader = new FileReader();
+
+    reader.onload = e => vetorRaiz.value = e.target.result;
+    reader.readAsText(file);
+
   } else {
     console.warn('Nenhum arquivo selecionado.')
   }
@@ -120,7 +126,6 @@ const resetForm = () => {
     tipoSolo: '',
     cidade: '',
     estado: '',
-    status: '',
     arquivo: null,
   }
   fileInput.value.value = null
@@ -132,6 +137,7 @@ const postForm = async () => {
   }
 
   try {
+
     const response = await axios.post('/api/areas-agricolas', {
       nome_fazenda: form.value.nomeFazenda,
       cultura: form.value.cultura,
@@ -140,7 +146,7 @@ const postForm = async () => {
       tipo_solo: form.value.tipoSolo,
       cidade: form.value.cidade,
       estado: form.value.estado,
-      status: form.value.status,
+      vetor_raiz: vetorRaiz.value
     }, {
       headers: {
         'Content-Type': 'application/json',
@@ -149,16 +155,16 @@ const postForm = async () => {
       },
     })
 
-    if (response.ok) {
-      alert('Cadastro enviado com sucesso!')
+    if (response.status == 201) {
+      showToast('success','Cadastro realizado com sucesso!')
       resetForm()
     } else {
       const data = await response.json()
-      alert(`Erro ao enviar cadastro: ${data.message}`)
+      showToast('error',`Erro ao enviar cadastro: ${data.message}`)
     }
   } catch (error) {
     console.error('Erro ao enviar cadastro:', error)
-    alert('Ocorreu um erro ao enviar o cadastro. Por favor, tente novamente.')
+    showToast('error','Ocorreu um erro ao enviar o cadastro. Por favor, tente novamente.')
   }
 }
 
@@ -181,9 +187,17 @@ const removeFile = () => {
   form.value.arquivo = null
   fileInput.value.value = null
 }
+
+const toast = useToast();
+
+const showToast = (strSeverity,strMensagem) =>
+   {
+    toast.add({ severity: strSeverity, summary: 'Informando:', detail: strMensagem, life: 5000 })
+   }
 </script>
 
 <template>
+  <Toast />
   <div class="bg-white shadow-md rounded-lg p-6 w-full max-w-2xl mx-auto">
     <h2 class="text-2xl font-semibold text-center mb-6">Cadastro de Área Agrícola</h2>
 
@@ -211,16 +225,6 @@ const removeFile = () => {
           <option v-for="estado in estados" :key="estado.sigla" :value="estado.sigla">{{ estado.nome }}</option>
         </select>
         <p v-if="errors.estado" class="text-red-500 text-sm">{{ errors.estado }}</p>
-      </div>
-
-      <div>
-        <label class="block text-gray-700">Status</label>
-        <select v-model="form.status" class="w-full p-2 border border-gray-300 rounded-md"
-                :class="{ 'border-red-500': errors.status }">
-          <option value="" disabled>Selecione o status</option>
-          <option v-for="status in statusOptions" :key="status" :value="status">{{ status }}</option>
-        </select>
-        <p v-if="errors.status" class="text-red-500 text-sm">{{ errors.status }}</p>
       </div>
 
       <div class="flex flex-col items-center border-2 border-dashed border-gray-400 p-4 rounded-md">
