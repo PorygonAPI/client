@@ -1,8 +1,3 @@
-<script setup lang="ts">
-import CadastroFazenda from '@/components/CadastroFazenda.vue';
-
-</script>
-
 <template>
-<CadastroFazenda/>
+  <p>Vetores</p>
 </template>

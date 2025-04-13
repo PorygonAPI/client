@@ -10,8 +10,9 @@
 
       <FloatLabel variant="on" class="mb-3">
         <Select
+          editable
           id="fazenda"
-          class="w-full rounded shadow p-1.5"
+          class="p-dropdown-item w-full rounded shadow p-1.5"
           v-model="fazendaSelecionada"
           :options="fazendas"
           optionLabel="nome"
@@ -20,7 +21,6 @@
         <label for="fazenda">Fazenda</label>
       </FloatLabel>
 
-      <!-- Talhão e Cultura lado a lado -->
       <div class="flex gap-4 mb-3">
         <FloatLabel variant="on" class="w-1/2">
           <InputText type="number" id="talhao" class="w-full p-1.5" v-model="talhao" />
@@ -32,7 +32,6 @@
         </FloatLabel>
       </div>
 
-      <!-- Produtividade por ano e Ano lado a lado -->
       <div class="flex gap-4 mb-3">
         <FloatLabel variant="on" class="w-1/2">
           <InputText type="number" id="produtividade" class="w-full p-1.5" v-model="produtividadePorAno" />
@@ -44,7 +43,6 @@
         </FloatLabel>
       </div>
 
-      <!-- Tipo de Solo e Área lado a lado -->
       <div class="flex gap-4 mb-3">
         <FloatLabel variant="on" class="w-1/2">
           <InputText type="text" id="solo" class="w-full p-1.5" v-model="tipoSolo" />
@@ -98,9 +96,9 @@ const produtividadePorAno = ref('');
 const ano = ref('');
 const tipoSolo = ref('');
 const area = ref('');
+const statusFazenda = ref(true);
 
 const fetchFazendas = async () => {
-  // Simulação - você pode trocar para buscar do seu backend depois
   fazendas.value = [
     { id: 1, nome: 'Fazenda São José' },
     { id: 2, nome: 'Fazenda Primavera' },
@@ -118,11 +116,8 @@ const cadastrarTalhao = () => {
     return;
   }
 
-  // Aqui poderia ser a chamada de API para salvar o talhão
-
   toast.add({ severity: 'success', summary: 'Sucesso', detail: 'Talhão cadastrado!', life: 3000 });
 
-  // Resetando o formulário depois de cadastrar
   fazendaSelecionada.value = '';
   talhao.value = '';
   cultura.value = '';
@@ -132,3 +127,4 @@ const cadastrarTalhao = () => {
   area.value = '';
 };
 </script>
+

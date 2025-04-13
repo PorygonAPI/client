@@ -1,7 +1,3 @@
-<script setup>
-import CadastroTalhao from '@/components/CadastroTalhao.vue';
-</script>
-
 <template>
-<CadastroTalhao/>
+<p>Dashboard</p>
 </template>

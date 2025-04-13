@@ -17,6 +17,7 @@
         <span class="w-1/2">
           <FloatLabel variant="on">
             <Select
+              editable
               id="estado"
               class="w-full rounded shadow p-1.5 z-0"
               v-model="estadoSelecionado"
@@ -31,6 +32,7 @@
         <span class="w-1/2">
           <FloatLabel variant="on">
             <Select
+              editable
               id="cidade"
               class="w-full rounded shadow p-1.5 z-0"
               v-model="cidadeSelecionada"
