@@ -2,7 +2,7 @@
   <div class="bg-white shadow-md rounded-lg p-4 my-4 w-full max-w-lg mx-auto z-0">
     <form>
       <div class="mb-3">
-        <RouterLink to="/home">&larr;</RouterLink>
+        <RouterLink to="/areasagro">&larr;</RouterLink>
         <p class="text-center text-3xl font-semibold text-gray-800">Cadastro de Fazendas</p>
       </div>
 
@@ -48,6 +48,7 @@
 
       <div class="flex mt-4 gap-1.5 w-full">
         <div class="w-1/2 border border-gray-300 rounded-md p-3 flex flex-col items-center justify-center text-center">
+          <p class="text-xs mb-0.5">Upload - Arquivo GeoJSON de Saída</p>
           <input
             ref="geojsonInput"
             type="file"
@@ -57,10 +58,10 @@
           />
           <button
             type="button"
-            class="bg-gray-400 hover:bg-gray-500 text-white font-semibold py-2 px-4 rounded w-full"
+            class="bg-gray-400 hover:bg-gray-500 text-white font-semibold py-2 px-4 rounded w-full cursor-pointer"
             @click="triggerGeoJSONUpload"
           >
-            {{ geojsonFile ? 'Trocar Arquivo' : 'Selecionar GeoJSON' }}
+            {{ geojsonFile ? 'Trocar Arquivo' : 'Selecionar Arquivo' }}
           </button>
           <div v-if="geojsonFile" class="mt-2 relative w-full">
             <p class="text-sm text-gray-700 truncate w-full">{{ geojsonFile.name }}</p>
@@ -75,19 +76,20 @@
         </div>
 
         <div class="w-1/2 border border-gray-300 rounded-md p-3 flex flex-col items-center justify-center text-center">
+          <p class="text-xs mb-0.5">Upload - Mapa de Classif. Automática</p>
           <input
             ref="imageInput"
             type="file"
-            accept="image/*"
+            accept=".geojson"
             class="hidden"
             @change="handleImageUpload"
           />
           <button
             type="button"
-            class="bg-gray-400 hover:bg-gray-500 text-white font-semibold py-2 px-4 rounded w-full"
+            class="bg-gray-400 hover:bg-gray-500 text-white font-semibold py-2 px-4 rounded w-full cursor-pointer"
             @click="triggerImageUpload"
           >
-            {{ imageFile ? 'Trocar Imagem' : 'Selecionar Imagem' }}
+            {{ imageFile ? 'Trocar Arquivo' : 'Selecionar Arquivo' }}
           </button>
           <div v-if="imageFile" class="mt-2 relative w-full">
             <p class="text-sm text-gray-700 truncate w-full">{{ imageFile.name }}</p>

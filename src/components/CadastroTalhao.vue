@@ -2,7 +2,7 @@
   <div class="bg-white shadow-md rounded-lg p-4 my-4 w-full max-w-lg mx-auto z-0">
     <form>
       <div class="mb-3">
-        <RouterLink to="/home">&larr;</RouterLink>
+        <RouterLink to="/areasagro">&larr;</RouterLink>
         <p class="text-center text-3xl font-semibold text-gray-800">Cadastro de Talhão</p>
       </div>
 
