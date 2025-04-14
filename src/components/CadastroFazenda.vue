@@ -3,7 +3,7 @@
     <form>
       <div class="mb-3">
         <RouterLink to="/areasagro">&larr;</RouterLink>
-        <p class="text-center text-3xl font-semibold text-gray-800">Cadastro de Fazendas</p>
+        <p class="text-center text-3xl font-semibold text-gray-800">Cadastro de Fazenda</p>
       </div>
 
       <Divider type="solid" class="mb-5" />
