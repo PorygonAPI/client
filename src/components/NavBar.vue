@@ -121,7 +121,7 @@ router.beforeEach((to, from, next) => {
     </div>
   </nav>
 
-  <div v-if="showMobileMenu" class="absolute top-8 left-0 w-full bg-white shadow-md md:hidden p-4 flex flex-col gap-3 border-t border-gray-200">
+  <div v-if="showMobileMenu" class="z-50 absolute top-8 left-0 w-full bg-white shadow-md md:hidden p-4 flex flex-col gap-3 border-t border-gray-200">
     <RouterLink v-show="userRole" to="/usuario" class="hover:text-orange-400 transition" @click="toggleMobileMenu">Usuários</RouterLink>
     <RouterLink v-show="areaRole" to="/areasagro" class="hover:text-orange-400 transition" @click="toggleMobileMenu">Áreas Agrícolas</RouterLink>
     <RouterLink v-show="vectorRole" to="/vetor" class="hover:text-orange-400 transition" @click="toggleMobileMenu">Vetores</RouterLink>

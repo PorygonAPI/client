@@ -8,6 +8,8 @@ import AreasAgricolasView from '@/views/AreasAgricolasView.vue'
 import VetoresView from '@/views/VetoresView.vue'
 import DashboardView from '@/views/DashboardView.vue'
 import UserRegisterForm from '@/components/UserRegisterForm.vue'
+import CadastroFazenda from '@/components/CadastroFazenda.vue'
+import CadastroTalhao from '@/components/CadastroTalhao.vue'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -57,6 +59,16 @@ const router = createRouter({
       path: '/cadastroUsuario',
       name: 'cadastroUsuario',
       component: UserRegisterForm
+    },
+    {
+      path:'/areasagro/cadastrofazenda',
+      name: 'cadastroFazenda',
+      component: CadastroFazenda
+    },
+    {
+      path:'/areasagro/cadastrotalhao',
+      name:'cadastroTalhao',
+      component: CadastroTalhao
     }
   ]
 })

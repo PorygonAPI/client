@@ -1,6 +1,3 @@
 <template>
-
-  <p>
-    Vetores
-  </p>
+  <p>Vetores</p>
 </template>

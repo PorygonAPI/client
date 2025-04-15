@@ -1,6 +1,3 @@
 <template>
-
-  <p>
-    Dashboard
-  </p>
+<p>Dashboard</p>
 </template>
