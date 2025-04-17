@@ -14,6 +14,8 @@ const userRole = ref(false);
 const vectorRole = ref(false);
 const areaRole = ref(false);
 const dashboardRole = ref(false);
+const talhaoRole = ref(false);
+const editTalhaoRole = ref(false);
 
 const verifyRole = (role) =>{
   if (role == 'Administrador'){
@@ -21,18 +23,24 @@ const verifyRole = (role) =>{
     vectorRole.value = true;
     areaRole.value = true;
     dashboardRole.value = true;
+    talhaoRole.value = true;
+    editTalhaoRole.value = true;
   }
   if (role == 'Consultor'){
     userRole.value = false;
     vectorRole.value = false;
     areaRole.value = true;
     dashboardRole.value = true;
+    talhaoRole.value = false;
+    editTalhaoRole.value = false;
   }
   if (role == 'Analista'){
     userRole.value = false;
     dashboardRole.value = false;
-    areaRole.value = true;
-    vectorRole.value = true;
+    areaRole.value = false;
+    vectorRole.value = false;
+    talhaoRole.value = true;
+    editTalhaoRole.value = true;
   }
 }
 
@@ -95,6 +103,8 @@ router.beforeEach((to, from, next) => {
 
     <div class="h-8 md:h-10 col-span-3 md:col-span-4">
       <ul class="h-full w-full hidden md:flex gap-7 justify-end items-center pr-10">
+        <li v-if="talhaoRole"><RouterLink to="/analista/talhao" class="hover:text-orange-400 transition">Talhões</RouterLink></li>
+        <li v-if="editTalhaoRole"><RouterLink to="/analista/edicao-talhao" class="hover:text-orange-400 transition">Edição de talhões</RouterLink></li>
         <li v-if="userRole"><RouterLink to="/usuario" class="hover:text-orange-400 transition">Usuários</RouterLink></li>
         <li v-if="areaRole"><RouterLink to="/areasagro" class="hover:text-orange-400 transition">Áreas Agrícolas</RouterLink></li>
         <li v-if="vectorRole"><RouterLink to="/vetor" class="hover:text-orange-400 transition">Vetores</RouterLink></li>
@@ -122,6 +132,8 @@ router.beforeEach((to, from, next) => {
   </nav>
 
   <div v-if="showMobileMenu" class="z-50 absolute top-8 left-0 w-full bg-white shadow-md md:hidden p-4 flex flex-col gap-3 border-t border-gray-200">
+    <RouterLink v-show="talhaoRole" to="/analista/talhao" class="hover:text-orange-400 transition" @click="toggleMobileMenu">Talhões</RouterLink>
+    <RouterLink v-show="editTalhaoRole" to="/analista/edicao-talhao" class="hover:text-orange-400 transition" @click="toggleMobileMenu">Editor de Talhões</RouterLink>
     <RouterLink v-show="userRole" to="/usuario" class="hover:text-orange-400 transition" @click="toggleMobileMenu">Usuários</RouterLink>
     <RouterLink v-show="areaRole" to="/areasagro" class="hover:text-orange-400 transition" @click="toggleMobileMenu">Áreas Agrícolas</RouterLink>
     <RouterLink v-show="vectorRole" to="/vetor" class="hover:text-orange-400 transition" @click="toggleMobileMenu">Vetores</RouterLink>
