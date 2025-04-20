@@ -10,6 +10,7 @@ import DashboardView from '@/views/DashboardView.vue'
 import UserRegisterForm from '@/components/UserRegisterForm.vue'
 import CadastroFazenda from '@/components/CadastroFazenda.vue'
 import CadastroTalhao from '@/components/CadastroTalhao.vue'
+import EdicaoTalhoesView from '@/views/EdicaoTalhoesView.vue'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -69,6 +70,16 @@ const router = createRouter({
       path:'/areasagro/cadastrotalhao',
       name:'cadastroTalhao',
       component: CadastroTalhao
+    },
+    {
+      path:'/talhao/edicao',
+      name: 'edicaoTalhoes',
+      component: EdicaoTalhoesView
+    },
+    {
+      path:'/talhao/editar/:id',
+      name: 'editarTalhao',
+      component: () => import('@/views/EditarTalhaoView.vue')
     }
   ]
 })
