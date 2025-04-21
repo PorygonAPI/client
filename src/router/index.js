@@ -73,12 +73,12 @@ const router = createRouter({
       component: CadastroTalhao
     },
     {
-      path:'/analista/talhao',
+      path:'/analista/talhoes',
       name:'analistaTalhao',
       component:TalhaoView
     },
     {
-      path:'/analista/edicao-talhao',
+      path:'/analista/edicao-talhoes',
       name:'analistaEdicaoTalhao',
       component: EditorTalhaoView
     }
