@@ -11,6 +11,8 @@ import UserRegisterForm from '@/components/UserRegisterForm.vue'
 import CadastroFazenda from '@/components/CadastroFazenda.vue'
 import CadastroTalhao from '@/components/CadastroTalhao.vue'
 import EdicaoTalhoesView from '@/views/EdicaoTalhoesView.vue'
+import TalhaoView from '@/views/TalhaoView.vue'
+import EditorTalhaoView from '@/views/EditorTalhaoView.vue'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -80,7 +82,18 @@ const router = createRouter({
       path:'/talhao/editar/:id',
       name: 'editarTalhao',
       component: () => import('@/views/EditarTalhaoView.vue')
+    },
+    {
+      path:'/analista/talhoes',
+      name:'analistaTalhao',
+      component:TalhaoView
+    },
+    {
+      path:'/analista/edicao-talhoes',
+      name:'analistaEdicaoTalhao',
+      component: EditorTalhaoView
     }
+
   ]
 })
 
