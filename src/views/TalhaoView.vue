@@ -1,30 +1,5 @@
 <script setup>
 import TalhaoListComponent from '@/components/TalhaoListComponent.vue';
-import { ref } from 'vue';
-
-const talhoes = ref([
-  {
-    nome: 'Fazenda Boa Esperança',
-    cultura: 'Soja',
-    produtividade: '60 sc/ha',
-    area: '150 ha',
-    solo: 'Ideal',
-    cidade: 'Londrina',
-    estado: 'PR',
-    status: 'Aprovada'
-  },
-  {
-    nome: 'Sítio Santa Clara',
-    cultura: 'Milho',
-    produtividade: '80 sc/ha',
-    area: '90 ha',
-    solo: 'Arenoso',
-    cidade: 'Maringá',
-    estado: 'PR',
-    status: 'Em análise'
-  }
-]);
-
 </script>
 
 <template>
@@ -37,7 +12,7 @@ const talhoes = ref([
 
       <hr class="border-gray-300 mb-4"/>
       <div>
-        <TalhaoListComponent :talhao="talhoes"/>
+        <TalhaoListComponent/>
       </div>
       
     </div>
