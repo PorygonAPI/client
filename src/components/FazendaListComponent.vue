@@ -43,6 +43,7 @@ const confirmarExclusao = () => {
   console.log('Excluir fazenda:', fazendaSelecionada.value);
   visibleExcluir.value = false;
 };
+
 </script>
 
 <template>
@@ -90,7 +91,7 @@ const confirmarExclusao = () => {
         <template #body="{ data }">
           <div class="flex justify-center">
             <Button class=" hover:text-gray-600 cursor-pointer p-1 m-1 px-2 bg-gray-400 text-white border-0 rounded shadow hover:bg-gray-300 transition">
-              Visualizar Imagem
+              Visualizar
             </Button>
           </div>
         </template>
@@ -110,7 +111,7 @@ const confirmarExclusao = () => {
         <template #body="{ data }">
           <div class="flex justify-center">
             <Button class="hover:text-gray-600 cursor-pointer p-1 m-1 px-2 bg-gray-400 text-white border-0 rounded shadow hover:bg-gray-300 transition">
-              Editar
+              <RouterLink to="/areasagro/cadastrofazenda">Editar</RouterLink>
             </Button>
           </div>
         </template>
@@ -131,7 +132,7 @@ const confirmarExclusao = () => {
     </DataTable>
 
     
-    <Dialog v-model:visible="visibleExcluir" modal header="Confirmar Exclusão" class="w-72 lg:w-96 p-1">
+    <Dialog v-model:visible="visibleExcluir" modal header="Confirmar Exclusão" class="w-80 lg:w-96 p-1">
       <hr class="border-gray-200 mb-2">
       <span class="block mb-5 p-0.5">Tem certeza que deseja excluir a fazenda <b>{{ nomeFazendaSelecionada }}</b>?</span>
       <div class="flex justify-end gap-2">

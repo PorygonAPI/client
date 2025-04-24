@@ -1,9 +1,11 @@
 <script setup>
 import TalhaoListComponent from '@/components/TalhaoListComponent.vue';
 import FazendaListComponent from '@/components/FazendaListComponent.vue';
-import { ref } from 'vue';
+import { ref,onMounted } from 'vue';
 
-const activeTab = ref('fazendas');
+const STORAGE_KEY = 'selectedTab';
+const activeTab = ref(localStorage.getItem(STORAGE_KEY) || 'fazendas');
+
 const fazendasMock = ref([
   {
     nome: 'Fazenda Santa Maria',
@@ -24,6 +26,38 @@ const fazendasMock = ref([
     status: 'Em análise',
   }
 ]);
+
+const talhoes = ref([
+  {
+    nome: 'Fazenda Boa Esperança',
+    cultura: 'Soja',
+    produtividade: '60 sc/ha',
+    area: '150 ha',
+    solo: 'Ideal',
+    cidade: 'Londrina',
+    estado: 'PR',
+    status: 'Aprovada'
+  },
+  {
+    nome: 'Sítio Santa Clara',
+    cultura: 'Milho',
+    produtividade: '80 sc/ha',
+    area: '90 ha',
+    solo: 'Arenoso',
+    cidade: 'Maringá',
+    estado: 'PR',
+    status: 'Em análise'
+  }
+]);
+
+const saveTabSelection = () => {
+  localStorage.setItem(STORAGE_KEY, activeTab.value);
+};
+
+onMounted(() => {
+  saveTabSelection();
+});
+
 </script>
 
 <template>
@@ -48,7 +82,7 @@ const fazendasMock = ref([
             ]">
             <button
             class="cursor-pointer"
-            @click="activeTab='fazendas'"
+            @click="activeTab='fazendas',saveTabSelection()"
             >
             Fazendas
             </button>
@@ -62,7 +96,7 @@ const fazendasMock = ref([
             ]">
             <button
             class="cursor-pointer"
-            @click="activeTab='talhoes'"
+            @click="activeTab='talhoes',saveTabSelection()"
             >Talhões</button>
           </span>
         </div>
@@ -71,7 +105,7 @@ const fazendasMock = ref([
       
         <div>
           <FazendaListComponent v-if="activeTab === 'fazendas'" :fazendas="fazendasMock"/>
-          <TalhaoListComponent v-if="activeTab === 'talhoes'" />
+          <TalhaoListComponent v-if="activeTab === 'talhoes'" :talhao="talhoes"/>
         </div>
 
       </div>

@@ -1,7 +1,9 @@
 <script setup>
 import { DataTable,Column, Button, InputText, Tag  } from 'primevue';
 import { FilterMatchMode } from  '@primevue/core/api';
-import { ref, defineProps } from 'vue';
+import { ref, defineProps, computed } from 'vue';
+import { RouterLink } from 'vue-router';
+import Dialog from 'primevue/dialog';
 
 const props = defineProps({
   talhao: {
@@ -13,6 +15,21 @@ const props = defineProps({
 const filtros = ref({
   global: { value: null, matchMode: FilterMatchMode.CONTAINS }
 })
+
+const visibleExcluir = ref(false);
+const fazendaSelecionada = ref(null);
+
+const nomeFazendaSelecionada = computed(() => fazendaSelecionada.value?.nome);
+
+const abrirDialog = (data) => {
+  fazendaSelecionada.value = data
+  visibleExcluir.value = true
+};
+
+const confirmarExclusao = () => {
+  console.log('Excluir fazenda:', fazendaSelecionada.value);
+  visibleExcluir.value = false;
+};
 
 const getStatusSeverity = (status) => {
   switch (status) {
@@ -75,7 +92,7 @@ const getStatusSeverity = (status) => {
       <div class="flex justify-center">
         <Button
         class="cursor-pointer p-1 m-1 px-2 bg-gray-400 text-white border-0 rounded shadow hover:bg-gray-300 transition">
-        Visualizar Imagem
+        Visualizar
       </Button>
       </div>
     </template>
@@ -92,7 +109,40 @@ const getStatusSeverity = (status) => {
     </template>
   </Column>
 
+  <Column field="editar" header="Editar" class="p-1">
+    <template #body="{ data }">
+      <div class="flex justify-center">
+        <Button class="hover:text-gray-600 cursor-pointer p-1 m-1 px-2 bg-gray-400 text-white border-0 rounded shadow hover:bg-gray-300 transition">
+          <RouterLink to="/areasagro/cadastrotalhao">Editar</RouterLink>
+        </Button>
+      </div>
+    </template>
+  </Column>
+
+  <Column field="excluir" header="Excluir" class="p-1">
+    <template #body="{ data }">
+      <div class="flex justify-center">
+        <Button
+          class="cursor-pointer p-1 m-1 px-2 bg-orange-400 text-white border-0 rounded shadow hover:text-orange-500 hover:bg-orange-300 transition"
+          @click="() => { abrirDialog(data) }"
+        >
+          Excluir
+        </Button>
+      </div>
+    </template>
+  </Column>
+
   </DataTable>
+
+  <Dialog v-model:visible="visibleExcluir" modal header="Confirmar Exclusão" class="w-72 lg:w-96 p-1">
+      <hr class="border-gray-200 mb-2">
+      <span class="block mb-5 p-0.5">Tem certeza que deseja excluir este Talhão da <b>{{nomeFazendaSelecionada}}</b>?</span>
+      <div class="flex justify-end gap-2">
+        <Button class="p-1" label="Cancelar" severity="secondary" @click="visibleExcluir = false" />
+        <Button class="p-1" label="Confirmar" severity="danger" @click="confirmarExclusao" />
+      </div>
+  </Dialog>
+
   </div>
 
 </div>
