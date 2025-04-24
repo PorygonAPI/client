@@ -5,9 +5,9 @@
    -->
 
 <template>
-    <h2>Map Viewer Test</h2>
-    <p>{{ talhoesGeoJson }}</p>
-    <div id="map"></div>
+    <!-- <h2>Map Viewer Test</h2>
+    <p>{{ talhoesGeoJson }}</p> -->
+    <div id="map" class="h-full w-[90%] ml-[5%] mr-[5%]"></div>
 </template>
 
 <script>
@@ -114,6 +114,9 @@ export default defineComponent({
             // }
             // ];
 
+            //
+            // var idk = L.layerGroup(L.geoJSON(someFeatures))
+
             // L.geoJSON(someFeatures, {
             //     style: function (feature) {
             //         switch (feature.properties.party) {
@@ -172,6 +175,7 @@ export default defineComponent({
 <style scoped>
 #map {
     width: 80%;
-    height: 60vh;
+    height: 65vh;
+    margin: auto;
 }
 </style>
