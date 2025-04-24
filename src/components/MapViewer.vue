@@ -29,7 +29,12 @@ export default defineComponent({
         let mapLocation = []
 
         onMounted(() => {
-            createMapLayer()
+            try {
+                createMapLayer()
+            } catch (error) {
+               console.log(error) 
+            }
+            
         })
 
         onBeforeMount(() => {
@@ -89,14 +94,22 @@ export default defineComponent({
             //     "type": "Feature",
             //     "properties": { "party": "Democrat" },
             //     "geometry": {
-            //         "type": "Polygon",
-            //         "coordinates": [[
+            //         "type": "MultiPolygon",
+            //         "coordinates": [[ [
             //             [-109.05, 41.00],
             //             [-102.06, 40.99],
             //             [-102.03, 36.99],
             //             [-109.04, 36.99],
             //             [-109.05, 41.00]
-            //         ]]
+            //         ], [
+            //         [-46.3446028104612,-23.64587273889485],
+            //         [-46.3446028104612,-20.64587519603432],
+            //         [-46.344605505407046,-20.64587519603432],
+            //         [-49.344605505407046,-20.645880585926026],
+            //         [-49.34461089529875,-20.645880585926026],
+            //         [-49.34461089529875,-20.645873311398894],
+            //         [-49.3446028104612,-20.64587273889485]
+            //         ] ]]
             //     }
             // }
             // ];
@@ -112,9 +125,9 @@ export default defineComponent({
 
             // console.log(JSON.stringify(someFeatures))
 
+            //**PEGANDO DO COMPONENTE PAI */
             L.geoJSON(talhoesParsed, {
                 style: function (feature) {
-                    console.log(JSON.stringify(feature))
                     switch (feature.geometry.crs.properties.CLASSE) {
                         //DANINHAS -> Vermelho, Resto -> Azul
                         case 'DANINHAS': return { color: "#ff0000" };
