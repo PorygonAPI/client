@@ -91,7 +91,7 @@ const getStatusSeverity = (status) => {
     <template #body="{data}">
       <div class="flex justify-center">
         <Button
-        class="cursor-pointer p-1 m-1 px-2 bg-gray-400 text-white border-0 rounded shadow hover:bg-gray-300 transition">
+        class="hover:text-gray-600 cursor-pointer p-1 m-1 px-2 bg-gray-400 text-white border-0 rounded shadow hover:bg-gray-300 transition">
         Visualizar
       </Button>
       </div>
@@ -102,7 +102,7 @@ const getStatusSeverity = (status) => {
     <template #body="{data}" >
       <div class="flex justify-center">
         <Button
-        class="cursor-pointer p-1 m-1 px-2 bg-gray-400 text-white border-0 rounded shadow hover:bg-gray-300 transition">
+        class="hover:text-gray-600 cursor-pointer p-1 m-1 px-2 bg-gray-400 text-white border-0 rounded shadow hover:bg-gray-300 transition">
         +
         </Button>
       </div>
