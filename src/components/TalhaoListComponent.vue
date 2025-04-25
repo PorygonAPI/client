@@ -1,6 +1,6 @@
 <script setup>
-import { DataTable,Column, Button, InputText, Tag  } from 'primevue';
-import { FilterMatchMode } from  '@primevue/core/api';
+import { DataTable, Column, Button, InputText, Tag } from 'primevue';
+import { FilterMatchMode } from '@primevue/core/api';
 import { ref, defineProps, computed } from 'vue';
 import { RouterLink } from 'vue-router';
 import Dialog from 'primevue/dialog';
@@ -17,33 +17,53 @@ const filtros = ref({
 })
 
 const visibleExcluir = ref(false);
-const fazendaSelecionada = ref(null);
+const talhaoSelecionado = ref(null);
+const confirmarAtribuirDialog = ref(false);
 
-const nomeFazendaSelecionada = computed(() => fazendaSelecionada.value?.nome);
+const nomeFazendaSelecionada = computed(() => talhaoSelecionado.value?.nomeFazenda);
 
 const abrirDialog = (data) => {
-  fazendaSelecionada.value = data
+  talhaoSelecionado.value = data
   visibleExcluir.value = true
 };
 
+const abrirDialogAtribuir = (data) => {
+  talhaoSelecionado.value = data
+  confirmarAtribuirDialog.value = true
+};
+
 const confirmarExclusao = () => {
-  console.log('Excluir fazenda:', fazendaSelecionada.value);
+  console.log('Excluir talhão:', talhaoSelecionado.value);
   visibleExcluir.value = false;
+};
+
+const confirmarAtribuicao = () => {
+  console.log('Atribuir talhão:', talhaoSelecionado.value);
+  confirmarAtribuirDialog.value = false;
 };
 
 const getStatusSeverity = (status) => {
   switch (status) {
-    case 'Aprovada':
+    case 'APROVADO':
       return 'success'
-    case 'Pendente':
-      return 'danger'
-    case 'Em análise':
+    case 'PENDENTE':
       return 'warn'
-    default:
+    case 'EM_ANALISE':
       return 'info'
+    default:
+      return 'secondary'
   }
 }
 
+const formatStatus = (status) => {
+  if (!status) return '';
+  return status.replace('_', ' ').toLowerCase().replace(/\b\w/g, l => l.toUpperCase());
+}
+
+const formatNumber = (value) => {
+  if (value === null || value === undefined) return 'N/A';
+  return value;
+};
 </script>
 
 <template>
@@ -56,7 +76,6 @@ const getStatusSeverity = (status) => {
     type="text"
     v-model="filtros['global'].value"
     />
-
   </div>
 
   <div>
@@ -68,21 +87,26 @@ const getStatusSeverity = (status) => {
   :rows="10"
   stripedRows
   class="p-datatable-gridlines"
-  :global-filter-fields="['nome','cultura','produtividade','area','cidade','estado','status','solo']"
+  :global-filter-fields="['id', 'nomeFazenda', 'cultura', 'produtividade', 'area', 'tipoSolo', 'cidade', 'estado', 'status']"
   >
 
-  <Column field="nome" header="Nome" sortable class="p-1 min-w-40 max-w-40"/>
+  <Column field="id" header="ID Talhão" sortable class="p-1 w-24"/>
+  <Column field="nomeFazenda" header="Nome Fazenda" sortable class="p-1 min-w-40"/>
   <Column field="cultura" header="Cultura" sortable class="p-1"/>
-  <Column field="produtividade" header="Produtividade" sortable class="p-1"/>
+  <Column field="produtividade" header="Produtividade" sortable class="p-1">
+    <template #body="{ data }">
+      {{ formatNumber(data.produtividade) }}
+    </template>
+  </Column>
   <Column field="area" header="Área" sortable class="p-1"/>
-  <Column field="solo" header="Solo" sortable class="p-1"/>
+  <Column field="tipoSolo" header="Tipo de Solo" sortable class="p-1"/>
   <Column field="cidade" header="Cidade" sortable class="p-1"/>
   <Column field="estado" header="Estado" sortable class="p-1"/>
 
   <Column field="status" header="Status" sortable class="p-1">
     <template #body="{ data }">
       <div class="flex justify-center">
-        <Tag :value="data.status" :severity="getStatusSeverity(data.status)" class="p-1" />
+        <Tag :value="formatStatus(data.status)" :severity="getStatusSeverity(data.status)" class="p-1" />
       </div>
     </template>
   </Column>
@@ -102,8 +126,9 @@ const getStatusSeverity = (status) => {
     <template #body="{data}" >
       <div class="flex justify-center">
         <Button
+        @click="() => abrirDialogAtribuir(data)"
         class="hover:text-gray-600 cursor-pointer p-1 m-1 px-2 bg-gray-400 text-white border-0 rounded shadow hover:bg-gray-300 transition">
-        +
+        Atribuir
         </Button>
       </div>
     </template>
@@ -113,25 +138,11 @@ const getStatusSeverity = (status) => {
     <template #body="{ data }">
       <div class="flex justify-center">
         <Button class="hover:text-gray-600 cursor-pointer p-1 m-1 px-2 bg-gray-400 text-white border-0 rounded shadow hover:bg-gray-300 transition">
-          <RouterLink to="/areasagro/cadastrotalhao">Editar</RouterLink>
+          <RouterLink :to="`/talhao/editar/${data.id}`">Editar</RouterLink>
         </Button>
       </div>
     </template>
   </Column>
-
-  <Column field="excluir" header="Excluir" class="p-1">
-    <template #body="{ data }">
-      <div class="flex justify-center">
-        <Button
-          class="cursor-pointer p-1 m-1 px-2 bg-orange-400 text-white border-0 rounded shadow hover:text-orange-500 hover:bg-orange-300 transition"
-          @click="() => { abrirDialog(data) }"
-        >
-          Excluir
-        </Button>
-      </div>
-    </template>
-  </Column>
-
   </DataTable>
 
   <Dialog v-model:visible="visibleExcluir" modal header="Confirmar Exclusão" class="w-72 lg:w-96 p-1">
@@ -140,6 +151,15 @@ const getStatusSeverity = (status) => {
       <div class="flex justify-end gap-2">
         <Button class="p-1" label="Cancelar" severity="secondary" @click="visibleExcluir = false" />
         <Button class="p-1" label="Confirmar" severity="danger" @click="confirmarExclusao" />
+      </div>
+  </Dialog>
+
+  <Dialog v-model:visible="confirmarAtribuirDialog" modal header="Atribuir Talhão" class="w-72 lg:w-96 p-1">
+      <hr class="border-gray-200 mb-2">
+      <span class="block mb-5 p-0.5">Deseja atribuir este talhão a você como analista?</span>
+      <div class="flex justify-end gap-2">
+        <Button class="p-1" label="Cancelar" severity="secondary" @click="confirmarAtribuirDialog = false" />
+        <Button class="p-1" label="Confirmar" severity="success" @click="confirmarAtribuicao" />
       </div>
   </Dialog>
 
