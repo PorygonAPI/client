@@ -6,7 +6,8 @@ const userRole = ref(false);
 const vectorRole = ref(false);
 const areaRole = ref(false);
 const dashboardRole = ref(false);
-const margin = ref(0);
+const talhaoRole = ref(false);
+const editTalhaoRole = ref(false);
 
 const verifyRole = (role) =>{
   if (role == 'Administrador'){
@@ -14,16 +15,16 @@ const verifyRole = (role) =>{
     vectorRole.value = true;
     areaRole.value = true;
     dashboardRole.value = true;
+    talhaoRole.value = true;
+    editTalhaoRole.value = true;
   }
   if (role == 'Consultor'){
     areaRole.value = true;
     dashboardRole.value = true;
-    margin.value = 40;
   }
   if (role == 'Analista'){
-    areaRole.value = true;
-    vectorRole.value = true;
-    margin.value = 40;
+    talhaoRole.value = true;
+    editTalhaoRole.value = true;
   }
 }
 
@@ -48,7 +49,21 @@ onMounted(()=>{
 
 <template>
   <div class="mx-[10%] my-[45%] lg:my-[5%]">
-    <ul :class="`w-full h-full flex flex-wrap mt-${margin}`">
+    <ul class="w-full h-full flex flex-wrap">
+
+      <li v-show="talhaoRole" class="my-1 w-1/2 p-1 flex flex-col items-center text-center ">
+        <RouterLink to="/analista/talhoes" class="flex flex-col items-center text-center gap-5 font-sans hover:font-semibold hover:text-orange-400 option">
+          <img src="../assets/imagens/mapping.png" alt="talhao.png" class="lg:w-30 w-20">
+          <p class="lg:text-lg text-xs ">Talhões</p>
+        </RouterLink>
+      </li>
+
+      <li v-show="editTalhaoRole" class="my-1 w-1/2 p-1 flex flex-col items-center text-center ">
+        <RouterLink to="/analista/edicao-talhoes" class="flex flex-col items-center text-center gap-5 font-sans hover:font-semibold hover:text-orange-400 option">
+          <img src="../assets/imagens/field.png" alt="editTalhao.png" class="lg:w-30 w-20">
+          <p class="lg:text-lg text-xs ">Edição de Talhões</p>
+        </RouterLink>
+      </li>
 
       <li v-show="userRole" class="my-1 w-1/2 p-1 flex flex-col items-center text-center ">
         <RouterLink to="/usuario" class="flex flex-col items-center text-center gap-5 font-sans hover:font-semibold hover:text-orange-400 option">
