@@ -7,7 +7,7 @@
         <p class="text-4xl font-semibold text-gray-800">Visualizador de Talhão</p>
       </div>
       <hr class="border-gray-300 mb-4">
-      <MapViewer :talhoesGeoJson="finalGeoJson" :key="finalGeoJson"/>
+      <MapViewer :arquivoFazenda="arquivoFazenda" :arquivoDaninha="arquivoDaninha" :arquivoFinalDaninha="arquivoFinalDaninha" :key="arquivoFazenda"/>
     </div>
   </div>
 </template>
@@ -25,7 +25,9 @@ const TOKEN = localStorage.getItem('token')
 
 // const fullGeoJson = talhoesGeoJson + daninhasGeoJson;
 
-const finalGeoJson = ref()
+const arquivoFazenda = ref()
+const arquivoDaninha = ref()
+const arquivoFinalDaninha = ref()
 const areaAgricola = ref();
 
 const fetchData = async () => {
@@ -51,26 +53,34 @@ onMounted(() => {
 
 const montaGeoJson = () => {
 
-  var fazendaGeoJson = areaAgricola.value.fazenda.arquivoFazenda
+  arquivoFazenda.value = areaAgricola.value.fazenda.arquivoFazenda
 
-  finalGeoJson.value = '[' + fazendaGeoJson
+var DaninhaGeoJson = '['
+var FinalDaninhaGeoJson = '['
 
-  let talhoes = areaAgricola.value.talhao
+let talhoes = areaAgricola.value.talhao
 
-  for (let index = 0; index < talhoes.length; index++) {
-    // console.log(index + ':')
-    // console.log(talhoes[index].area)
-    // console.log(talhoes[index].id)
-    // console.log(talhoes[index].safras.length)
+for (let index = 0; index < talhoes.length; index++) {
+  // console.log(index + ':')
+  // console.log(talhoes[index].area)
+  // console.log(talhoes[index].id)
+  // console.log(talhoes[index].safras.length)
 
-    let safras = talhoes[index].safras
+  let safras = talhoes[index].safras
+  var virgula = (index> 0) ? ' , ' : ''
 
-    for (let j = 0; j < safras.length; j++) {
-      finalGeoJson.value += ' , ' + safras[j].arquivoDaninha + ' , ' + safras[j].arquivoFinalDaninha
-    }
+  for (let j = 0; j < safras.length; j++) {
+    
+    DaninhaGeoJson += virgula + safras[j].arquivoDaninha
+    FinalDaninhaGeoJson += virgula + safras[j].arquivoFinalDaninha
   }
+}
 
-  finalGeoJson.value += ']'
+DaninhaGeoJson += ']'
+FinalDaninhaGeoJson += ']'
+
+arquivoDaninha.value = DaninhaGeoJson
+arquivoFinalDaninha.value = FinalDaninhaGeoJson
 }
 
 </script>

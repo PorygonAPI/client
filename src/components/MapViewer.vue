@@ -17,7 +17,17 @@ import L from 'leaflet'
 
 export default defineComponent({
     props: {
-        talhoesGeoJson: {
+        arquivoFazenda: {
+            type: Array,
+            required: false,
+            default: () => []
+        },
+        arquivoDaninha: {
+            type: Array,
+            required: false,
+            default: () => []
+        },
+        arquivoFinalDaninha: {
             type: Array,
             required: false,
             default: () => []
@@ -25,16 +35,17 @@ export default defineComponent({
     },
     setup(props) {
         let map = null
-        let talhoesParsed = null
+        let arquivoFazendaParsed = null
+        let arquivoDaninhaParsed = null
+        let arquivoFinalDaninhaParsed = null
         let mapLocation = []
 
         onMounted(() => {
             try {
                 createMapLayer()
             } catch (error) {
-               console.log(error) 
+                console.log(error)
             }
-            
         })
 
         onBeforeMount(() => {
@@ -43,10 +54,11 @@ export default defineComponent({
             }
         })
 
-
         const createMapLayer = () => {
 
-            talhoesParsed = JSON.parse(props.talhoesGeoJson)
+            arquivoFazendaParsed = JSON.parse(props.arquivoFazenda)
+            arquivoDaninhaParsed = JSON.parse(props.arquivoDaninha)
+            arquivoFinalDaninhaParsed = JSON.parse(props.arquivoFinalDaninha)
 
             //Define a variável de posição do mapa que usada na linha abaixo (50)
             setLocalizacaoMapa()
@@ -114,9 +126,6 @@ export default defineComponent({
             // }
             // ];
 
-            //
-            // var idk = L.layerGroup(L.geoJSON(someFeatures))
-
             // L.geoJSON(someFeatures, {
             //     style: function (feature) {
             //         switch (feature.properties.party) {
@@ -128,44 +137,76 @@ export default defineComponent({
 
             // console.log(JSON.stringify(someFeatures))
 
+            //**TESTE DE LAYERS */
+            // var littleton = L.marker([39.61, -105.02]).bindPopup('This is Littleton, CO.'),
+            //     denver = L.marker([39.74, -104.99]).bindPopup('This is Denver, CO.'),
+            //     aurora = L.marker([39.73, -104.8]).bindPopup('This is Aurora, CO.'),
+            //     golden = L.marker([39.77, -105.23]).bindPopup('This is Golden, CO.');
+
+            // var cities = L.layerGroup([aurora, golden]).addTo(map);
+
+            // var IDK = L.layerGroup([littleton, denver]).addTo(map);
+
+            // var overlayMaps = {
+            //     "Cities": cities,
+            //     "IDK": IDK
+            // };
+
+            // var layerControl = L.control.layers( null,overlayMaps).addTo(map);
+
             //**PEGANDO DO COMPONENTE PAI */
-            L.geoJSON(talhoesParsed, {
-                style: function (feature) {
-                    switch (feature.geometry.crs.properties.CLASSE) {
-                        //DANINHAS -> Vermelho, Resto -> Azul
-                        case 'DANINHAS': return { color: "#ff0000" };
-                        default: return { color: "#0000ff" };
-                    }
-                }
-            }).addTo(map);
+            var arquivoFazendaLayer = L.geoJSON(arquivoFazendaParsed, {
+                //Azul
+                style: { color: "#0000ff" }
+            }
+            )
+
+            var arquivoDaninhaLayer = L.geoJSON(arquivoDaninhaParsed, {
+                //Vermelhor
+                style: { color: "#ff0000" }
+            }
+            )
+
+            var arquivoFinalDaninhaLayer = L.geoJSON(arquivoFinalDaninhaParsed, {
+                //Laranja
+                style: { color: "#ffa500 " }
+            }
+            )
+
+            var arquivoFazendaGroup = L.layerGroup([arquivoFazendaLayer]).addTo(map);
+            var arquivoDaninhaGroup = L.layerGroup([arquivoDaninhaLayer]).addTo(map);
+            var arquivoFinalDaninhaGroup = L.layerGroup([arquivoFinalDaninhaLayer]).addTo(map);
+
+            var overlayMaps = {
+                "Fazenda": arquivoFazendaGroup,
+                "Daninhas": arquivoDaninhaGroup,
+                "Daninhas Editado": arquivoFinalDaninhaGroup
+            };
+
+            var layerControl = L.control.layers(null, overlayMaps).addTo(map);
         }
 
         const setLocalizacaoMapa = () => {
 
-            if (talhoesParsed.length > 0) {
+            if (arquivoFazendaParsed.coordinates.length > 0) {
 
-                if (talhoesParsed[0].coordinates.length > 0) {
+                if (arquivoFazendaParsed.coordinates[0].length > 0) {
 
-                    if (talhoesParsed[0].coordinates[0].length > 0) {
+                    //arquivoFazendaParsed.coordinates[0] retona um vetor com todas as coordenadas (ie [[20,21], [22,23]])
+                    //Logo, arquivoFazendaParsed.coordinates[0][0] retorna a primeira coordenada (ie [20,21])
+                    //Portanto arquivoFazendaParsed.coordinates[0][0][0] retorna o primeiro valor da coordenada (ie 20)
+                    //Já arquivoFazendaParsed.coordinates[0][0][0] retorna o segundo (ie 21)
 
-                        //talhoesParsed[0].coordinates[0] retona um vetor com todas as coordenadas (ie [[20,21], [22,23]])
-                        //Logo, talhoesParsed[0].coordinates[0][0] retorna a primeira coordenada (ie [20,21])
-                        //Portanto talhoesParsed[0].coordinates[0][0][0] retorna o primeiro valor da coordenada (ie 20)
-                        //Já talhoesParsed[0].coordinates[0][0][0] retorna o segundo (ie 21)
-
-                        //Por algum motivo o setView recebe os parametros invertidos, se um geoJson possui uma coordenada [20,21] por exemplo,
-                        //a localização na setView da linha 50 deve ser inserida como [21,20] para que o mapa fica centralizado no mesmo ponto que o geoJSON
-                        //Se não inverter a posição, o mapa fica centralizado em uma área nada a ver bem distante do ponto
-                        let first = talhoesParsed[0].coordinates[0][0][1]
-                        let last = talhoesParsed[0].coordinates[0][0][0]
-                        mapLocation.push(first)
-                        mapLocation.push(last)
-                    }
-
+                    //Por algum motivo o setView recebe os parametros invertidos, se um geoJson possui uma coordenada [20,21] por exemplo,
+                    //a localização na setView da linha 50 deve ser inserida como [21,20] para que o mapa fica centralizado no mesmo ponto que o geoJSON
+                    //Se não inverter a posição, o mapa fica centralizado em uma área nada a ver bem distante do ponto
+                    let first = arquivoFazendaParsed.coordinates[0][0][1]
+                    let last = arquivoFazendaParsed.coordinates[0][0][0]
+                    mapLocation.push(first)
+                    mapLocation.push(last)
                 }
 
             }
-
         }
     }
 })
