@@ -24,8 +24,8 @@ const fetchTalhoesPendentes = async () => {
     }
 
     const data = await response.json();
-    console.log('Talhões pendentes data:', data); 
-    
+    console.log('Talhões pendentes data:', data);
+
     talhoesPendentes.value = data.map(talhao => ({
       id: talhao.id || '',
       nomeFazenda: talhao.nomeFazenda || '',
@@ -35,21 +35,41 @@ const fetchTalhoesPendentes = async () => {
       tipoSolo: talhao.tipoSolo || '',
       cidade: talhao.cidade || '',
       estado: talhao.estado || '',
-      status: 'PENDENTE' 
+      status: 'PENDENTE'
     }));
-    
+
   } catch (err) {
     error.value = err.message;
-    toast.add({ 
-      severity: 'error', 
-      summary: 'Erro', 
-      detail: 'Falha ao carregar talhões pendentes', 
-      life: 5000 
+    toast.add({
+      severity: 'error',
+      summary: 'Erro',
+      detail: 'Falha ao carregar talhões pendentes',
+      life: 5000
     });
     console.error('Erro ao buscar talhões pendentes:', err);
   } finally {
     loading.value = false;
   }
+};
+
+const handleTalhaoAtribuido = (data) => {
+  talhoesPendentes.value = talhoesPendentes.value.filter(talhao => talhao.id !== data.talhaoId);
+
+  toast.add({
+    severity: 'success',
+    summary: 'Sucesso',
+    detail: 'Talhão atribuído com sucesso!',
+    life: 3000
+  });
+};
+
+const handleError = (errorMessage) => {
+  toast.add({
+    severity: 'error',
+    summary: 'Erro',
+    detail: errorMessage,
+    life: 5000
+  });
 };
 
 onMounted(() => {
@@ -70,17 +90,22 @@ onMounted(() => {
         <div v-if="loading" class="flex justify-center items-center p-8">
           <div class="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-orange-500"></div>
         </div>
-        
+
         <div v-else-if="error" class="p-4 bg-red-50 text-red-600 rounded-lg text-center">
           {{ error }}
           <button @click="fetchTalhoesPendentes" class="ml-4 px-4 py-2 bg-orange-400 text-white rounded hover:bg-orange-500">
             Tentar novamente
           </button>
         </div>
-        
-        <TalhaoListComponent v-else :talhao="talhoesPendentes"/>
+
+        <TalhaoListComponent
+          v-else
+          :talhao="talhoesPendentes"
+          @talhao-atribuido="handleTalhaoAtribuido"
+          @error="handleError"
+        />
       </div>
-      
+
     </div>
   </div>
 </template>

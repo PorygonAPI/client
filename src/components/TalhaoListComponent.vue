@@ -1,10 +1,11 @@
 <script setup>
 import { DataTable, Column, Button, InputText, Tag } from 'primevue';
 import { FilterMatchMode } from '@primevue/core/api';
-import { ref, defineProps, computed } from 'vue';
+import { ref, defineProps, computed, defineEmits, onMounted } from 'vue';
 import { RouterLink } from 'vue-router';
 import Dialog from 'primevue/dialog';
 import Dropdown from 'primevue/dropdown';
+import UsuarioService from '@/services/UsuarioService';
 
 const props = defineProps({
   talhao: {
@@ -12,6 +13,9 @@ const props = defineProps({
     required: true
   }
 });
+
+// Add emits to notify parent component
+const emits = defineEmits(['talhao-atribuido', 'error']);
 
 const filtros = ref({
   global: { value: null, matchMode: FilterMatchMode.CONTAINS }
@@ -23,13 +27,26 @@ const visibleExcluir = ref(false);
 const talhaoSelecionado = ref(null);
 const confirmarAtribuirDialog = ref(false);
 const analistaSelecionado = ref(null);
+const loading = ref(false);
 
-const analistas = ref([
-  { nome: 'Ruth Mira', id: 1 },
-  { nome: 'João Bispo', id: 2 },
-  { nome: 'João Arruda', id: 3 },
-  { nome: 'Pablo Gregório', id: 4 }
-]);
+const analistas = ref([]);
+const loadingAnalistas = ref(false);
+
+const fetchAnalistas = async () => {
+  loadingAnalistas.value = true;
+  try {
+    analistas.value = await UsuarioService.getAnalistas();
+  } catch (error) {
+    console.error('Failed to load analysts:', error);
+    emits('error', 'Falha ao carregar a lista de analistas');
+  } finally {
+    loadingAnalistas.value = false;
+  }
+};
+
+onMounted(() => {
+  fetchAnalistas();
+});
 
 const nomeFazendaSelecionada = computed(() => talhaoSelecionado.value?.nomeFazenda);
 
@@ -45,9 +62,37 @@ const confirmarExclusao = () => {
   visibleExcluir.value = false;
 };
 
-const confirmarAtribuicao = () => {
-  console.log('Atribuir talhão:', talhaoSelecionado.value, 'para analista:', analistaSelecionado.value);
-  confirmarAtribuirDialog.value = false;
+const confirmarAtribuicao = async () => {
+  if (!analistaSelecionado.value) return;
+
+  loading.value = true;
+  try {
+    const response = await fetch(`/api/safras/${talhaoSelecionado.value.id}/associar-analista/${analistaSelecionado.value.id}`, {
+      method: 'PUT',
+      headers: {
+        'Accept': 'application/json',
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer ' + localStorage.getItem('token')
+      }
+    });
+
+    if (!response.ok) {
+      throw new Error(`Erro ao atribuir analista: ${response.status}`);
+    }
+
+    emits('talhao-atribuido', {
+      talhaoId: talhaoSelecionado.value.id,
+      analistaId: analistaSelecionado.value.id
+    });
+
+    confirmarAtribuirDialog.value = false;
+    console.log('Talhão atribuído com sucesso:', talhaoSelecionado.value, 'para analista:', analistaSelecionado.value);
+  } catch (error) {
+    console.error('Erro ao atribuir analista:', error);
+    emits('error', `Falha ao atribuir analista: ${error.message}`);
+  } finally {
+    loading.value = false;
+  }
 };
 
 const getStatusSeverity = (status) => {
@@ -210,6 +255,7 @@ const handleIdInput = (event) => {
                 :options="analistas"
                 optionLabel="nome"
                 placeholder="Selecione um analista"
+                :loading="loadingAnalistas"
                 class="w-full"
               />
             </div>
@@ -217,8 +263,14 @@ const handleIdInput = (event) => {
 
           <div class="flex justify-end gap-2">
             <Button class="p-1" label="Cancelar" severity="secondary" @click="confirmarAtribuirDialog = false" />
-            <Button class="p-1" label="Confirmar" severity="success" @click="confirmarAtribuicao"
-                    :disabled="!analistaSelecionado" />
+            <Button
+              class="p-1"
+              label="Confirmar"
+              :loading="loading"
+              severity="success"
+              @click="confirmarAtribuicao"
+              :disabled="!analistaSelecionado"
+            />
           </div>
       </Dialog>
 
