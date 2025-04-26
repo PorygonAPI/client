@@ -14,7 +14,6 @@ const props = defineProps({
   }
 });
 
-// Add emits to notify parent component
 const emits = defineEmits(['talhao-atribuido', 'error']);
 
 const filtros = ref({
@@ -52,7 +51,6 @@ const nomeFazendaSelecionada = computed(() => talhaoSelecionado.value?.nomeFazen
 
 const abrirDialogAtribuir = (data) => {
   talhaoSelecionado.value = data;
-  // Definir analista padrão se necessário
   analistaSelecionado.value = null;
   confirmarAtribuirDialog.value = true;
 };
