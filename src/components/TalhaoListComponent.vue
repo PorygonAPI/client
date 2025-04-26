@@ -4,6 +4,7 @@ import { FilterMatchMode } from '@primevue/core/api';
 import { ref, defineProps, computed } from 'vue';
 import { RouterLink } from 'vue-router';
 import Dialog from 'primevue/dialog';
+import Dropdown from 'primevue/dropdown';
 
 const props = defineProps({
   talhao: {
@@ -21,17 +22,22 @@ const searchById = ref('');
 const visibleExcluir = ref(false);
 const talhaoSelecionado = ref(null);
 const confirmarAtribuirDialog = ref(false);
+const analistaSelecionado = ref(null);
+
+const analistas = ref([
+  { nome: 'Ruth Mira', id: 1 },
+  { nome: 'João Bispo', id: 2 },
+  { nome: 'João Arruda', id: 3 },
+  { nome: 'Pablo Gregório', id: 4 }
+]);
 
 const nomeFazendaSelecionada = computed(() => talhaoSelecionado.value?.nomeFazenda);
 
-const abrirDialog = (data) => {
-  talhaoSelecionado.value = data
-  visibleExcluir.value = true
-};
-
 const abrirDialogAtribuir = (data) => {
-  talhaoSelecionado.value = data
-  confirmarAtribuirDialog.value = true
+  talhaoSelecionado.value = data;
+  // Definir analista padrão se necessário
+  analistaSelecionado.value = null;
+  confirmarAtribuirDialog.value = true;
 };
 
 const confirmarExclusao = () => {
@@ -40,7 +46,7 @@ const confirmarExclusao = () => {
 };
 
 const confirmarAtribuicao = () => {
-  console.log('Atribuir talhão:', talhaoSelecionado.value);
+  console.log('Atribuir talhão:', talhaoSelecionado.value, 'para analista:', analistaSelecionado.value);
   confirmarAtribuirDialog.value = false;
 };
 
@@ -69,7 +75,7 @@ const formatNumber = (value) => {
 
 const filteredTalhoes = computed(() => {
   if (searchById.value && searchById.value.trim() !== '') {
-    return props.talhao.filter(talhao => 
+    return props.talhao.filter(talhao =>
       talhao.id.toString() === searchById.value.trim()
     );
   }
@@ -89,7 +95,7 @@ const handleIdInput = (event) => {
     <div class="flex justify-between items-center mb-3">
       <div class="relative flex items-center">
         <div class="relative">
-          <i v-if="!isSearchFocused && !searchById" 
+          <i v-if="!isSearchFocused && !searchById"
              class="pi pi-search absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400"></i>
           <InputText
             id="searchById"
@@ -139,7 +145,7 @@ const handleIdInput = (event) => {
         </Column>
 
         <Column field="imagem" header="Imagem" class="p-1">
-          <template #body="{data}">
+          <template #body>
             <div class="flex justify-center">
               <Button
               class="hover:text-gray-600 cursor-pointer p-1 m-1 px-2 bg-gray-400 text-white border-0 rounded shadow hover:bg-gray-300 transition">
@@ -150,22 +156,24 @@ const handleIdInput = (event) => {
         </Column>
 
         <Column field="atribuir" header="Atribuir" class="p-1">
-          <template #body="{data}" >
+          <template #body="slotProps">
             <div class="flex justify-center">
               <Button
-              @click="() => abrirDialogAtribuir(data)"
-              class="hover:text-gray-600 cursor-pointer p-1 m-1 px-2 bg-gray-400 text-white border-0 rounded shadow hover:bg-gray-300 transition">
-              Atribuir
-              </Button>
+                @click="() => abrirDialogAtribuir(slotProps.data)"
+                class="hover:text-gray-600 cursor-pointer p-2 m-1 bg-gray-400 text-white border-0 rounded-full shadow hover:bg-gray-300 transition"
+                icon="pi pi-user-plus"
+                aria-label="Atribuir"
+                tooltip="Atribuir talhão"
+              />
             </div>
           </template>
         </Column>
 
         <Column field="editar" header="Editar" class="p-1">
-          <template #body="{ data }">
+          <template #body="slotProps">
             <div class="flex justify-center">
               <Button class="hover:text-gray-600 cursor-pointer p-1 m-1 px-2 bg-gray-400 text-white border-0 rounded shadow hover:bg-gray-300 transition">
-                <RouterLink :to="`/talhao/editar/${data.id}`">Editar</RouterLink>
+                <RouterLink :to="`/talhao/editar/${slotProps.data.id}`">Editar</RouterLink>
               </Button>
             </div>
           </template>
@@ -181,12 +189,36 @@ const handleIdInput = (event) => {
           </div>
       </Dialog>
 
-      <Dialog v-model:visible="confirmarAtribuirDialog" modal header="Atribuir Talhão" class="w-72 lg:w-96 p-1">
+      <Dialog v-model:visible="confirmarAtribuirDialog" modal header="Atribuir Talhão" class="w-80 lg:w-96 p-1">
           <hr class="border-gray-200 mb-2">
-          <span class="block mb-5 p-0.5">Deseja atribuir este talhão a você como analista?</span>
+          <div class="flex flex-col gap-3 mb-4">
+            <div class="field">
+              <label class="font-semibold block mb-1">ID do Talhão:</label>
+              <span class="block pl-2">{{ talhaoSelecionado?.id }}</span>
+            </div>
+
+            <div class="field">
+              <label class="font-semibold block mb-1">Nome da Fazenda:</label>
+              <span class="block pl-2">{{ talhaoSelecionado?.nomeFazenda }}</span>
+            </div>
+
+            <div class="field">
+              <label for="analista" class="font-semibold block mb-1">Selecionar Analista:</label>
+              <Dropdown
+                id="analista"
+                v-model="analistaSelecionado"
+                :options="analistas"
+                optionLabel="nome"
+                placeholder="Selecione um analista"
+                class="w-full"
+              />
+            </div>
+          </div>
+
           <div class="flex justify-end gap-2">
             <Button class="p-1" label="Cancelar" severity="secondary" @click="confirmarAtribuirDialog = false" />
-            <Button class="p-1" label="Confirmar" severity="success" @click="confirmarAtribuicao" />
+            <Button class="p-1" label="Confirmar" severity="success" @click="confirmarAtribuicao"
+                    :disabled="!analistaSelecionado" />
           </div>
       </Dialog>
 
@@ -198,5 +230,9 @@ const handleIdInput = (event) => {
 <style scoped>
 .pi-search {
   font-size: 0.8rem;
+}
+
+.field {
+  margin-bottom: 0.75rem;
 }
 </style>
