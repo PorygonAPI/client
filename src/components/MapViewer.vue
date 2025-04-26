@@ -1,6 +1,7 @@
 <!-- Referencias:
  https://leafletjs.com/examples/quick-start/
  https://leafletjs.com/examples/geojson/
+ https://leafletjs.com/examples/layers-control/
  https://github.com/patrickmonteiro/quasar-pontos-turisticos/blob/main/src/components/LMap.vue
    -->
 
@@ -64,7 +65,7 @@ export default defineComponent({
             setLocalizacaoMapa()
 
             //Mostrar o mapa na tela
-            map = L.map('map').setView(mapLocation, 6)
+            map = L.map('map').setView(mapLocation, 10)
             L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
                 attribution:
                     '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>'
@@ -124,6 +125,30 @@ export default defineComponent({
             //         ] ]]
             //     }
             // }
+            // ];
+
+
+            // var someFeatures = [
+            //     {
+
+            //         "type": "MultiPolygon",
+            //         "coordinates": [[[
+            //             [-109.05, 41.00],
+            //             [-102.06, 40.99],
+            //             [-102.03, 36.99],
+            //             [-109.04, 36.99],
+            //             [-109.05, 41.00]
+            //         ], [
+            //             [-46.3446028104612, -23.64587273889485],
+            //             [-46.3446028104612, -20.64587519603432],
+            //             [-46.344605505407046, -20.64587519603432],
+            //             [-49.344605505407046, -20.645880585926026],
+            //             [-49.34461089529875, -20.645880585926026],
+            //             [-49.34461089529875, -20.645873311398894],
+            //             [-49.3446028104612, -20.64587273889485]
+            //         ]]]
+
+            //     }
             // ];
 
             // L.geoJSON(someFeatures, {
@@ -200,8 +225,9 @@ export default defineComponent({
                     //Por algum motivo o setView recebe os parametros invertidos, se um geoJson possui uma coordenada [20,21] por exemplo,
                     //a localização na setView da linha 50 deve ser inserida como [21,20] para que o mapa fica centralizado no mesmo ponto que o geoJSON
                     //Se não inverter a posição, o mapa fica centralizado em uma área nada a ver bem distante do ponto
-                    let first = arquivoFazendaParsed.coordinates[0][0][1]
-                    let last = arquivoFazendaParsed.coordinates[0][0][0]
+                    let first = arquivoFazendaParsed.coordinates[0][0][0][1]
+                    let last = arquivoFazendaParsed.coordinates[0][0][0][0]
+
                     mapLocation.push(first)
                     mapLocation.push(last)
                 }
