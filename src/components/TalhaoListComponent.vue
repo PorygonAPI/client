@@ -14,7 +14,9 @@ const props = defineProps({
 
 const filtros = ref({
   global: { value: null, matchMode: FilterMatchMode.CONTAINS }
-})
+});
+
+const searchById = ref('');
 
 const visibleExcluir = ref(false);
 const talhaoSelecionado = ref(null);
@@ -64,106 +66,137 @@ const formatNumber = (value) => {
   if (value === null || value === undefined) return 'N/A';
   return value;
 };
+
+const filteredTalhoes = computed(() => {
+  if (searchById.value && searchById.value.trim() !== '') {
+    return props.talhao.filter(talhao => 
+      talhao.id.toString() === searchById.value.trim()
+    );
+  }
+  return props.talhao;
+});
+
+const isSearchFocused = ref(false);
+
+const handleIdInput = (event) => {
+  event.target.value = event.target.value.replace(/\D/g, '');
+  searchById.value = event.target.value;
+};
 </script>
 
 <template>
-<div class="bg-white rounded-xl shadow p-5 flex flex-col gap-3">
+  <div class="bg-white rounded-xl shadow p-5 flex flex-col gap-3">
+    <div class="flex justify-between items-center mb-3">
+      <div class="relative flex items-center">
+        <div class="relative">
+          <i v-if="!isSearchFocused && !searchById" 
+             class="pi pi-search absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400"></i>
+          <InputText
+            id="searchById"
+            v-model="searchById"
+            @input="handleIdInput"
+            @focus="isSearchFocused = true"
+            @blur="isSearchFocused = false"
+            class="p-1 pl-3 border border-gray-300 rounded-lg w-40 focus-within:ring focus-within:ring-orange-400 focus:outline-none"
+            pattern="[0-9]*"
+            inputmode="numeric"
+          />
+        </div>
+      </div>
 
-  <div class="flex justify-between ">
-    <InputText
-    class="p-1 flex gap-2 items-center border border-gray-300 rounded-lg w-44 lg:w-96 focus-within:ring focus-within:ring-orange-400"
-    placeholder="Pesquisar"
-    type="text"
-    v-model="filtros['global'].value"
-    />
+    </div>
+
+    <div>
+      <DataTable
+        v-model:filters="filtros"
+        :value="filteredTalhoes"
+        removableSort
+        paginator
+        :rows="10"
+        stripedRows
+        class="p-datatable-gridlines"
+        :global-filter-fields="['id', 'nomeFazenda', 'cultura', 'produtividade', 'area', 'tipoSolo', 'cidade', 'estado', 'status']"
+      >
+        <Column field="id" header="ID Talhão" sortable class="p-1 w-24"/>
+        <Column field="nomeFazenda" header="Nome Fazenda" sortable class="p-1 min-w-40"/>
+        <Column field="cultura" header="Cultura" sortable class="p-1"/>
+        <Column field="produtividade" header="Produtividade" sortable class="p-1">
+          <template #body="{ data }">
+            {{ formatNumber(data.produtividade) }}
+          </template>
+        </Column>
+        <Column field="area" header="Área" sortable class="p-1"/>
+        <Column field="tipoSolo" header="Tipo de Solo" sortable class="p-1"/>
+        <Column field="cidade" header="Cidade" sortable class="p-1"/>
+        <Column field="estado" header="Estado" sortable class="p-1"/>
+
+        <Column field="status" header="Status" sortable class="p-1">
+          <template #body="{ data }">
+            <div class="flex justify-center">
+              <Tag :value="formatStatus(data.status)" :severity="getStatusSeverity(data.status)" class="p-1" />
+            </div>
+          </template>
+        </Column>
+
+        <Column field="imagem" header="Imagem" class="p-1">
+          <template #body="{data}">
+            <div class="flex justify-center">
+              <Button
+              class="hover:text-gray-600 cursor-pointer p-1 m-1 px-2 bg-gray-400 text-white border-0 rounded shadow hover:bg-gray-300 transition">
+              Visualizar
+            </Button>
+            </div>
+          </template>
+        </Column>
+
+        <Column field="atribuir" header="Atribuir" class="p-1">
+          <template #body="{data}" >
+            <div class="flex justify-center">
+              <Button
+              @click="() => abrirDialogAtribuir(data)"
+              class="hover:text-gray-600 cursor-pointer p-1 m-1 px-2 bg-gray-400 text-white border-0 rounded shadow hover:bg-gray-300 transition">
+              Atribuir
+              </Button>
+            </div>
+          </template>
+        </Column>
+
+        <Column field="editar" header="Editar" class="p-1">
+          <template #body="{ data }">
+            <div class="flex justify-center">
+              <Button class="hover:text-gray-600 cursor-pointer p-1 m-1 px-2 bg-gray-400 text-white border-0 rounded shadow hover:bg-gray-300 transition">
+                <RouterLink :to="`/talhao/editar/${data.id}`">Editar</RouterLink>
+              </Button>
+            </div>
+          </template>
+        </Column>
+      </DataTable>
+
+      <Dialog v-model:visible="visibleExcluir" modal header="Confirmar Exclusão" class="w-72 lg:w-96 p-1">
+          <hr class="border-gray-200 mb-2">
+          <span class="block mb-5 p-0.5">Tem certeza que deseja excluir este Talhão da <b>{{nomeFazendaSelecionada}}</b>?</span>
+          <div class="flex justify-end gap-2">
+            <Button class="p-1" label="Cancelar" severity="secondary" @click="visibleExcluir = false" />
+            <Button class="p-1" label="Confirmar" severity="danger" @click="confirmarExclusao" />
+          </div>
+      </Dialog>
+
+      <Dialog v-model:visible="confirmarAtribuirDialog" modal header="Atribuir Talhão" class="w-72 lg:w-96 p-1">
+          <hr class="border-gray-200 mb-2">
+          <span class="block mb-5 p-0.5">Deseja atribuir este talhão a você como analista?</span>
+          <div class="flex justify-end gap-2">
+            <Button class="p-1" label="Cancelar" severity="secondary" @click="confirmarAtribuirDialog = false" />
+            <Button class="p-1" label="Confirmar" severity="success" @click="confirmarAtribuicao" />
+          </div>
+      </Dialog>
+
+    </div>
+
   </div>
-
-  <div>
-  <DataTable
-  v-model:filters="filtros"
-  :value="props.talhao"
-  removableSort
-  paginator
-  :rows="10"
-  stripedRows
-  class="p-datatable-gridlines"
-  :global-filter-fields="['id', 'nomeFazenda', 'cultura', 'produtividade', 'area', 'tipoSolo', 'cidade', 'estado', 'status']"
-  >
-
-  <Column field="id" header="ID Talhão" sortable class="p-1 w-24"/>
-  <Column field="nomeFazenda" header="Nome Fazenda" sortable class="p-1 min-w-40"/>
-  <Column field="cultura" header="Cultura" sortable class="p-1"/>
-  <Column field="produtividade" header="Produtividade" sortable class="p-1">
-    <template #body="{ data }">
-      {{ formatNumber(data.produtividade) }}
-    </template>
-  </Column>
-  <Column field="area" header="Área" sortable class="p-1"/>
-  <Column field="tipoSolo" header="Tipo de Solo" sortable class="p-1"/>
-  <Column field="cidade" header="Cidade" sortable class="p-1"/>
-  <Column field="estado" header="Estado" sortable class="p-1"/>
-
-  <Column field="status" header="Status" sortable class="p-1">
-    <template #body="{ data }">
-      <div class="flex justify-center">
-        <Tag :value="formatStatus(data.status)" :severity="getStatusSeverity(data.status)" class="p-1" />
-      </div>
-    </template>
-  </Column>
-
-  <Column field="imagem" header="Imagem" class="p-1">
-    <template #body="{data}">
-      <div class="flex justify-center">
-        <Button
-        class="hover:text-gray-600 cursor-pointer p-1 m-1 px-2 bg-gray-400 text-white border-0 rounded shadow hover:bg-gray-300 transition">
-        Visualizar
-      </Button>
-      </div>
-    </template>
-  </Column>
-
-  <Column field="atribuir" header="Atribuir" class="p-1">
-    <template #body="{data}" >
-      <div class="flex justify-center">
-        <Button
-        @click="() => abrirDialogAtribuir(data)"
-        class="hover:text-gray-600 cursor-pointer p-1 m-1 px-2 bg-gray-400 text-white border-0 rounded shadow hover:bg-gray-300 transition">
-        Atribuir
-        </Button>
-      </div>
-    </template>
-  </Column>
-
-  <Column field="editar" header="Editar" class="p-1">
-    <template #body="{ data }">
-      <div class="flex justify-center">
-        <Button class="hover:text-gray-600 cursor-pointer p-1 m-1 px-2 bg-gray-400 text-white border-0 rounded shadow hover:bg-gray-300 transition">
-          <RouterLink :to="`/talhao/editar/${data.id}`">Editar</RouterLink>
-        </Button>
-      </div>
-    </template>
-  </Column>
-  </DataTable>
-
-  <Dialog v-model:visible="visibleExcluir" modal header="Confirmar Exclusão" class="w-72 lg:w-96 p-1">
-      <hr class="border-gray-200 mb-2">
-      <span class="block mb-5 p-0.5">Tem certeza que deseja excluir este Talhão da <b>{{nomeFazendaSelecionada}}</b>?</span>
-      <div class="flex justify-end gap-2">
-        <Button class="p-1" label="Cancelar" severity="secondary" @click="visibleExcluir = false" />
-        <Button class="p-1" label="Confirmar" severity="danger" @click="confirmarExclusao" />
-      </div>
-  </Dialog>
-
-  <Dialog v-model:visible="confirmarAtribuirDialog" modal header="Atribuir Talhão" class="w-72 lg:w-96 p-1">
-      <hr class="border-gray-200 mb-2">
-      <span class="block mb-5 p-0.5">Deseja atribuir este talhão a você como analista?</span>
-      <div class="flex justify-end gap-2">
-        <Button class="p-1" label="Cancelar" severity="secondary" @click="confirmarAtribuirDialog = false" />
-        <Button class="p-1" label="Confirmar" severity="success" @click="confirmarAtribuicao" />
-      </div>
-  </Dialog>
-
-  </div>
-
-</div>
 </template>
+
+<style scoped>
+.pi-search {
+  font-size: 0.8rem;
+}
+</style>
