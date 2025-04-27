@@ -1,9 +1,11 @@
 <script setup>
-import { DataTable,Column, Button, InputText, Tag  } from 'primevue';
-import { FilterMatchMode } from  '@primevue/core/api';
+import { DataTable, Column, Button, InputText, Tag } from 'primevue';
+import { FilterMatchMode } from '@primevue/core/api';
 import { ref, defineProps, computed } from 'vue';
-import { RouterLink } from 'vue-router';
+import { useRouter } from 'vue-router'; // Add this import
 import Dialog from 'primevue/dialog';
+
+const router = useRouter(); // Add this line
 
 const props = defineProps({
   talhao: {
@@ -43,6 +45,10 @@ const getStatusSeverity = (status) => {
       return 'info'
   }
 }
+
+const editarTalhao = (id) => {
+  router.push(`/talhao/editar/${id}`);
+};
 
 </script>
 
@@ -88,7 +94,7 @@ const getStatusSeverity = (status) => {
   </Column>
 
   <Column field="imagem" header="Imagem" class="p-1">
-    <template #body="{data}">
+    <template #body>
       <div class="flex justify-center">
         <Button
         class="hover:text-gray-600 cursor-pointer p-1 m-1 px-2 bg-gray-400 text-white border-0 rounded shadow hover:bg-gray-300 transition">
@@ -99,7 +105,7 @@ const getStatusSeverity = (status) => {
   </Column>
 
   <Column field="atribuir" header="Atribuir" class="p-1">
-    <template #body="{data}" >
+    <template #body>
       <div class="flex justify-center">
         <Button
         class="hover:text-gray-600 cursor-pointer p-1 m-1 px-2 bg-gray-400 text-white border-0 rounded shadow hover:bg-gray-300 transition">
@@ -112,8 +118,11 @@ const getStatusSeverity = (status) => {
   <Column field="editar" header="Editar" class="p-1">
     <template #body="{ data }">
       <div class="flex justify-center">
-        <Button class="hover:text-gray-600 cursor-pointer p-1 m-1 px-2 bg-gray-400 text-white border-0 rounded shadow hover:bg-gray-300 transition">
-          <RouterLink to="/areasagro/cadastrotalhao">Editar</RouterLink>
+        <Button
+          class="hover:text-gray-600 cursor-pointer p-1 m-1 px-2 bg-gray-400 text-white border-0 rounded shadow hover:bg-gray-300 transition"
+          @click="editarTalhao(data.id)"
+        >
+          Editar
         </Button>
       </div>
     </template>
