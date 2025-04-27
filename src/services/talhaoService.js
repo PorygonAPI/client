@@ -1,7 +1,6 @@
 const TOKEN = localStorage.getItem('token')
 
 export async function listarTalhoesPorUsuario(userId) {
-  console.log('Iniciando chamada à API para userId:', userId);
 
   try {
     const response = await fetch(`/api/safras/api/talhoes/usuario/${userId}`, {
@@ -12,8 +11,6 @@ export async function listarTalhoesPorUsuario(userId) {
       }
     });
 
-    console.log('Status da resposta:', response.status);
-
     if (!response.ok) {
       const errorData = await response.json();
       console.error('Erro da API:', errorData);
@@ -21,7 +18,6 @@ export async function listarTalhoesPorUsuario(userId) {
     }
 
     const data = await response.json();
-    console.log('Dados recebidos da API:', data);
 
     return {
       atribuidos: data.atribuidos.map(t => ({

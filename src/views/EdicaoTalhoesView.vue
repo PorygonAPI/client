@@ -20,10 +20,8 @@ const fetchData = async () => {
   try {
     const userId = localStorage.getItem('id') || '2'; // Usando 2 como fallback para teste
     console.group('Carregando talhões');
-    console.log('ID do usuário:', userId);
 
     const response = await listarTalhoesPorUsuario(userId);
-    console.log('Dados recebidos:', response);
 
     talhoesAtribuidos.value = response.atribuidos;
     talhoesAprovados.value = response.aprovados;
@@ -32,11 +30,6 @@ const fetchData = async () => {
       atribuidos: talhoesAtribuidos.value.length,
       aprovados: talhoesAprovados.value.length
     };
-
-    console.log('Talhões carregados:', {
-      atribuidos: talhoesAtribuidos.value,
-      aprovados: talhoesAprovados.value
-    });
     console.groupEnd();
 
   } catch (error) {
