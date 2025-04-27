@@ -1,7 +1,7 @@
 <template>
   <Toast />
   <div class="bg-white shadow-md rounded-lg p-4 my-4 w-full max-w-7xl mx-auto z-0">
-    <a href="/areasagro" class="">←</a>
+    <button @click="goBack" class="text-gray-600 hover:text-gray-800">←</button>
     <div class="flex flex-col">
       <div class="text-center p-2 mt-4 lg:mb-3 mb-1">
         <p class="text-4xl font-semibold text-gray-800">Visualizador de Talhão</p>
@@ -16,8 +16,10 @@
 <script setup>
 import MapViewer from '@/components/MapViewer.vue';
 import { onMounted, ref } from 'vue';
+import { useRouter } from 'vue-router';
 
 
+const router = useRouter();
 const TOKEN = localStorage.getItem('token')
 const ID =  (!localStorage.getItem('id_visualizacao')) ? 1 : localStorage.getItem('id_visualizacao')
 
@@ -25,6 +27,16 @@ const arquivoFazenda = ref()
 const arquivoDaninha = ref()
 const arquivoFinalDaninha = ref()
 const areaAgricola = ref();
+
+const goBack = () => {
+  const role = localStorage.getItem('role');
+
+  if (role === 'Analista') {
+    router.push('/analista/talhoes');
+  } else {
+    router.push('/areasagro');
+  }
+};
 
 const fetchData = async () => {
   try {
