@@ -7,8 +7,26 @@
         <p class="text-4xl font-semibold text-gray-800">Visualizador de Talhão</p>
       </div>
       <hr class="border-gray-300 mb-4">
-      <MapViewer :arquivoFazenda="arquivoFazenda" :arquivoDaninha="arquivoDaninha"
-        :arquivoFinalDaninha="arquivoFinalDaninha" :key="arquivoFazenda" />
+
+      <div v-if="loading" class="flex justify-center items-center p-8">
+        <div class="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-orange-500"></div>
+        <span class="ml-3 text-gray-700">Carregando dados do talhão...</span>
+      </div>
+
+      <div v-else-if="error" class="p-4 bg-red-50 text-red-600 rounded-lg text-center">
+        {{ error }}
+        <button @click="fetchData" class="ml-4 px-4 py-2 bg-orange-400 text-white rounded hover:bg-orange-500">
+          Tentar novamente
+        </button>
+      </div>
+
+      <MapViewer
+        v-else
+        :arquivoFazenda="arquivoFazenda"
+        :arquivoDaninha="arquivoDaninha"
+        :arquivoFinalDaninha="arquivoFinalDaninha"
+        :key="mapKey"
+      />
     </div>
   </div>
 </template>
@@ -17,16 +35,20 @@
 import MapViewer from '@/components/MapViewer.vue';
 import { onMounted, ref } from 'vue';
 import { useRouter } from 'vue-router';
-
+import { useToast } from 'primevue/usetoast';
 
 const router = useRouter();
-const TOKEN = localStorage.getItem('token')
-const ID =  (!localStorage.getItem('id_visualizacao')) ? 1 : localStorage.getItem('id_visualizacao')
+const toast = useToast();
+const TOKEN = localStorage.getItem('token');
+const ID = ref(localStorage.getItem('id_visualizacao') || null);
 
 const arquivoFazenda = ref()
 const arquivoDaninha = ref()
 const arquivoFinalDaninha = ref()
 const areaAgricola = ref();
+const loading = ref(true)
+const error = ref()
+const mapKey = ref(0);
 
 const goBack = () => {
   const role = localStorage.getItem('role');
@@ -39,19 +61,56 @@ const goBack = () => {
 };
 
 const fetchData = async () => {
+  if (!ID.value) {
+    error.value = 'ID do talhão não encontrado';
+    loading.value = false;
+    toast.add({
+      severity: 'error',
+      summary: 'Erro',
+      detail: 'ID do talhão não encontrado',
+      life: 5000
+    });
+    return;
+  }
+
+  loading.value = true;
+  error.value = null;
+
   try {
-    const response = await fetch(`api/areas-agricolas/${ID}/detalhes-completos`, {
+    const response = await fetch(`/api/areas-agricolas/${ID.value}/detalhes-completos`, {
       headers: {
         'Accept': 'application/json',
         'Content-Type': 'application/json',
         'Authorization': 'Bearer ' + TOKEN
       }
     });
+
+    if (!response.ok) {
+      throw new Error(`Erro ao buscar dados: ${response.status}`);
+    }
+
     areaAgricola.value = await response.json();
     montaGeoJson()
 
+    mapKey.value++;
+
+    toast.add({
+      severity: 'success',
+      summary: 'Sucesso',
+      detail: 'Dados do talhão carregados com sucesso',
+      life: 3000
+    });
   } catch (error) {
-    error.value = 'Erro ao carregar os dados';
+    console.error('Erro na requisição:', error);
+    error.value = `Erro ao carregar os dados: ${error.message}`;
+    toast.add({
+      severity: 'error',
+      summary: 'Erro',
+      detail: `Falha ao carregar dados: ${error.message}`,
+      life: 5000
+    });
+  } finally {
+    loading.value = false;
   }
 };
 
@@ -60,6 +119,10 @@ onMounted(() => {
 });
 
 const montaGeoJson = () => {
+  if (!areaAgricola.value || !areaAgricola.value.fazenda) {
+    console.error('Dados da área agrícola incompletos');
+    return;
+  }
 
   arquivoFazenda.value = areaAgricola.value.fazenda.arquivoFazenda
 
@@ -74,9 +137,13 @@ const montaGeoJson = () => {
     let virgula = (index > 0) ? ' , ' : ''
 
     for (let j = 0; j < safras.length; j++) {
+      if (safras[j].arquivoDaninha) {
+        DaninhaGeoJson += virgula + safras[j].arquivoDaninha;
+      }
 
-      DaninhaGeoJson += virgula + safras[j].arquivoDaninha
-      FinalDaninhaGeoJson += virgula + safras[j].arquivoFinalDaninha
+      if (safras[j].arquivoFinalDaninha) {
+        FinalDaninhaGeoJson += virgula + safras[j].arquivoFinalDaninha;
+      }
     }
   }
 
@@ -86,5 +153,4 @@ const montaGeoJson = () => {
   arquivoDaninha.value = DaninhaGeoJson
   arquivoFinalDaninha.value = FinalDaninhaGeoJson
 }
-
 </script>
