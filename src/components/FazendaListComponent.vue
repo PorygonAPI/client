@@ -1,9 +1,18 @@
 <script setup>
-import { DataTable, Column, Button, InputText, Tag } from 'primevue';
+import { DataTable, Column, Button, InputText, Tag,Toast } from 'primevue';
 import { FilterMatchMode } from '@primevue/core/api';
 import { ref, defineProps, computed } from 'vue';
 import { RouterLink } from 'vue-router';
 import Dialog from 'primevue/dialog';
+import { useRouter } from 'vue-router';
+
+const TOKEN = localStorage.getItem('token');
+
+const router = useRouter();
+
+const cadastrarOuEditarFazenda = (id) => {
+  router.push({ path: '/areasagro/cadastrofazenda', query: { id: id } });
+};
 
 const props = defineProps({
   fazendas: {
@@ -39,14 +48,34 @@ const abrirDialog = (data) => {
   visibleExcluir.value = true
 };
 
-const confirmarExclusao = () => {
-  console.log('Excluir fazenda:', fazendaSelecionada.value);
-  visibleExcluir.value = false;
+  const confirmarExclusao = async () => {
+  try {
+    const response = await fetch(`/api/areas-agricolas/${fazendaSelecionada.value.id}`, {
+      method: 'DELETE',
+      headers: {
+        'Authorization': 'Bearer ' + TOKEN,
+        'Accept': 'application/json',
+        'Content-Type': 'application/json',
+      },
+    });
+
+    if (response.ok) {
+      console.log('Fazenda excluída com sucesso');
+      // Atualizar a lista de fazendas para refletir a exclusão
+      window.location.reload();
+    } else {
+      console.error('Erro ao excluir a fazenda');
+      toast.add({ severity: 'error', summary: 'Erro', detail: 'Não é possível excluir fazendas com talhões associados.', life: 3000 })
+    }
+  } catch (error) {
+    console.error('Erro ao chamar a API de exclusão:', error);
+  }
 };
 
 </script>
 
 <template>
+  <Toast/>
   <div class="bg-white rounded-xl shadow p-5 flex flex-col gap-3">
 
     <div class="flex justify-between">
@@ -57,11 +86,9 @@ const confirmarExclusao = () => {
         v-model="filtros['global'].value"
       />
 
-      <Button class="md:text-base text-sm p-1 px-2 rounded-lg shadow text-white border-gray-300 bg-gray-400 hover:text-gray-600 hover:bg-gray-300 transition">
-        <RouterLink to="/areasagro/cadastrofazenda">
+      <Button @click="cadastrarOuEditarFazenda(null)" class="md:text-base text-sm p-1 px-2 rounded-lg shadow text-white border-gray-300 bg-gray-400 hover:text-gray-600 hover:bg-gray-300 transition">
           <span class="block md:hidden">Cadastrar</span>
           <span class="hidden md:block">Cadastrar Fazendas</span>
-        </RouterLink>
       </Button>
     </div>
 
@@ -108,10 +135,12 @@ const confirmarExclusao = () => {
       </Column>
 
       <Column field="editar" header="Editar" class="p-1">
-        <template #body="{ data }">
+        <template #body="dataBody">
           <div class="flex justify-center">
-            <Button class="hover:text-gray-600 cursor-pointer p-1 m-1 px-2 bg-gray-400 text-white border-0 rounded shadow hover:bg-gray-300 transition">
-              <RouterLink to="/areasagro/cadastrofazenda">Editar</RouterLink>
+            <Button
+            class="hover:text-gray-600 cursor-pointer p-1 m-1 px-2 bg-gray-400 text-white border-0 rounded shadow hover:bg-gray-300 transition"
+            @click="cadastrarOuEditarFazenda(dataBody.data.id)">
+              Editar
             </Button>
           </div>
         </template>
@@ -131,7 +160,7 @@ const confirmarExclusao = () => {
       </Column>
     </DataTable>
 
-    
+
     <Dialog v-model:visible="visibleExcluir" modal header="Confirmar Exclusão" class="w-80 lg:w-96 p-1">
       <hr class="border-gray-200 mb-2">
       <span class="block mb-5 p-0.5">Tem certeza que deseja excluir a fazenda <b>{{ nomeFazendaSelecionada }}</b>?</span>

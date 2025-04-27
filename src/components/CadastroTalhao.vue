@@ -23,8 +23,8 @@
 
       <div class="flex gap-4 mb-3">
         <FloatLabel variant="on" class="w-1/2">
-          <InputText type="number" id="talhao" class="w-full p-1.5" v-model="talhao" />
-          <label for="talhao">Número do Talhão</label>
+          <InputText type="text" id="talhao" class="w-full p-1.5" v-model="talhao" />
+          <label for="talhao">Talhão</label>
         </FloatLabel>
         <FloatLabel variant="on" class="w-1/2">
           <InputText type="text" id="cultura" class="w-full p-1.5" v-model="cultura" />
@@ -82,7 +82,7 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue';
+import { ref, onMounted, defineProps } from 'vue';
 import { FloatLabel, InputText, Divider, Select, Toast, RadioButton } from 'primevue';
 import { useToast } from 'primevue/usetoast';
 
