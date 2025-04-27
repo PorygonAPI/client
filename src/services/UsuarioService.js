@@ -13,7 +13,8 @@ export default {
         throw new Error(`Erro ao buscar analistas: ${response.status}`);
       }
 
-      return await response.json();
+      const data = await response.json();
+      return data;
     } catch (error) {
       console.error('Error fetching analysts:', error);
       throw error;

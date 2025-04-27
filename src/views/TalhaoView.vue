@@ -53,7 +53,11 @@ const fetchTalhoesPendentes = async () => {
 };
 
 const handleTalhaoAtribuido = (data) => {
-  talhoesPendentes.value = talhoesPendentes.value.filter(talhao => talhao.id !== data.talhaoId);
+  console.log('Talhão atribuído, removendo da lista:', data);
+
+  talhoesPendentes.value = talhoesPendentes.value.filter(talhao =>
+    talhao.id !== data.talhaoId
+  );
 
   toast.add({
     severity: 'success',
