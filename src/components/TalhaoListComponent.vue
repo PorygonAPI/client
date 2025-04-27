@@ -2,7 +2,7 @@
 import { DataTable, Column, Button, InputText, Tag } from 'primevue';
 import { FilterMatchMode } from '@primevue/core/api';
 import { ref, defineProps, computed, defineEmits, onMounted } from 'vue';
-import { RouterLink } from 'vue-router';
+import { RouterLink, useRouter } from 'vue-router';
 import Dialog from 'primevue/dialog';
 import Dropdown from 'primevue/dropdown';
 import UsuarioService from '@/services/UsuarioService';
@@ -131,6 +131,13 @@ const handleIdInput = (event) => {
   event.target.value = event.target.value.replace(/\D/g, '');
   searchById.value = event.target.value;
 };
+
+const router = useRouter();
+
+const visualizarTalhao = (talhaoId) => {
+  localStorage.setItem('id_visualizacao', talhaoId);
+  router.push('/visualizartalhao');
+};
 </script>
 
 <template>
@@ -188,12 +195,13 @@ const handleIdInput = (event) => {
         </Column>
 
         <Column field="imagem" header="Imagem" class="p-1">
-          <template #body>
+          <template #body="slotProps">
             <div class="flex justify-center">
               <Button
-              class="hover:text-gray-600 cursor-pointer p-1 m-1 px-2 bg-gray-400 text-white border-0 rounded shadow hover:bg-gray-300 transition">
-              Visualizar
-            </Button>
+                @click="() => visualizarTalhao(slotProps.data.id)"
+                class="hover:text-gray-600 cursor-pointer p-1 m-1 px-2 bg-gray-400 text-white border-0 rounded shadow hover:bg-gray-300 transition">
+                Visualizar
+              </Button>
             </div>
           </template>
         </Column>
