@@ -26,7 +26,7 @@
 
         <div class="form-group">
           <label for="role">Cargo:</label>
-          <select id="role" v-model="formData.cargoId" required>
+          <select id="role" v-model="formData.cargo" required>
             <option value="" disabled selected>Selecione um cargo</option>
             <option value="1"> Consultor</option>
             <option value="2"> Analista</option>
@@ -61,7 +61,7 @@ export default {
         nome: '',
         email: '',
         senha: '',
-        cargoId: ''
+        cargo: ''
       },
       flagSenha: ref(true),
       btnLabel: 'Cadastrar'
