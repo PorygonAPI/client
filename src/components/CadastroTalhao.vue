@@ -73,7 +73,9 @@
 import { ref, onMounted, watch } from 'vue';
 import { FloatLabel, InputText, Divider, Select, Toast } from 'primevue';
 import { useToast } from 'primevue/usetoast';
+import { useRoute } from 'vue-router';
 
+const route = useRoute();
 const toast = useToast();
 
 const fazendas = ref([]);
@@ -85,7 +87,7 @@ const ano = ref('');
 const tipoSolo = ref('');
 const area = ref('');
 
-const fetchTalhoes = async (fazendaId) => {
+const fetchPreenchimento = async (fazendaId, talhaoId) => {
   try {
     const response = await fetch(`/api/areas-agricolas/${fazendaId}/detalhes-completos`, {
       method: 'GET',
@@ -94,20 +96,46 @@ const fetchTalhoes = async (fazendaId) => {
         Authorization: `Bearer ${localStorage.getItem('token')}`,
       },
     });
+
     const data = await response.json();
-    console.log(data)
-    // toast.add({ severity: 'success', summary: 'Sucesso', detail: 'Talhões carregados!', life: 3000 });
+
+    if (!data || !data.talhao) {
+      console.error('Dados da fazenda não encontrados.');
+      return;
+    }
+
+    // Procura o talhão pelo id
+    const talhao = data.talhao.find(t => t.id === Number(talhaoId));
+    if (!talhao) {
+      console.error('Talhão não encontrado.');
+      return;
+    }
+
+    // Pegamos a primeira safra (ou você poderia adaptar para permitir seleção)
+    const primeiraSafra = talhao.safras[0];
+
+    if (!primeiraSafra) {
+      console.error('Nenhuma safra encontrada no talhão.');
+      return;
+    }
+
+    // Preenche os campos
+    fazendaSelecionada.value = fazendaId; // Aqui é o id da fazenda
+    safra.value = primeiraSafra.id; // Aqui você pode usar o ID da safra ou o ano
+    cultura.value = primeiraSafra.cultura;
+    produtividadePorAno.value = primeiraSafra.produtividadeAno || 0;
+    ano.value = primeiraSafra.ano;
+    tipoSolo.value = talhao.tipoSolo;
+    area.value = talhao.area;
+
+    console.log('Preenchimento realizado com sucesso.');
+
+    console.log(fazendaSelecionada)
   } catch (error) {
-    console.error('Erro ao buscar talhões:', error);
-    // toast.add({ severity: 'error', summary: 'Erro', detail: 'Erro ao buscar talhões.', life: 3000 });
+    console.error('Erro ao buscar detalhes do talhão:', error);
+    toast.add({ severity: 'error', summary: 'Erro', detail: 'Erro ao buscar detalhes.', life: 3000 });
   }
 };
-
-watch(fazendaSelecionada, (newFazendaId) => {
-  if (newFazendaId) {
-    fetchTalhoes(newFazendaId);
-  }
-});
 
 const fetchFazendas = async () => {
   await fetch('/api/areas-agricolas', {
@@ -127,31 +155,18 @@ const fetchFazendas = async () => {
     });
 };
 
-const fetchSafras = async () => {
-  await fetch('/api/safras', {
-    method: 'GET',
-    headers: {
-      'Content-Type': 'application/json',
-      Authorization: `Bearer ${localStorage.getItem('token')}`,
-    },
-  })
-    .then((response) => response.json())
-    .then((data) => {
-      /**TODO
-       * Implementar lógica para lidar com as safras
-       * Exibir as safras em um dropdown ou lista
-       */
-      console.log(data);
-    })
-    .catch((error) => {
-      console.error('Erro ao buscar fazendas:', error);
-      toast.add({ severity: 'error', summary: 'Erro', detail: 'Erro ao buscar fazendas.', life: 3000 });
-    });
-};
-
 onMounted(() => {
   fetchFazendas();
-  fetchSafras();
+
+  const fazendaId = Number(route.query.idFazenda);
+  const talhaoId = Number(route.query.id);
+
+  console.log(fazendaId)
+  if (fazendaId && talhaoId) {
+    fetchPreenchimento(fazendaId, talhaoId);
+  } else {
+    console.error('FazendaId ou TalhaoId não encontrados na URL.');
+  }
 });
 
 const cadastrarTalhao = async () => {

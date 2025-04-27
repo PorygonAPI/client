@@ -6,6 +6,11 @@ import { RouterLink } from 'vue-router';
 import Dialog from 'primevue/dialog';
 import { useRouter } from 'vue-router';
 
+const editarTalhao = (idFazenda,id) => {
+
+  router.push({ path: '/areasagro/cadastrotalhao', query: { idFazenda: idFazenda , id:id} });
+};
+
 const TOKEN = localStorage.getItem('token');
 
 const router = useRouter();
@@ -151,8 +156,10 @@ onMounted(()=>{
   <Column v-if="visualizarEditar" field="editar" header="Editar" class="p-1">
     <template #body="{ data }">
       <div class="flex justify-center">
-        <Button class="hover:text-gray-600 cursor-pointer p-1 m-1 px-2 bg-gray-400 text-white border-0 rounded shadow hover:bg-gray-300 transition">
-          <RouterLink to="/areasagro/cadastrotalhao">Editar</RouterLink>
+        <Button
+        @click="editarTalhao(data.idFazenda,data.id)"
+        class="hover:text-gray-600 cursor-pointer p-1 m-1 px-2 bg-gray-400 text-white border-0 rounded shadow hover:bg-gray-300 transition">
+          Editar
         </Button>
       </div>
     </template>

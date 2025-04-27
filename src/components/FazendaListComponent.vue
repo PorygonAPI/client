@@ -2,12 +2,9 @@
 import { DataTable, Column, Button, InputText, Tag } from 'primevue';
 import { FilterMatchMode } from '@primevue/core/api';
 import { ref, defineProps, computed } from 'vue';
-import { RouterLink } from 'vue-router';
 import Dialog from 'primevue/dialog';
 import { useRouter } from 'vue-router';
-import { useToast } from 'primevue/usetoast';
 
-const toast = useToast();
 const TOKEN = localStorage.getItem('token');
 
 const router = useRouter();
@@ -184,6 +181,5 @@ const mostrarAlerta = (mensagem, tipo = 'success') => {
       </div>
     </Dialog>
 
-    <Toast />
   </div>
 </template>
