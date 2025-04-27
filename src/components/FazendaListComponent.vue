@@ -1,11 +1,13 @@
 <script setup>
-import { DataTable, Column, Button, InputText, Tag,Toast } from 'primevue';
+import { DataTable, Column, Button, InputText, Tag } from 'primevue';
 import { FilterMatchMode } from '@primevue/core/api';
 import { ref, defineProps, computed } from 'vue';
 import { RouterLink } from 'vue-router';
 import Dialog from 'primevue/dialog';
 import { useRouter } from 'vue-router';
+import { useToast } from 'primevue/usetoast';
 
+const toast = useToast();
 const TOKEN = localStorage.getItem('token');
 
 const router = useRouter();
@@ -69,19 +71,35 @@ const abrirDialog = (data) => {
       // Atualizar a lista de fazendas para refletir a exclusão
       window.location.reload();
     } else {
-      console.error('Erro ao excluir a fazenda');
-      toast.add({ severity: 'error', summary: 'Erro', detail: 'Não é possível excluir fazendas com talhões associados.', life: 3000 })
+      visibleExcluir.value=false;
+      mostrarAlerta( 'Não é possível excluir fazendas com talhões associados.', 'error');
     }
   } catch (error) {
     console.error('Erro ao chamar a API de exclusão:', error);
   }
 };
 
+const alertaVisivel = ref(false);
+const alertaMensagem = ref('');
+const alertaTipo = ref('success');
+
+const mostrarAlerta = (mensagem, tipo = 'success') => {
+  alertaMensagem.value = mensagem;
+  alertaTipo.value = tipo;
+  alertaVisivel.value = true;
+  setTimeout(() => {
+    alertaVisivel.value = false;
+  }, 2000);
+};
+
 </script>
 
 <template>
-  <Toast/>
   <div class="bg-white rounded-xl shadow p-5 flex flex-col gap-3">
+
+    <div v-if="alertaVisivel" :class="['fixed top-5 right-5 z-50 px-4 py-2 rounded shadow-lg text-white', alertaTipo === 'success' ? 'bg-green-500' : 'bg-red-500']">
+    {{ alertaMensagem }}
+    </div>
 
     <div class="flex justify-between">
       <InputText
@@ -166,5 +184,6 @@ const abrirDialog = (data) => {
       </div>
     </Dialog>
 
+    <Toast />
   </div>
 </template>
