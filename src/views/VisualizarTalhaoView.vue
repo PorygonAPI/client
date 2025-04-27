@@ -17,7 +17,9 @@
 import MapViewer from '@/components/MapViewer.vue';
 import { onMounted, ref } from 'vue';
 
+
 const TOKEN = localStorage.getItem('token')
+const ID =  (!localStorage.getItem('id_visualizacao')) ? 1 : localStorage.getItem('id_visualizacao')
 
 //***CONSTANTES de TESTES MOCKADOS */
 // const fullGeoJson = '{"type": "FeatureCollection","name": "MAPA_CLASSIF_AUTOMATICA","crs": { "type": "name", "properties": { "name": "urn:ogc:def:crs:OGC:1.3:CRS84" } },"features": [{ "type": "Feature", "properties": { "MN_TL": 24, "CLASSE": "DANINHAS", "AREA_M2": 0.194 }, "geometry": { "type": "MultiPolygon", "coordinates": [ [ [ [ -49.344077296019982, -20.645835526132164 ], [ -49.344077296019982, -20.645837466792386 ], [ -49.344088075803391, -20.645837466792386 ], [ -49.344088075803391, -20.645836289470886 ], [ -49.344077296019982, -20.645835526132164 ] ] ] ] } },{ "type": "Feature", "properties": { "MN_TL": 24, "CLASSE": "DANINHAS", "AREA_M2": 1.844 }, "geometry": { "type": "MultiPolygon", "coordinates": [ [ [ [ -49.343805106488894, -20.645837466792386 ], [ -49.343805106488894, -20.645840161738239 ], [ -49.343802411543045, -20.645840161738239 ], [ -49.343802411543045, -20.645845551629943 ], [ -49.343805106488894, -20.645845551629943 ], [ -49.343805106488894, -20.645850941521648 ], [ -49.34380780143475, -20.645850941521648 ], [ -49.34380780143475, -20.6458536364675 ], [ -49.343813191326454, -20.6458536364675 ], [ -49.343813191326454, -20.645850941521648 ], [ -49.343815886272303, -20.645850941521648 ], [ -49.343815886272303, -20.645842856684091 ], [ -49.343813191326454, -20.645842856684091 ], [ -49.343813191326454, -20.645837466792386 ], [ -49.343805106488894, -20.645837466792386 ] ] ] ] } }]}'
@@ -32,7 +34,7 @@ const areaAgricola = ref();
 
 const fetchData = async () => {
   try {
-    const response = await fetch('api/areas-agricolas/1/detalhes-completos', {
+    const response = await fetch(`api/areas-agricolas/${ID}/detalhes-completos`, {
       headers: {
         'Accept': 'application/json',
         'Content-Type': 'application/json',
