@@ -4,7 +4,6 @@ export async function listarTalhoesPorUsuario(userId) {
   console.log('Iniciando chamada à API para userId:', userId);
 
   try {
-    // Ajustando a rota para corresponder à API real
     const response = await fetch(`/api/safras/api/talhoes/usuario/${userId}`, {
       headers: {
         'Accept': 'application/json',
@@ -24,7 +23,6 @@ export async function listarTalhoesPorUsuario(userId) {
     const data = await response.json();
     console.log('Dados recebidos da API:', data);
 
-    // Transformando os dados para o formato que a view espera
     return {
       atribuidos: data.atribuidos.map(t => ({
         id: t.talhaoId,

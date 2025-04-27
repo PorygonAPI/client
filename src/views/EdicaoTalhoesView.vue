@@ -25,7 +25,6 @@ const fetchData = async () => {
     const response = await listarTalhoesPorUsuario(userId);
     console.log('Dados recebidos:', response);
 
-    // Os dados já vêm mapeados do serviço no formato correto
     talhoesAtribuidos.value = response.atribuidos;
     talhoesAprovados.value = response.aprovados;
 
@@ -81,13 +80,11 @@ onMounted(() => {
   <div class="edicao-talhoes-container p-4 md:p-6">
     <h1 class="text-2xl md:text-3xl font-semibold text-gray-800 mb-4">Edição de Talhões</h1>
 
-    <!-- Loading state -->
     <div v-if="isLoading" class="text-center py-8">
       <i class="pi pi-spin pi-spinner text-4xl text-orange-400"></i>
       <p class="mt-2 text-gray-600">Carregando talhões...</p>
     </div>
 
-    <!-- Error state -->
     <div v-else-if="error" class="bg-red-50 border border-red-200 text-red-700 p-4 rounded-lg mb-6">
       <p class="font-medium">{{ error }}</p>
       <button
@@ -98,7 +95,6 @@ onMounted(() => {
       </button>
     </div>
 
-    <!-- Content -->
     <div v-else>
       <div class="controls-section bg-white p-4 rounded-lg shadow-md mb-6">
         <div class="flex flex-col md:flex-row md:justify-between md:items-center gap-4">
