@@ -2,6 +2,7 @@
 import AnalistaTalhaoComponent from '@/components/AnalistaTalhaoComponent.vue';
 import { ref, onMounted } from 'vue';
 import { useToast } from 'primevue/usetoast';
+import Toast from 'primevue/toast';
 
 const talhoesPendentes = ref([]);
 const loading = ref(true);
@@ -52,7 +53,7 @@ const fetchTalhoesPendentes = async () => {
   }
 };
 
-const handleTalhaoAtribuido = (data) => {
+const handleTalhaoAtribuido = async (data) => {
   console.log('Talhão atribuído, removendo da lista:', data);
 
   talhoesPendentes.value = talhoesPendentes.value.filter(talhao =>
@@ -65,6 +66,10 @@ const handleTalhaoAtribuido = (data) => {
     detail: 'Talhão atribuído com sucesso!',
     life: 3000
   });
+
+  setTimeout(() => {
+    fetchTalhoesPendentes();
+  }, 2000);
 };
 
 const handleError = (errorMessage) => {
@@ -82,6 +87,7 @@ onMounted(() => {
 </script>
 
 <template>
+  <Toast />
   <div class="h-full w-[90%] ml-[5%] mr-[5%]">
     <div class="flex flex-col">
 

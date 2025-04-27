@@ -1,12 +1,10 @@
 <script setup>
 import { DataTable, Column, Button, InputText, Tag } from 'primevue';
 import { FilterMatchMode } from '@primevue/core/api';
-import { ref, defineProps, computed, defineEmits, onMounted } from 'vue';
-import { RouterLink, useRouter } from 'vue-router';
+import { ref, defineProps, computed, defineEmits } from 'vue';
+import { useRouter } from 'vue-router';
 import Dialog from 'primevue/dialog';
-import Dropdown from 'primevue/dropdown';
-import RadioButton from 'primevue/radiobutton';
-import UsuarioService from '@/services/UsuarioService';
+import { useToast } from 'primevue/usetoast';
 
 const props = defineProps({
   talhao: {
@@ -16,6 +14,7 @@ const props = defineProps({
 });
 
 const router = useRouter();
+const toast = useToast();
 const emits = defineEmits(['talhao-atribuido', 'error']);
 
 const filtros = ref({
@@ -26,73 +25,64 @@ const searchById = ref('');
 const talhaoSelecionado = ref(null);
 const confirmarAtribuirDialog = ref(false);
 const loading = ref(false);
-const loadingAnalistas = ref(false);
 
-const atribuicaoTipo = ref('self');
-const analistas = ref([]);
-const analistaSelecionado = ref(null);
+const currentUserId = localStorage.getItem('userId');
+const currentUserName = localStorage.getItem('nome') || 'Usuário atual';
 
-const currentUser = ref({
-  id: localStorage.getItem('userId') || '',
-  nome: localStorage.getItem('nome') || 'Usuário atual'
-});
-
-const nomeFazendaSelecionada = computed(() => {
-  return talhaoSelecionado.value?.nomeFazenda;
-});
-
-const fetchAnalistas = async () => {
-  loadingAnalistas.value = true;
-  try {
-    analistas.value = await UsuarioService.getAnalistas();
-    console.log('Analistas carregados:', analistas.value);
-  } catch (error) {
-    console.error('Falha ao carregar analistas:', error);
-    emits('error', 'Falha ao carregar a lista de analistas. Verifique o console.');
-    analistas.value = [];
-  } finally {
-    loadingAnalistas.value = false;
+const filteredTalhoes = computed(() => {
+  if (searchById.value && searchById.value.trim() !== '') {
+    return props.talhao.filter(talhao =>
+      talhao.id?.toString() === searchById.value.trim()
+    );
   }
+  return props.talhao;
+});
+
+const isSearchFocused = ref(false);
+
+const handleIdInput = (event) => {
+  event.target.value = event.target.value.replace(/\D/g, '');
+  searchById.value = event.target.value;
 };
 
 const abrirDialogAtribuir = (data) => {
   talhaoSelecionado.value = data;
-  atribuicaoTipo.value = 'self';
-  analistaSelecionado.value = null;
   confirmarAtribuirDialog.value = true;
 
-  if (analistas.value.length === 0 && !loadingAnalistas.value) {
-     fetchAnalistas();
-  }
 };
 
 const confirmarAtribuicao = async () => {
-  let analistaId;
-
-  if (atribuicaoTipo.value === 'self') {
-    analistaId = currentUser.value.id;
-    if (!analistaId) {
-      emits('error', 'Não foi possível identificar o usuário atual. Por favor faça login novamente.');
-      return;
-    }
-  } else {
-    if (!analistaSelecionado.value) {
-      emits('error', 'Por favor, selecione um analista.');
-      return;
-    }
-    analistaId = analistaSelecionado.value.id;
+  if (!currentUserId) {
+    const errorMsg = 'Não foi possível identificar o usuário atual. Por favor faça login novamente.';
+    toast.add({
+      severity: 'error',
+      summary: 'Erro',
+      detail: errorMsg,
+      life: 5000
+    });
+    emits('error', errorMsg);
+    return;
   }
 
   if (!talhaoSelecionado.value || !talhaoSelecionado.value.id) {
-     emits('error', 'ID do talhão selecionado não encontrado.');
-     return;
+    const errorMsg = 'ID do talhão não encontrado.';
+    toast.add({
+      severity: 'error',
+      summary: 'Erro',
+      detail: errorMsg,
+      life: 5000
+    });
+    emits('error', errorMsg);
+    return;
   }
 
   loading.value = true;
   try {
-    console.log(`Atribuindo talhão ${talhaoSelecionado.value.id} para analista ${analistaId}`);
+    const safraId = talhaoSelecionado.value.id;
 
-    const response = await fetch(`/api/${talhaoSelecionado.value.id}/associar-analista/${analistaId}`, {
+    const apiUrl = `/api/safras/${safraId}/associar-analista/${currentUserId}`;
+
+    const response = await fetch(apiUrl, {
       method: 'PUT',
       headers: {
         'Accept': 'application/json',
@@ -104,25 +94,45 @@ const confirmarAtribuicao = async () => {
     console.log('Response status:', response.status);
 
     if (!response.ok) {
-      let errorMessage;
+      let errorMessage = `Erro ${response.status}`;
       try {
-        const errorData = await response.json();
-        errorMessage = errorData.message || `Erro ${response.status}`;
+        const text = await response.text(); // Pegar o texto bruto primeiro
+
+        if (text && text.trim().length > 0) {
+          try {
+            if (text.includes('{') || text.includes('[')) {
+              const errorData = JSON.parse(text);
+              errorMessage = errorData.message || errorMessage;
+            } else {
+              errorMessage = text;
+            }
+          } catch (jsonError) {
+            console.error('Erro ao analisar resposta:', jsonError);
+            errorMessage = text || errorMessage;
+          }
+        }
       } catch (e) {
-        errorMessage = await response.text() || `Erro ${response.status}`;
+        console.error('Erro ao ler resposta:', e);
       }
       throw new Error(errorMessage);
     }
 
+    confirmarAtribuirDialog.value = false;
     emits('talhao-atribuido', {
       talhaoId: talhaoSelecionado.value.id,
-      analistaId: analistaId
+      analistaId: currentUserId
     });
 
-    confirmarAtribuirDialog.value = false;
-    console.log('Talhão atribuído com sucesso:', talhaoSelecionado.value.id, 'para analista ID:', analistaId);
   } catch (error) {
     console.error('Erro ao atribuir analista:', error);
+
+    toast.add({
+      severity: 'error',
+      summary: 'Erro',
+      detail: `Falha ao atribuir analista: ${error.message}`,
+      life: 5000
+    });
+
     emits('error', `Falha ao atribuir analista: ${error.message}`);
   } finally {
     loading.value = false;
@@ -152,25 +162,13 @@ const formatNumber = (value) => {
   return value;
 };
 
-const filteredTalhoes = computed(() => {
-  if (searchById.value && searchById.value.trim() !== '') {
-    return props.talhao.filter(talhao =>
-      talhao.id.toString() === searchById.value.trim()
-    );
-  }
-  return props.talhao;
-});
-
-const isSearchFocused = ref(false);
-
-const handleIdInput = (event) => {
-  event.target.value = event.target.value.replace(/\D/g, '');
-  searchById.value = event.target.value;
-};
-
 const visualizarTalhao = (talhaoId) => {
   localStorage.setItem('id_visualizacao', talhaoId);
   router.push({ name: 'visualizarTalhao' });
+};
+
+const editarTalhao = (id) => {
+  router.push(`/talhao/editar/${id}`);
 };
 </script>
 
@@ -247,8 +245,8 @@ const visualizarTalhao = (talhaoId) => {
                 @click="() => abrirDialogAtribuir(slotProps.data)"
                 class="hover:text-gray-600 cursor-pointer p-2 m-1 bg-gray-400 text-white border-0 rounded-full shadow hover:bg-gray-300 transition"
                 icon="pi pi-user-plus"
-                aria-label="Atribuir"
-                tooltip="Atribuir talhão"
+                aria-label="Atribuir para mim"
+                tooltip="Atribuir para mim"
               />
             </div>
           </template>
@@ -257,8 +255,10 @@ const visualizarTalhao = (talhaoId) => {
         <Column field="editar" header="Editar" class="p-1">
           <template #body="slotProps">
             <div class="flex justify-center">
-              <Button class="hover:text-gray-600 cursor-pointer p-1 m-1 px-2 bg-gray-400 text-white border-0 rounded shadow hover:bg-gray-300 transition">
-                <RouterLink :to="`/talhao/editar/${slotProps.data.id}`">Editar</RouterLink>
+              <Button
+                @click="() => editarTalhao(slotProps.data.id)"
+                class="hover:text-gray-600 cursor-pointer p-1 m-1 px-2 bg-gray-400 text-white border-0 rounded shadow hover:bg-gray-300 transition">
+                Editar
               </Button>
             </div>
           </template>
@@ -266,7 +266,6 @@ const visualizarTalhao = (talhaoId) => {
       </DataTable>
     </div>
 
-    <!-- Analista-specific dialog -->
     <Dialog v-model:visible="confirmarAtribuirDialog" modal header="Atribuir Talhão" class="w-80 lg:w-96 p-1">
       <hr class="border-gray-200 mb-2">
       <div class="flex flex-col gap-3 mb-4">
@@ -282,33 +281,7 @@ const visualizarTalhao = (talhaoId) => {
 
         <div class="field">
           <label class="font-semibold block mb-1">Atribuir para:</label>
-
-          <div class="flex items-center gap-2 mb-2">
-            <RadioButton v-model="atribuicaoTipo" inputId="self" name="atribuicaoTipo" value="self" />
-            <label for="self">Eu mesmo ({{ currentUser.nome }})</label>
-          </div>
-
-          <div class="flex items-center gap-2">
-            <RadioButton v-model="atribuicaoTipo" inputId="other" name="atribuicaoTipo" value="other" />
-            <label for="other">Outro analista</label>
-          </div>
-        </div>
-
-        <div class="field" v-if="atribuicaoTipo === 'other'">
-          <label for="analista" class="font-semibold block mb-1">Selecionar Analista:</label>
-          <Dropdown
-            id="analista"
-            v-model="analistaSelecionado"
-            :options="analistas"
-            optionLabel="nome"
-            optionValue="id"
-            placeholder="Selecione um analista"
-            class="w-full"
-            :loading="loadingAnalistas"
-            :disabled="loadingAnalistas"
-            filter
-          />
-          <small v-if="!loadingAnalistas && analistas.length === 0" class="text-red-500">Não foi possível carregar analistas.</small>
+          <span class="block pl-2">{{ currentUserName }} (ID: {{ currentUserId }})</span>
         </div>
       </div>
 
@@ -320,7 +293,7 @@ const visualizarTalhao = (talhaoId) => {
           :loading="loading"
           severity="success"
           @click="confirmarAtribuicao"
-          :disabled="loading || (atribuicaoTipo === 'other' && !analistaSelecionado)"
+          :disabled="loading"
         />
       </div>
     </Dialog>
