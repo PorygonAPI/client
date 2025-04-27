@@ -1,13 +1,4 @@
-<!-- Referencias:
- https://leafletjs.com/examples/quick-start/
- https://leafletjs.com/examples/geojson/
- https://leafletjs.com/examples/layers-control/
- https://github.com/patrickmonteiro/quasar-pontos-turisticos/blob/main/src/components/LMap.vue
-   -->
-
 <template>
-    <!-- <h2>Map Viewer Test</h2>
-    <p>{{ talhoesGeoJson }}</p> -->
     <div id="map" class="h-full w-[90%] ml-[5%] mr-[5%]"></div>
 </template>
 
@@ -77,108 +68,6 @@ export default defineComponent({
 
         const setTalhoes = () => {
 
-            //***TESTE PONTO***
-            // var someFeatures = {
-            //     "type": "Feature",
-            //     "properties": {
-            //     },
-            //     "geometry": {
-            //         "type": "Point",
-            //         "coordinates": [-0.09, 51.5]
-            //     }
-            // };
-
-            //  ***TESTE GEOJSONPOLIGONO E ESTILIZACAO***
-            // var someFeatures = [{
-            //     "type": "Feature",
-            //     "properties": { "party": "Republican" },
-            //     "geometry": {
-            //         "type": "Polygon",
-            //         "coordinates": [[
-            //             [-104.05, 48.99],
-            //             [-97.22, 48.98],
-            //             [-96.58, 45.94],
-            //             [-104.03, 45.94],
-            //             [-104.05, 48.99]
-            //         ]]
-            //     }
-            // },
-            // {
-            //     "type": "Feature",
-            //     "properties": { "party": "Democrat" },
-            //     "geometry": {
-            //         "type": "MultiPolygon",
-            //         "coordinates": [[ [
-            //             [-109.05, 41.00],
-            //             [-102.06, 40.99],
-            //             [-102.03, 36.99],
-            //             [-109.04, 36.99],
-            //             [-109.05, 41.00]
-            //         ], [
-            //         [-46.3446028104612,-23.64587273889485],
-            //         [-46.3446028104612,-20.64587519603432],
-            //         [-46.344605505407046,-20.64587519603432],
-            //         [-49.344605505407046,-20.645880585926026],
-            //         [-49.34461089529875,-20.645880585926026],
-            //         [-49.34461089529875,-20.645873311398894],
-            //         [-49.3446028104612,-20.64587273889485]
-            //         ] ]]
-            //     }
-            // }
-            // ];
-
-
-            // var someFeatures = [
-            //     {
-
-            //         "type": "MultiPolygon",
-            //         "coordinates": [[[
-            //             [-109.05, 41.00],
-            //             [-102.06, 40.99],
-            //             [-102.03, 36.99],
-            //             [-109.04, 36.99],
-            //             [-109.05, 41.00]
-            //         ], [
-            //             [-46.3446028104612, -23.64587273889485],
-            //             [-46.3446028104612, -20.64587519603432],
-            //             [-46.344605505407046, -20.64587519603432],
-            //             [-49.344605505407046, -20.645880585926026],
-            //             [-49.34461089529875, -20.645880585926026],
-            //             [-49.34461089529875, -20.645873311398894],
-            //             [-49.3446028104612, -20.64587273889485]
-            //         ]]]
-
-            //     }
-            // ];
-
-            // L.geoJSON(someFeatures, {
-            //     style: function (feature) {
-            //         switch (feature.properties.party) {
-            //             case 'Republican': return { color: "#ff0000" };
-            //             case 'Democrat': return { color: "#0000ff" };
-            //         }
-            //     }
-            // }).addTo(map);
-
-            // console.log(JSON.stringify(someFeatures))
-
-            //**TESTE DE LAYERS */
-            // var littleton = L.marker([39.61, -105.02]).bindPopup('This is Littleton, CO.'),
-            //     denver = L.marker([39.74, -104.99]).bindPopup('This is Denver, CO.'),
-            //     aurora = L.marker([39.73, -104.8]).bindPopup('This is Aurora, CO.'),
-            //     golden = L.marker([39.77, -105.23]).bindPopup('This is Golden, CO.');
-
-            // var cities = L.layerGroup([aurora, golden]).addTo(map);
-
-            // var IDK = L.layerGroup([littleton, denver]).addTo(map);
-
-            // var overlayMaps = {
-            //     "Cities": cities,
-            //     "IDK": IDK
-            // };
-
-            // var layerControl = L.control.layers( null,overlayMaps).addTo(map);
-
             //**PEGANDO DO COMPONENTE PAI */
             var arquivoFazendaLayer = L.geoJSON(arquivoFazendaParsed, {
                 //Azul
@@ -187,7 +76,7 @@ export default defineComponent({
             )
 
             var arquivoDaninhaLayer = L.geoJSON(arquivoDaninhaParsed, {
-                //Vermelhor
+                //Vermelho
                 style: { color: "#ff0000" }
             }
             )
