@@ -41,6 +41,11 @@ const getStatusSeverity = (status) => {
   }
 };
 
+const visualizarImagem = (id) => {
+  localStorage.setItem('id_visualizacao', id);
+  router.push({ path: '/visualizartalhao' });
+}
+
 const nomeFazendaSelecionada = computed(() => fazendaSelecionada.value?.nome);
 
 const abrirDialog = (data) => {
@@ -117,18 +122,9 @@ const abrirDialog = (data) => {
       <Column field="imagem" header="Imagem" class="p-1">
         <template #body="{ data }">
           <div class="flex justify-center">
-            <Button class=" hover:text-gray-600 cursor-pointer p-1 m-1 px-2 bg-gray-400 text-white border-0 rounded shadow hover:bg-gray-300 transition">
+            <Button  @click="() => visualizarImagem(data.idFazenda)"
+            class=" hover:text-gray-600 cursor-pointer p-1 m-1 px-2 bg-gray-400 text-white border-0 rounded shadow hover:bg-gray-300 transition">
               Visualizar
-            </Button>
-          </div>
-        </template>
-      </Column>
-
-      <Column field="cadastrarTalhao" header="Cadastrar Talhão" class="p-1">
-        <template #body="{ data }">
-          <div class="flex justify-center">
-            <Button class=" hover:text-gray-600 cursor-pointer p-1 m-1 px-2 bg-gray-400 text-white border-0 rounded shadow hover:bg-gray-300 transition">
-              <RouterLink to="/areasagro/cadastrotalhao">Cadastrar</RouterLink>
             </Button>
           </div>
         </template>

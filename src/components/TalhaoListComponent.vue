@@ -4,8 +4,11 @@ import { FilterMatchMode } from  '@primevue/core/api';
 import { ref, defineProps, computed, onMounted } from 'vue';
 import { RouterLink } from 'vue-router';
 import Dialog from 'primevue/dialog';
+import { useRouter } from 'vue-router';
 
 const TOKEN = localStorage.getItem('token');
+
+const router = useRouter();
 
 const props = defineProps({
   talhao: {
@@ -58,7 +61,7 @@ const confirmarExclusao = async () => {
       window.location.reload();
     } else {
       console.error('Erro ao excluir o talhão');
-      
+
     }
   } catch (error) {
     console.error('Erro ao chamar a API de exclusão:', error);
@@ -76,6 +79,11 @@ const getStatusSeverity = (status) => {
     default:
       return 'info'
   }
+}
+
+const visualizarImagem = (id) => {
+  localStorage.setItem('id_visualizacao', id);
+  router.push({ path: '/visualizartalhao' });
 }
 
 onMounted(()=>{
@@ -131,6 +139,7 @@ onMounted(()=>{
     <template #body="{data}">
       <div class="flex justify-center">
         <Button
+        @click="() => visualizarImagem(data.idFazenda)"
         class="hover:text-gray-600 cursor-pointer p-1 m-1 px-2 bg-gray-400 text-white border-0 rounded shadow hover:bg-gray-300 transition">
         Visualizar
       </Button>
@@ -138,16 +147,6 @@ onMounted(()=>{
     </template>
   </Column>
 
-  <Column field="atribuir" header="Atribuir" class="p-1">
-    <template #body="{data}" >
-      <div class="flex justify-center">
-        <Button
-        class="hover:text-gray-600 cursor-pointer p-1 m-1 px-2 bg-gray-400 text-white border-0 rounded shadow hover:bg-gray-300 transition">
-        +
-        </Button>
-      </div>
-    </template>
-  </Column>
 
   <Column v-if="visualizarEditar" field="editar" header="Editar" class="p-1">
     <template #body="{ data }">

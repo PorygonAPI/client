@@ -50,7 +50,7 @@ const fetchTalhoes = async () => {
       return {
         id: talhao.id,
         nome: fazenda ? fazenda.nome : 'Fazenda não encontrada',
-        cultura: talhao.cultura,
+        cultura: talhao.culturaNome,
         produtividade: talhao.produtividadeAno || 0,
         area: talhao.area,
         solo: talhao.tipoSoloNome,
