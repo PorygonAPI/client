@@ -1,5 +1,5 @@
 <script setup>
-import TalhaoListComponent from '@/components/TalhaoListComponent.vue';
+import AnalistaTalhaoComponent from '@/components/AnalistaTalhaoComponent.vue';
 import { ref, onMounted } from 'vue';
 import { useToast } from 'primevue/usetoast';
 
@@ -102,7 +102,7 @@ onMounted(() => {
           </button>
         </div>
 
-        <TalhaoListComponent
+        <AnalistaTalhaoComponent
           v-else
           :talhao="talhoesPendentes"
           @talhao-atribuido="handleTalhaoAtribuido"
