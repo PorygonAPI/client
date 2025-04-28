@@ -1,11 +1,21 @@
 <script setup>
-import { DataTable, Column, Button, InputText, Tag } from 'primevue';
-import { FilterMatchMode } from '@primevue/core/api';
-import { ref, defineProps, computed } from 'vue';
-import { useRouter } from 'vue-router'; // Add this import
+import { DataTable,Column, Button, InputText, Tag, Toast  } from 'primevue';
+import { FilterMatchMode } from  '@primevue/core/api';
+import { ref, defineProps, computed, onMounted } from 'vue';
+import { RouterLink } from 'vue-router';
 import Dialog from 'primevue/dialog';
+import { useRouter } from 'vue-router';
 
-const router = useRouter(); // Add this line
+const editarTalhao = (idFazenda,id) => {
+
+  router.push({ path: '/areasagro/cadastrotalhao', query: { idFazenda: idFazenda , id:id} });
+};
+
+const TOKEN = localStorage.getItem('token');
+
+const router = useRouter();
+
+
 
 const props = defineProps({
   talhao: {
@@ -14,23 +24,55 @@ const props = defineProps({
   }
 });
 
+const visualizarExcluir = ref(false);
+const visualizarEditar = ref(false);
+
+const verifyRole = (role) =>{
+  if (role == "Administrador"){
+    visualizarExcluir.value = true;
+    visualizarEditar.value=true;
+  }
+  else{
+    visualizarExcluir.value=false;
+    visualizarEditar.value=false
+  }
+}
+
 const filtros = ref({
   global: { value: null, matchMode: FilterMatchMode.CONTAINS }
 })
 
 const visibleExcluir = ref(false);
-const fazendaSelecionada = ref(null);
+const talhaoSelecionado = ref(null);
 
-const nomeFazendaSelecionada = computed(() => fazendaSelecionada.value?.nome);
+const nomeTalhaoSelecionada = computed(() => talhaoSelecionado.value?.nome);
 
 const abrirDialog = (data) => {
-  fazendaSelecionada.value = data
+  talhaoSelecionado.value = data
   visibleExcluir.value = true
 };
 
-const confirmarExclusao = () => {
-  console.log('Excluir fazenda:', fazendaSelecionada.value);
-  visibleExcluir.value = false;
+const confirmarExclusao = async () => {
+  try {
+    const response = await fetch(`/api/talhoes/${talhaoSelecionado.value.id}`, {
+      method: 'DELETE',
+      headers: {
+        'Authorization': 'Bearer ' + TOKEN,
+        'Accept': 'application/json',
+        'Content-Type': 'application/json',
+      },
+    });
+
+    if (response.ok) {
+      console.log('Talhão excluído com sucesso');
+      window.location.reload();
+    } else {
+      console.error('Erro ao excluir o talhão');
+
+    }
+  } catch (error) {
+    console.error('Erro ao chamar a API de exclusão:', error);
+  }
 };
 
 const getStatusSeverity = (status) => {
@@ -46,13 +88,20 @@ const getStatusSeverity = (status) => {
   }
 }
 
-const editarTalhao = (id) => {
-  router.push(`/talhao/editar/${id}`);
-};
+const visualizarImagem = (id) => {
+  localStorage.setItem('id_visualizacao', id);
+  router.push({ path: '/visualizartalhao' });
+}
+
+onMounted(()=>{
+  const role = localStorage.getItem('role');
+  verifyRole(role)
+})
 
 </script>
 
 <template>
+<Toast/>
 <div class="bg-white rounded-xl shadow p-5 flex flex-col gap-3">
 
   <div class="flex justify-between ">
@@ -79,7 +128,7 @@ const editarTalhao = (id) => {
 
   <Column field="nome" header="Nome" sortable class="p-1 min-w-40 max-w-40"/>
   <Column field="cultura" header="Cultura" sortable class="p-1"/>
-  <Column field="produtividade" header="Produtividade" sortable class="p-1"/>
+  <!-- <Column field="produtividade" header="Produtividade" sortable class="p-1"/> -->
   <Column field="area" header="Área" sortable class="p-1"/>
   <Column field="solo" header="Solo" sortable class="p-1"/>
   <Column field="cidade" header="Cidade" sortable class="p-1"/>
@@ -97,6 +146,7 @@ const editarTalhao = (id) => {
     <template #body>
       <div class="flex justify-center">
         <Button
+        @click="() => visualizarImagem(data.idFazenda)"
         class="hover:text-gray-600 cursor-pointer p-1 m-1 px-2 bg-gray-400 text-white border-0 rounded shadow hover:bg-gray-300 transition">
         Visualizar
       </Button>
@@ -104,31 +154,20 @@ const editarTalhao = (id) => {
     </template>
   </Column>
 
-  <Column field="atribuir" header="Atribuir" class="p-1">
-    <template #body>
-      <div class="flex justify-center">
-        <Button
-        class="hover:text-gray-600 cursor-pointer p-1 m-1 px-2 bg-gray-400 text-white border-0 rounded shadow hover:bg-gray-300 transition">
-        +
-        </Button>
-      </div>
-    </template>
-  </Column>
 
-  <Column field="editar" header="Editar" class="p-1">
+  <Column v-if="visualizarEditar" field="editar" header="Editar" class="p-1">
     <template #body="{ data }">
       <div class="flex justify-center">
         <Button
-          class="hover:text-gray-600 cursor-pointer p-1 m-1 px-2 bg-gray-400 text-white border-0 rounded shadow hover:bg-gray-300 transition"
-          @click="editarTalhao(data.id)"
-        >
+        @click="editarTalhao(data.idFazenda,data.id)"
+        class="hover:text-gray-600 cursor-pointer p-1 m-1 px-2 bg-gray-400 text-white border-0 rounded shadow hover:bg-gray-300 transition">
           Editar
         </Button>
       </div>
     </template>
   </Column>
 
-  <Column field="excluir" header="Excluir" class="p-1">
+  <Column v-if="visualizarExcluir" field="excluir" header="Excluir" class="p-1">
     <template #body="{ data }">
       <div class="flex justify-center">
         <Button
@@ -145,7 +184,7 @@ const editarTalhao = (id) => {
 
   <Dialog v-model:visible="visibleExcluir" modal header="Confirmar Exclusão" class="w-72 lg:w-96 p-1">
       <hr class="border-gray-200 mb-2">
-      <span class="block mb-5 p-0.5">Tem certeza que deseja excluir este Talhão da <b>{{nomeFazendaSelecionada}}</b>?</span>
+      <span class="block mb-5 p-0.5">Tem certeza que deseja excluir este Talhão da <b>{{nomeTalhaoSelecionada}}</b>?</span>
       <div class="flex justify-end gap-2">
         <Button class="p-1" label="Cancelar" severity="secondary" @click="visibleExcluir = false" />
         <Button class="p-1" label="Confirmar" severity="danger" @click="confirmarExclusao" />
