@@ -15,6 +15,8 @@ const TOKEN = localStorage.getItem('token');
 
 const router = useRouter();
 
+
+
 const props = defineProps({
   talhao: {
     type: Array,
@@ -126,7 +128,7 @@ onMounted(()=>{
 
   <Column field="nome" header="Nome" sortable class="p-1 min-w-40 max-w-40"/>
   <Column field="cultura" header="Cultura" sortable class="p-1"/>
-  <Column field="produtividade" header="Produtividade" sortable class="p-1"/>
+  <!-- <Column field="produtividade" header="Produtividade" sortable class="p-1"/> -->
   <Column field="area" header="Área" sortable class="p-1"/>
   <Column field="solo" header="Solo" sortable class="p-1"/>
   <Column field="cidade" header="Cidade" sortable class="p-1"/>

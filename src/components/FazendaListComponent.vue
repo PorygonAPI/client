@@ -65,7 +65,6 @@ const abrirDialog = (data) => {
 
     if (response.ok) {
       console.log('Fazenda excluída com sucesso');
-      // Atualizar a lista de fazendas para refletir a exclusão
       window.location.reload();
     } else {
       visibleExcluir.value=false;
