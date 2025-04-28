@@ -77,6 +77,7 @@ export default {
           localStorage.setItem('token',data.token)
           localStorage.setItem('role',data.role)
           localStorage.setItem('nome',data.nome)
+          localStorage.setItem('userId', data.id)
           this.$router.push('/home')
         })
         .catch((error) => {
