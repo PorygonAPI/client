@@ -8,6 +8,11 @@ import AreasAgricolasView from '@/views/AreasAgricolasView.vue'
 import VetoresView from '@/views/VetoresView.vue'
 import DashboardView from '@/views/DashboardView.vue'
 import UserRegisterForm from '@/components/UserRegisterForm.vue'
+import CadastroFazenda from '@/components/CadastroFazenda.vue'
+import CadastroTalhao from '@/components/CadastroTalhao.vue'
+import EdicaoTalhoesView from '@/views/EdicaoTalhoesView.vue'
+import TalhaoView from '@/views/TalhaoView.vue'
+import VisualizarTalhaoView from '@/views/VisualizarTalhaoView.vue'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -57,7 +62,43 @@ const router = createRouter({
       path: '/cadastroUsuario',
       name: 'cadastroUsuario',
       component: UserRegisterForm
+    },
+    {
+      path:'/areasagro/cadastrofazenda',
+      name: 'cadastroFazenda',
+      component: CadastroFazenda
+    },
+    {
+      path:'/areasagro/cadastrotalhao',
+      name:'cadastroTalhao',
+      component: CadastroTalhao
+    },
+    {
+      path:'/visualizartalhao',
+      name:'visualizarTalhao',
+      component: VisualizarTalhaoView
+    },
+    {
+      path:'/talhao/edicao',
+      name: 'edicaoTalhoes',
+      component: EdicaoTalhoesView
+    },
+    {
+      path:'/talhao/editar/:id',
+      name: 'editarTalhao',
+      component: () => import('@/views/EditarTalhaoView.vue')
+    },
+    {
+      path:'/analista/talhoes',
+      name:'analistaTalhao',
+      component:TalhaoView
+    },
+    {
+      path:'/analista/edicao-talhoes',
+      name:'analistaEdicaoTalhao',
+      component: EdicaoTalhoesView
     }
+
   ]
 })
 

@@ -3,6 +3,7 @@ import App from './App.vue'
 import router from './router'
 import fetchPlugin from './plugins/fetch.js'
 import './assets/main.css'
+import 'primeicons/primeicons.css'
 
 import PrimeVue from 'primevue/config';
 
