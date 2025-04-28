@@ -143,7 +143,7 @@ onMounted(()=>{
   </Column>
 
   <Column field="imagem" header="Imagem" class="p-1">
-    <template #body="{data}">
+    <template #body>
       <div class="flex justify-center">
         <Button
         @click="() => visualizarImagem(data.idFazenda)"
