@@ -27,6 +27,7 @@ import { defineComponent, onMounted, onBeforeMount } from 'vue'
 import { useRouter } from 'vue-router'
 import 'leaflet/dist/leaflet.css'
 import L from 'leaflet'
+import 'leaflet-draw'
 
 export default defineComponent({
   props: {
@@ -91,8 +92,8 @@ export default defineComponent({
 
     const setLocalizacaoMapa = (geometria) => {
       if (geometria.coordinates?.length > 0 &&
-          geometria.coordinates[0]?.length > 0 &&
-          geometria.coordinates[0][0]?.length > 0) {
+        geometria.coordinates[0]?.length > 0 &&
+        geometria.coordinates[0][0]?.length > 0) {
         let first = geometria.coordinates[0][0][0][1]
         let last = geometria.coordinates[0][0][0][0]
         mapLocation = [first, last]
@@ -119,16 +120,65 @@ export default defineComponent({
       if (daninhaGeometry) {
         const daninhaLayer = L.geoJSON(daninhaGeometry, {
           style: { color: "#ff0000" }
-        })
+        }).bindPopup(`<p>${JSON.stringify(daninhaGeometry)}</p>`)
         overlayMaps["Daninhas"] = L.layerGroup([daninhaLayer]).addTo(map)
       }
+
+      var drawnFeatures = new L.FeatureGroup();
+      map.addLayer(drawnFeatures);
 
       if (finalDaninhaGeometry) {
         const finalDaninhaLayer = L.geoJSON(finalDaninhaGeometry, {
           style: { color: "#ffa500" }
         })
-        overlayMaps["Daninhas Editado"] = L.layerGroup([finalDaninhaLayer]).addTo(map)
+        overlayMaps["Daninhas Editado"] = L.layerGroup([finalDaninhaLayer, drawnFeatures]).addTo(map)
       }
+
+      //Método para salvar features novos criados a partir da aplicação (ie clicando e arrasta)
+      map.on("draw:created", function (e) {
+        var layer = e.layer;
+
+        //Ao clicar na feature, mostrar o geoJSON do mesmo
+        layer.bindPopup(`<p>${JSON.stringify(layer.toGeoJSON().geometry)}</p>`)
+
+        //'Salva' a feature no mapa depois que o usuário terminar de desenhar
+        drawnFeatures.addLayer(layer);
+      });
+
+      var drawControl = new L.Control.Draw({
+        draw: {
+          polyline: {
+            shapeOptions: {
+              color: '#ffa500'
+            }
+          },
+          polygon: {
+            shapeOptions: {
+              color: '#ffa500'
+            }
+          },
+          rectangle: false,
+          circle: {
+            shapeOptions: {
+              color: '#ffa500'
+            }
+          }
+        },
+        edit: {
+             featureGroup: drawnFeatures
+         }
+      });
+      map.addControl(drawControl);
+
+      // map.on("draw:edited", function (e) {
+      //   var layers = e.layers;
+      //   var type = e.layerType;
+
+      //   layers.eachLayer(function (layer) {
+      //     console.log(layer)
+      //   })
+
+      // })
 
       L.control.layers(null, overlayMaps).addTo(map)
 
