@@ -122,7 +122,7 @@
 </template>
 
 <script setup>
-import { ref, onMounted, watch, defineProps } from 'vue';
+import { ref, onMounted, watch } from 'vue';
 import { FloatLabel, InputText, Divider, Select, Toast } from 'primevue';
 import { useToast } from 'primevue/usetoast';
 import { useRoute, useRouter } from 'vue-router';
@@ -270,7 +270,7 @@ const cadastrarOuAtualizarFazenda = async () => {
     let fetchData = {};
 
     if (isEditing.value) {
-  
+
       fetchData = {
         nomeFazenda: nomeFazenda.value,
         estado: estadoSelecionado.value,

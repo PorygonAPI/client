@@ -22,7 +22,7 @@ const fetchFazendas = async () => {
     const data = await response.json();
 
     fazendas.value = data.map(fazenda => ({
-      id:fazenda.id,
+      id: fazenda.id,
       nome: fazenda.nomeFazenda,
       cidade: fazenda.cidadeNome,
       estado: fazenda.estado,
@@ -51,7 +51,7 @@ const fetchTalhoes = async () => {
         id: talhao.id,
         nome: fazenda ? fazenda.nome : 'Fazenda não encontrada',
         cultura: talhao.culturaNome,
-        produtividade: talhao.produtividadeAno || 0,
+        produtividade: talhao.produtividadeAno,
         area: talhao.area,
         solo: talhao.tipoSoloNome,
         cidade: fazenda ? fazenda.cidade : 'Cidade não encontrada',
