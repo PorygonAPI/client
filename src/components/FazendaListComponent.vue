@@ -47,10 +47,10 @@ const visualizarImagem = (id) => {
 
 const nomeFazendaSelecionada = computed(() => fazendaSelecionada.value?.nome);
 
-const abrirDialog = (data) => {
-  fazendaSelecionada.value = data
-  visibleExcluir.value = true
-};
+// const abrirDialog = (data) => {
+//   fazendaSelecionada.value = data
+//   visibleExcluir.value = true
+// };
 
   const confirmarExclusao = async () => {
   try {
@@ -156,7 +156,7 @@ const mostrarAlerta = (mensagem, tipo = 'success') => {
         </template>
       </Column>
 
-      <Column field="excluir" header="Excluir" class="p-1">
+      <!-- <Column field="excluir" header="Excluir" class="p-1">
         <template #body="{ data }">
           <div class="flex justify-center">
             <Button
@@ -167,7 +167,8 @@ const mostrarAlerta = (mensagem, tipo = 'success') => {
             </Button>
           </div>
         </template>
-      </Column>
+      </Column> -->
+
     </DataTable>
 
 
