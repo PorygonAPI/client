@@ -11,7 +11,7 @@
       <div id="map" class="w-full h-[500px] mb-6 rounded-lg shadow"></div>
 
       <div class="flex justify-end gap-4">
-        <button class="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600">
+        <button @click="salvar" class="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600">
           Salvar
         </button>
         <button class="px-4 py-2 bg-green-500 text-white rounded hover:bg-green-600">
@@ -41,6 +41,7 @@ export default defineComponent({
     let map = null
     let mapLocation = []
     const TOKEN = localStorage.getItem('token')
+    var drawnFeatures = new L.FeatureGroup();
 
     const voltar = () => {
       router.push('/analista/edicao-talhoes')
@@ -76,6 +77,8 @@ export default defineComponent({
         console.log('Dados recebidos:', data)
 
         const fazendaGeometry = JSON.parse(data.fazenda.arquivoFazenda)
+
+        // const talhao = data.talhao?.find(t => t.id > 0)
         const talhao = data.talhao?.find(t => t.id === Number(props.id))
 
         if (talhao?.safras?.[0]) {
@@ -121,18 +124,17 @@ export default defineComponent({
         const daninhaLayer = L.geoJSON(daninhaGeometry, {
           style: { color: "#ff0000" }
         }).bindPopup(`<p>${JSON.stringify(daninhaGeometry)}</p>`)
-        overlayMaps["Daninhas"] = L.layerGroup([daninhaLayer]).addTo(map)
+        overlayMaps["Imagem Original"] = L.layerGroup([daninhaLayer]).addTo(map)
       }
 
-      var drawnFeatures = new L.FeatureGroup();
       map.addLayer(drawnFeatures);
 
-      if (finalDaninhaGeometry) {
-        const finalDaninhaLayer = L.geoJSON(finalDaninhaGeometry, {
-          style: { color: "#ffa500" }
-        })
-        overlayMaps["Daninhas Editado"] = L.layerGroup([finalDaninhaLayer, drawnFeatures]).addTo(map)
-      }
+      // if (finalDaninhaGeometry) {
+      const finalDaninhaLayer = L.geoJSON(finalDaninhaGeometry, {
+        style: { color: "#ffa500" }
+      })
+      overlayMaps["Imagem Editada"] = L.layerGroup([finalDaninhaLayer, drawnFeatures]).addTo(map)
+      // }
 
       //Método para salvar features novos criados a partir da aplicação (ie clicando e arrasta)
       map.on("draw:created", function (e) {
@@ -165,8 +167,8 @@ export default defineComponent({
           }
         },
         edit: {
-             featureGroup: drawnFeatures
-         }
+          featureGroup: drawnFeatures
+        }
       });
       map.addControl(drawControl);
 
@@ -185,7 +187,36 @@ export default defineComponent({
       map.fitBounds(fazendaLayer.getBounds())
     }
 
-    return { voltar }
+    const generateUpdatedGeoJson = () => {
+      let newCoordinates = null
+      let outputGeoJson = null
+      drawnFeatures.eachLayer(function (layer) {
+
+        if (outputGeoJson == null) {
+          outputGeoJson = layer.toGeoJSON()
+        }
+
+        if (newCoordinates == null) {
+          newCoordinates = layer.toGeoJSON().geometry.coordinates[0]
+        }
+        else {
+          var newLayer = layer.toGeoJSON().geometry.coordinates[0]
+          newLayer.forEach(coordinate => {
+            newCoordinates.push(coordinate)
+          });
+        }
+      });
+
+      outputGeoJson.geometry.coordinates = newCoordinates
+
+      return outputGeoJson
+    }
+
+    const salvar = () => {
+      console.log( generateUpdatedGeoJson() )
+    }
+
+    return { voltar, salvar }
   }
 })
 </script>
