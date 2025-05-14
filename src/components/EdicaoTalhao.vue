@@ -78,8 +78,8 @@ export default defineComponent({
 
         const fazendaGeometry = JSON.parse(data.fazenda.arquivoFazenda)
 
-        const talhao = data.talhao?.find(t => t.id > 0)
-        // const talhao = data.talhao?.find(t => t.id === Number(props.id))
+        // const talhao = data.talhao?.find(t => t.id > 0)
+        const talhao = data.talhao?.find(t => t.id === Number(props.id))
 
         if (talhao?.safras?.[0]) {
           const daninhaGeometry = JSON.parse(talhao.safras[0].arquivoDaninha)
@@ -142,29 +142,10 @@ export default defineComponent({
         })
       }
 
-      var polyLayers = [];
-
-      finalDaninhaLayer.eachLayer(function (layer) {
-        polyLayers.push(layer)
-      });
-
-      // Add the layers to the drawnFeatures feature group 
-      for (let layer of polyLayers) {
-        drawnFeatures.addLayer(layer);
-      }
+      //Função que configura os polígonos para serem editados
+      transformGeoJsonIntoEditableLayer(finalDaninhaLayer, drawnFeatures)
 
       overlayMaps["Imagem Editada"] = L.layerGroup([finalDaninhaLayer, drawnFeatures]).addTo(map)
-
-      //Método para salvar features novos criados a partir da aplicação (ie clicando e arrasta)
-      map.on("draw:created", function (e) {
-        var layer = e.layer;
-
-        //Ao clicar na feature, mostrar o geoJSON do mesmo
-        layer.bindPopup(`<p>${JSON.stringify(layer.toGeoJSON().geometry)}</p>`)
-
-        //'Salva' a feature no mapa depois que o usuário terminar de desenhar
-        drawnFeatures.addLayer(layer);
-      });
 
       var drawControl = new L.Control.Draw({
         draw: {
@@ -191,6 +172,17 @@ export default defineComponent({
       });
       map.addControl(drawControl);
 
+      //Método para salvar features novos criados a partir da aplicação (ie clicando e arrasta)
+      map.on("draw:created", function (e) {
+        var layer = e.layer;
+
+        //Ao clicar na feature, mostrar o geoJSON do mesmo
+        layer.bindPopup(`<p>${JSON.stringify(layer.toGeoJSON().geometry)}</p>`)
+
+        //'Salva' a feature no mapa depois que o usuário terminar de desenhar
+        drawnFeatures.addLayer(layer);
+      });
+
       map.on("draw:edited", function (e) {
         var layers = e.layers;
 
@@ -203,6 +195,19 @@ export default defineComponent({
       L.control.layers(null, overlayMaps).addTo(map)
 
       map.fitBounds(fazendaLayer.getBounds())
+    }
+
+    const transformGeoJsonIntoEditableLayer = (geoJson, featureToBeAdded) => {
+      let polyLayers = [];
+
+      geoJson.eachLayer(function (layer) {
+        polyLayers.push(layer)
+      });
+
+      // Add the layers to the feature group 
+      for (let layer of polyLayers) {
+        featureToBeAdded.addLayer(layer);
+      }
     }
 
     const generateUpdatedGeoJson = () => {
