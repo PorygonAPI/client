@@ -78,8 +78,8 @@ export default defineComponent({
 
         const fazendaGeometry = JSON.parse(data.fazenda.arquivoFazenda)
 
-        // const talhao = data.talhao?.find(t => t.id > 0)
-        const talhao = data.talhao?.find(t => t.id === Number(props.id))
+        const talhao = data.talhao?.find(t => t.id > 0)
+        // const talhao = data.talhao?.find(t => t.id === Number(props.id))
 
         if (talhao?.safras?.[0]) {
           const daninhaGeometry = JSON.parse(talhao.safras[0].arquivoDaninha)
@@ -128,13 +128,32 @@ export default defineComponent({
       }
 
       map.addLayer(drawnFeatures);
+      let finalDaninhaLayer = null
 
-      // if (finalDaninhaGeometry) {
-      const finalDaninhaLayer = L.geoJSON(finalDaninhaGeometry, {
-        style: { color: "#ffa500" }
-      })
+      if (finalDaninhaGeometry) {
+        finalDaninhaLayer = L.geoJSON(finalDaninhaGeometry, {
+          style: { color: "#ffa500" }
+        })
+      }
+      else {
+        finalDaninhaLayer = L.geoJSON(daninhaGeometry, {
+          style: { color: "#ffa500" }
+
+        })
+      }
+
+      var polyLayers = [];
+
+      finalDaninhaLayer.eachLayer(function (layer) {
+        polyLayers.push(layer)
+      });
+
+      // Add the layers to the drawnFeatures feature group 
+      for (let layer of polyLayers) {
+        drawnFeatures.addLayer(layer);
+      }
+
       overlayMaps["Imagem Editada"] = L.layerGroup([finalDaninhaLayer, drawnFeatures]).addTo(map)
-      // }
 
       //Método para salvar features novos criados a partir da aplicação (ie clicando e arrasta)
       map.on("draw:created", function (e) {
@@ -172,15 +191,14 @@ export default defineComponent({
       });
       map.addControl(drawControl);
 
-      // map.on("draw:edited", function (e) {
-      //   var layers = e.layers;
-      //   var type = e.layerType;
+      map.on("draw:edited", function (e) {
+        var layers = e.layers;
 
-      //   layers.eachLayer(function (layer) {
-      //     console.log(layer)
-      //   })
+        layers.eachLayer(function (layer) {
+         layer.bindPopup(`<p>${JSON.stringify(layer.toGeoJSON().geometry)}</p>`)
+        })
 
-      // })
+      })
 
       L.control.layers(null, overlayMaps).addTo(map)
 
@@ -213,7 +231,7 @@ export default defineComponent({
     }
 
     const salvar = () => {
-      console.log( generateUpdatedGeoJson() )
+      console.log(generateUpdatedGeoJson())
     }
 
     return { voltar, salvar }
