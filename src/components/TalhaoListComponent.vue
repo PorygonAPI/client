@@ -1,8 +1,7 @@
 <script setup>
 import { DataTable,Column, Button, InputText, Tag, Toast  } from 'primevue';
 import { FilterMatchMode } from  '@primevue/core/api';
-import { ref, defineProps, computed, onMounted } from 'vue';
-import { RouterLink } from 'vue-router';
+import { ref, defineProps, computed } from 'vue';
 import Dialog from 'primevue/dialog';
 import { useRouter } from 'vue-router';
 
@@ -15,28 +14,12 @@ const TOKEN = localStorage.getItem('token');
 
 const router = useRouter();
 
-
-
 const props = defineProps({
   talhao: {
     type: Array,
     required: true
   }
 });
-
-const visualizarExcluir = ref(false);
-const visualizarEditar = ref(false);
-
-const verifyRole = (role) =>{
-  if (role == "Administrador"){
-    visualizarExcluir.value = true;
-    visualizarEditar.value=true;
-  }
-  else{
-    visualizarExcluir.value=false;
-    visualizarEditar.value=false
-  }
-}
 
 const filtros = ref({
   global: { value: null, matchMode: FilterMatchMode.CONTAINS }
@@ -47,10 +30,10 @@ const talhaoSelecionado = ref(null);
 
 const nomeTalhaoSelecionada = computed(() => talhaoSelecionado.value?.nome);
 
-const abrirDialog = (data) => {
-  talhaoSelecionado.value = data
-  visibleExcluir.value = true
-};
+// const abrirDialog = (data) => {
+//   talhaoSelecionado.value = data
+//   visibleExcluir.value = true
+// };
 
 const confirmarExclusao = async () => {
   try {
@@ -93,10 +76,6 @@ const visualizarImagem = (id) => {
   router.push({ path: '/visualizartalhao' });
 }
 
-onMounted(()=>{
-  const role = localStorage.getItem('role');
-  verifyRole(role)
-})
 
 </script>
 
@@ -128,7 +107,7 @@ onMounted(()=>{
 
   <Column field="nome" header="Nome" sortable class="p-1 min-w-40 max-w-40"/>
   <Column field="cultura" header="Cultura" sortable class="p-1"/>
-  <!-- <Column field="produtividade" header="Produtividade" sortable class="p-1"/> -->
+  <Column field="produtividade" header="Produtividade" sortable class="p-1"/>
   <Column field="area" header="Área" sortable class="p-1"/>
   <Column field="solo" header="Solo" sortable class="p-1"/>
   <Column field="cidade" header="Cidade" sortable class="p-1"/>
@@ -146,7 +125,7 @@ onMounted(()=>{
     <template #body="{ data }" >
       <div class="flex justify-center">
         <Button
-        @click="() => visualizarImagem(data.id)"
+        @click="() => visualizarImagem(data.idFazenda)"
         class="hover:text-gray-600 cursor-pointer p-1 m-1 px-2 bg-gray-400 text-white border-0 rounded shadow hover:bg-gray-300 transition">
         Visualizar
       </Button>
@@ -155,7 +134,7 @@ onMounted(()=>{
   </Column>
 
 
-  <Column v-if="visualizarEditar" field="editar" header="Editar" class="p-1">
+  <Column field="editar" header="Editar" class="p-1">
     <template #body="{ data }">
       <div class="flex justify-center">
         <Button
@@ -167,7 +146,7 @@ onMounted(()=>{
     </template>
   </Column>
 
-  <Column v-if="visualizarExcluir" field="excluir" header="Excluir" class="p-1">
+  <!-- <Column field="excluir" header="Excluir" class="p-1">
     <template #body="{ data }">
       <div class="flex justify-center">
         <Button
@@ -178,7 +157,7 @@ onMounted(()=>{
         </Button>
       </div>
     </template>
-  </Column>
+  </Column> -->
 
   </DataTable>
 
