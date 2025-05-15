@@ -1,5 +1,24 @@
 <template>
   <div class="p-4">
+
+    <div v-if="mostrarModal" class="fixed inset-0 flex items-center justify-center bg-gray-200/[var(--bg-opacity)] [--bg-opacity:50%] z-50">
+      <div class="bg-white rounded-lg shadow-lg p-6 w-full max-w-md z-50 relative">
+        <h2 class="text-lg font-semibold text-gray-800 mb-4">Confirmar salvamento</h2>
+        <p class="text-gray-700 mb-6">
+          Ao salvar a versão atual, a última versão será excluída.<br>
+          Tem certeza que deseja substituir?
+        </p>
+        <div class="flex justify-end gap-4">
+          <button @click="cancelar" class="px-4 py-2 bg-gray-300 text-gray-800 rounded hover:bg-gray-400">
+            Cancelar
+          </button>
+          <button @click="salvar" class="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600">
+            Confirmar
+          </button>
+        </div>
+      </div>
+    </div>
+
     <div class="bg-white rounded-lg shadow-md p-6 w-[90%] mx-auto">
       <div class="flex items-center mb-6">
         <button @click="voltar" class="mr-4 text-gray-600 hover:text-gray-800">
@@ -18,10 +37,10 @@
         </div>
       </div>
 
-      <div id="map" class="w-full h-[500px] mb-6 rounded-lg shadow"></div>
+      <div id="map" class="w-full h-[500px] mb-6 rounded-lg shadow z-0"></div>
 
       <div class="flex justify-end gap-4">
-        <button class="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600">
+        <button @click="mostrarModal = true" class="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600">
           Salvar
         </button>
         <button class="px-4 py-2 bg-green-500 text-white rounded hover:bg-green-600">
@@ -47,13 +66,26 @@ export default defineComponent({
   },
   setup(props) {
     const router = useRouter()
-    let map = null
-    let mapLocation = []
     const TOKEN = localStorage.getItem('token')
     const safraInfo = ref(null)
+    const mostrarModal = ref(false)
+
+    let map = null
+    let mapLocation = []
 
     const voltar = () => {
       router.push('/analista/edicao-talhoes')
+    }
+
+    const cancelar = () => {
+      mostrarModal.value = false
+    }
+
+    const salvar = () => {
+      console.log('Salvando dados...')
+      // Aqui entra sua lógica de salvamento real (API, etc.)
+      mostrarModal.value = false
+      alert('Dados salvos com sucesso!')
     }
 
     onMounted(() => {
@@ -83,8 +115,6 @@ export default defineComponent({
         if (!response.ok) throw new Error('Erro ao carregar dados')
 
         const data = await response.json()
-        console.log('Dados recebidos:', data)
-
         const fazendaGeometry = JSON.parse(data.fazenda.arquivoFazenda)
         const talhao = data.talhao?.find(t => t.id === Number(props.id))
 
@@ -94,7 +124,7 @@ export default defineComponent({
             cultura: talhao.safras[0].cultura || 'N/A',
             ano: talhao.safras[0].ano || 'N/A'
           }
-          
+
           const daninhaGeometry = JSON.parse(talhao.safras[0].arquivoDaninha)
           const finalDaninhaGeometry = JSON.parse(talhao.safras[0].arquivoFinalDaninha)
           createMapLayer(fazendaGeometry, daninhaGeometry, finalDaninhaGeometry)
@@ -107,9 +137,11 @@ export default defineComponent({
     }
 
     const setLocalizacaoMapa = (geometria) => {
-      if (geometria.coordinates?.length > 0 &&
-          geometria.coordinates[0]?.length > 0 &&
-          geometria.coordinates[0][0]?.length > 0) {
+      if (
+        geometria.coordinates?.length > 0 &&
+        geometria.coordinates[0]?.length > 0 &&
+        geometria.coordinates[0][0]?.length > 0
+      ) {
         let first = geometria.coordinates[0][0][0][1]
         let last = geometria.coordinates[0][0][0][0]
         mapLocation = [first, last]
@@ -148,11 +180,16 @@ export default defineComponent({
       }
 
       L.control.layers(null, overlayMaps).addTo(map)
-
       map.fitBounds(fazendaLayer.getBounds())
     }
 
-    return { voltar, safraInfo }
+    return {
+      voltar,
+      safraInfo,
+      mostrarModal,
+      cancelar,
+      salvar
+    }
   }
 })
 </script>
@@ -162,5 +199,9 @@ export default defineComponent({
   width: 100%;
   height: 500px;
   border-radius: 0.5rem;
+}
+
+.z-50 {
+  z-index: 1000;
 }
 </style>
