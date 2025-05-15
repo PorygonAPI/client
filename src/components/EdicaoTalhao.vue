@@ -5,7 +5,17 @@
         <button @click="voltar" class="mr-4 text-gray-600 hover:text-gray-800">
           <i class="pi pi-arrow-left"></i>
         </button>
-        <h1 class="text-2xl font-semibold text-gray-800">Edição do Talhão #{{ id }}</h1>
+        <div>
+          <h1 class="text-2xl font-semibold text-gray-800">Edição do Talhão #{{ id }}</h1>
+          <div v-if="safraInfo" class="mt-1 flex">
+            <span class="inline-block bg-blue-100 text-blue-800 text-sm font-medium px-2 py-1 rounded">
+              Safra #{{ safraInfo.safraId }}
+            </span>
+            <span class="inline-block bg-gray-100 text-gray-700 text-sm px-2 py-1 rounded ml-2">
+              {{ safraInfo.cultura }} - {{ safraInfo.ano }}
+            </span>
+          </div>
+        </div>
       </div>
 
       <div id="map" class="w-full h-[500px] mb-6 rounded-lg shadow"></div>
@@ -23,7 +33,7 @@
 </template>
 
 <script>
-import { defineComponent, onMounted, onBeforeMount } from 'vue'
+import { defineComponent, onMounted, onBeforeMount, ref } from 'vue'
 import { useRouter } from 'vue-router'
 import 'leaflet/dist/leaflet.css'
 import L from 'leaflet'
@@ -40,6 +50,7 @@ export default defineComponent({
     let map = null
     let mapLocation = []
     const TOKEN = localStorage.getItem('token')
+    const safraInfo = ref(null)
 
     const voltar = () => {
       router.push('/analista/edicao-talhoes')
@@ -78,6 +89,12 @@ export default defineComponent({
         const talhao = data.talhao?.find(t => t.id === Number(props.id))
 
         if (talhao?.safras?.[0]) {
+          safraInfo.value = {
+            safraId: talhao.safras[0].id,
+            cultura: talhao.safras[0].cultura || 'N/A',
+            ano: talhao.safras[0].ano || 'N/A'
+          }
+          
           const daninhaGeometry = JSON.parse(talhao.safras[0].arquivoDaninha)
           const finalDaninhaGeometry = JSON.parse(talhao.safras[0].arquivoFinalDaninha)
           createMapLayer(fazendaGeometry, daninhaGeometry, finalDaninhaGeometry)
@@ -135,7 +152,7 @@ export default defineComponent({
       map.fitBounds(fazendaLayer.getBounds())
     }
 
-    return { voltar }
+    return { voltar, safraInfo }
   }
 })
 </script>
