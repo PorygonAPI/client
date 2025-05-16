@@ -205,7 +205,7 @@ const editarTalhao = (id) => {
         class="p-datatable-gridlines"
         :global-filter-fields="['id', 'nomeFazenda', 'cultura', 'produtividade', 'area', 'tipoSolo', 'cidade', 'estado', 'status']"
       >
-        <Column field="id" header="ID Talhão" sortable class="p-1 w-24"/>
+        <Column field="id" header="ID" sortable class="p-1 w-24"/>
         <Column field="nomeFazenda" header="Nome Fazenda" sortable class="p-1 min-w-40"/>
         <Column field="cultura" header="Cultura" sortable class="p-1"/>
         <Column field="produtividade" header="Produtividade" sortable class="p-1">
@@ -248,18 +248,6 @@ const editarTalhao = (id) => {
                 aria-label="Atribuir para mim"
                 tooltip="Atribuir para mim"
               />
-            </div>
-          </template>
-        </Column>
-
-        <Column field="editar" header="Editar" class="p-1">
-          <template #body="slotProps">
-            <div class="flex justify-center">
-              <Button
-                @click="() => editarTalhao(slotProps.data.id)"
-                class="hover:text-gray-600 cursor-pointer p-1 m-1 px-2 bg-gray-400 text-white border-0 rounded shadow hover:bg-gray-300 transition">
-                Editar
-              </Button>
             </div>
           </template>
         </Column>

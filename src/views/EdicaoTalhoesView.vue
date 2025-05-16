@@ -132,9 +132,13 @@ onMounted(() => {
             <div v-for="talhao in filteredTalhoesAtribuidos" :key="talhao.id" class="talhao-card border border-gray-200 rounded-lg p-3">
               <div class="flex justify-between items-start">
                 <div>
+                  <div class="mb-2">
+                    <span class="inline-block bg-blue-100 text-blue-800 text-xs font-semibold px-2 py-1 rounded">Safra #{{ talhao.safraId }}</span>
+                    <span class="inline-block bg-gray-100 text-gray-800 text-xs font-semibold px-2 py-1 rounded ml-1">Talhão #{{ talhao.id }}</span>
+                  </div>
                   <h4 class="font-medium text-gray-800">{{ talhao.fazenda }}</h4>
-                  <p class="text-sm text-gray-600">Talhão #{{ talhao.numero }}</p>
-                  <p class="text-sm text-gray-600">{{ talhao.cultura }}</p>
+                  <p class="text-sm text-gray-600">Cultura: {{ talhao.cultura }}</p>
+                  <p class="text-sm text-gray-600">Ano: {{ talhao.anoSafra }}</p>
                 </div>
                 <button
                   @click="editarTalhao(talhao.id)"
@@ -162,9 +166,13 @@ onMounted(() => {
             <div v-for="talhao in filteredTalhoesAprovados" :key="talhao.id" class="talhao-card border border-gray-200 rounded-lg p-3">
               <div class="flex justify-between items-start">
                 <div>
+                  <div class="mb-2">
+                    <span class="inline-block bg-green-100 text-green-800 text-xs font-semibold px-2 py-1 rounded">Safra #{{ talhao.safraId }}</span>
+                    <span class="inline-block bg-gray-100 text-gray-800 text-xs font-semibold px-2 py-1 rounded ml-1">Talhão #{{ talhao.id }}</span>
+                  </div>
                   <h4 class="font-medium text-gray-800">{{ talhao.fazenda }}</h4>
-                  <p class="text-sm text-gray-600">Talhão #{{ talhao.numero }}</p>
-                  <p class="text-sm text-gray-600">{{ talhao.cultura }}</p>
+                  <p class="text-sm text-gray-600">Cultura: {{ talhao.cultura }}</p>
+                  <p class="text-sm text-gray-600">Ano: {{ talhao.anoSafra }}</p>
                 </div>
                 <button
                   @click="editarTalhao(talhao.id)"

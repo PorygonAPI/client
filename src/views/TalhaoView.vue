@@ -12,7 +12,7 @@ const toast = useToast();
 const fetchTalhoesPendentes = async () => {
   loading.value = true;
   try {
-    const response = await fetch('/api/talhoes/pendentes', {
+    const response = await fetch('/api/safras/pendentes', {
       headers: {
         'Accept': 'application/json',
         'Content-Type': 'application/json',
