@@ -28,7 +28,6 @@ import { useRouter } from 'vue-router'
 import 'leaflet/dist/leaflet.css'
 import L from 'leaflet'
 import 'leaflet-draw'
-import { circleMarker } from 'leaflet'
 
 export default defineComponent({
   props: {
@@ -42,6 +41,9 @@ export default defineComponent({
     let map = null
     let mapLocation = []
     const TOKEN = localStorage.getItem('token')
+    const ArquivoFazendaColor = "#0000ff"
+    const DaninhaColor = "#ff0000"
+    const DaninhaFinalColor = "#ffa500"
     var drawnFeatures = new L.FeatureGroup();
 
     const voltar = () => {
@@ -79,8 +81,8 @@ export default defineComponent({
 
         const fazendaGeometry = JSON.parse(data.fazenda.arquivoFazenda)
 
-        const talhao = data.talhao?.find(t => t.id > 0)
-        // const talhao = data.talhao?.find(t => t.id === Number(props.id))
+        // const talhao = data.talhao?.find(t => t.id > 0)
+        const talhao = data.talhao?.find(t => t.id === Number(props.id))
 
         if (talhao?.safras?.[0]) {
           const daninhaGeometry = JSON.parse(talhao.safras[0].arquivoDaninha)
@@ -114,7 +116,7 @@ export default defineComponent({
       }).addTo(map)
 
       const fazendaLayer = L.geoJSON(fazendaGeometry, {
-        style: { color: "#0000ff" }
+        style: { color: ArquivoFazendaColor }
       })
 
       let overlayMaps = {
@@ -123,25 +125,18 @@ export default defineComponent({
 
       if (daninhaGeometry) {
         const daninhaLayer = L.geoJSON(daninhaGeometry, {
-          style: { color: "#ff0000" }
-        }).bindPopup(`<p>${JSON.stringify(daninhaGeometry)}</p>`)
+          style: { color: DaninhaColor }
+        })
+        
         overlayMaps["Imagem Original"] = L.layerGroup([daninhaLayer]).addTo(map)
       }
 
       map.addLayer(drawnFeatures);
-      let finalDaninhaLayer = null
+      let finalDaninhaInput = (finalDaninhaGeometry ? finalDaninhaGeometry : daninhaGeometry)
 
-      if (finalDaninhaGeometry) {
-        finalDaninhaLayer = L.geoJSON(finalDaninhaGeometry, {
-          style: { color: "#ffa500" }
+      let finalDaninhaLayer = L.geoJSON(finalDaninhaInput, {
+          style: { color: DaninhaFinalColor }
         })
-      }
-      else {
-        finalDaninhaLayer = L.geoJSON(daninhaGeometry, {
-          style: { color: "#ffa500" }
-
-        })
-      }
 
       //Função que configura os polígonos para serem editados
       transformGeoJsonIntoEditableLayer(finalDaninhaLayer, drawnFeatures)
@@ -152,17 +147,17 @@ export default defineComponent({
         draw: {
           polyline: {
             shapeOptions: {
-              color: '#ffa500'
+              color: DaninhaFinalColor
             }
           },
           polygon: {
             shapeOptions: {
-              color: '#ffa500'
+              color: DaninhaFinalColor
             }
           },
           circle: {
             shapeOptions: {
-              color: '#ffa500'
+              color: DaninhaFinalColor
             }
           },
           rectangle: false,
@@ -193,15 +188,10 @@ export default defineComponent({
 
       geoJson.eachLayer(function (layer) {
 
-        // var latlngs = [[37, -109.05],[41, -109.03],[41, -102.05],[37, -102.04]];
-
-        // var polygon = L.polygon(latlngs)
-        // polyLayers.push(polygon)
-
         layer.toGeoJSON().geometry.coordinates.forEach(function (coordinateArray) {
 
           revertCoordinates(coordinateArray)
-          let newPolygon = L.polygon(coordinateArray, {color: "#ffa500"})
+          let newPolygon = L.polygon(coordinateArray, {color: DaninhaFinalColor})
           polyLayers.push(newPolygon)
         })
       });
