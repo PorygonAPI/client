@@ -256,7 +256,7 @@ export default defineComponent({
       console.log(generateUpdatedGeoJson())
     }
 
-    return { voltar, salvar }
+    return { voltar, salvar, safraInfo }
   }
 })
 </script>
