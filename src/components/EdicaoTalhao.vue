@@ -28,6 +28,7 @@ import { useRouter } from 'vue-router'
 import 'leaflet/dist/leaflet.css'
 import L from 'leaflet'
 import 'leaflet-draw'
+import { circleMarker } from 'leaflet'
 
 export default defineComponent({
   props: {
@@ -78,8 +79,8 @@ export default defineComponent({
 
         const fazendaGeometry = JSON.parse(data.fazenda.arquivoFazenda)
 
-        // const talhao = data.talhao?.find(t => t.id > 0)
-        const talhao = data.talhao?.find(t => t.id === Number(props.id))
+        const talhao = data.talhao?.find(t => t.id > 0)
+        // const talhao = data.talhao?.find(t => t.id === Number(props.id))
 
         if (talhao?.safras?.[0]) {
           const daninhaGeometry = JSON.parse(talhao.safras[0].arquivoDaninha)
@@ -145,7 +146,7 @@ export default defineComponent({
       //Função que configura os polígonos para serem editados
       transformGeoJsonIntoEditableLayer(finalDaninhaLayer, drawnFeatures)
 
-      overlayMaps["Imagem Editada"] = L.layerGroup([finalDaninhaLayer, drawnFeatures]).addTo(map)
+      overlayMaps["Imagem Editada"] = L.layerGroup([drawnFeatures]).addTo(map)
 
       var drawControl = new L.Control.Draw({
         draw: {
@@ -159,12 +160,14 @@ export default defineComponent({
               color: '#ffa500'
             }
           },
-          rectangle: false,
           circle: {
             shapeOptions: {
               color: '#ffa500'
             }
-          }
+          },
+          rectangle: false,
+          circlemarker: false,
+          marker: false
         },
         edit: {
           featureGroup: drawnFeatures
@@ -176,21 +179,9 @@ export default defineComponent({
       map.on("draw:created", function (e) {
         var layer = e.layer;
 
-        //Ao clicar na feature, mostrar o geoJSON do mesmo
-        layer.bindPopup(`<p>${JSON.stringify(layer.toGeoJSON().geometry)}</p>`)
-
         //'Salva' a feature no mapa depois que o usuário terminar de desenhar
         drawnFeatures.addLayer(layer);
       });
-
-      map.on("draw:edited", function (e) {
-        var layers = e.layers;
-
-        layers.eachLayer(function (layer) {
-         layer.bindPopup(`<p>${JSON.stringify(layer.toGeoJSON().geometry)}</p>`)
-        })
-
-      })
 
       L.control.layers(null, overlayMaps).addTo(map)
 
@@ -201,13 +192,32 @@ export default defineComponent({
       let polyLayers = [];
 
       geoJson.eachLayer(function (layer) {
-        polyLayers.push(layer)
+
+        // var latlngs = [[37, -109.05],[41, -109.03],[41, -102.05],[37, -102.04]];
+
+        // var polygon = L.polygon(latlngs)
+        // polyLayers.push(polygon)
+
+        layer.toGeoJSON().geometry.coordinates.forEach(function (coordinateArray) {
+
+          revertCoordinates(coordinateArray)
+          let newPolygon = L.polygon(coordinateArray, {color: "#ffa500"})
+          polyLayers.push(newPolygon)
+        })
       });
 
       // Add the layers to the feature group 
       for (let layer of polyLayers) {
         featureToBeAdded.addLayer(layer);
       }
+    }
+
+    const revertCoordinates = (multipolygonArray) => {
+      multipolygonArray.forEach(function (coordinateArray) {
+        coordinateArray.forEach(function (coordinate) {
+          coordinate.reverse()
+        })   
+      })
     }
 
     const generateUpdatedGeoJson = () => {
