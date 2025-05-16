@@ -71,7 +71,7 @@
 </template>
 
 <script setup>
-import { ref, onMounted, watch } from 'vue';
+import { ref, onMounted } from 'vue';
 import { FloatLabel, InputText, Divider, Select, Toast } from 'primevue';
 import { useToast } from 'primevue/usetoast';
 import { useRoute, useRouter } from 'vue-router';
@@ -174,7 +174,7 @@ onMounted(() => {
 });
 
 const cadastrarTalhao = async () => {
-  if (!fazendaSelecionada.value || !talhao.value || !cultura.value || !produtividadePorAno.value || !ano.value || !tipoSolo.value || !area.value) {
+  if (!fazendaSelecionada.value || !safra.value || !cultura.value || !produtividadePorAno.value || !ano.value || !tipoSolo.value || !area.value) {
     toast.add({ severity: 'error', summary: 'Erro', detail: 'Por favor, preencha todos os campos.', life: 3000 });
     return;
   }
@@ -208,4 +208,3 @@ const cadastrarTalhao = async () => {
   }
 };
 </script>
-

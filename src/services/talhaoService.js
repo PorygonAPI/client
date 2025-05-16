@@ -25,14 +25,16 @@ export async function listarTalhoesPorUsuario(userId) {
         fazenda: t.nomeFazenda,
         numero: t.talhaoId,
         cultura: t.cultura,
-        safraId: t.safraId
+        safraId: t.safraId,
+        anoSafra: t.anoSafra || t.ano
       })),
       aprovados: data.aprovados.map(t => ({
         id: t.talhaoId,
         fazenda: t.nomeFazenda,
         numero: t.talhaoId,
         cultura: t.cultura,
-        safraId: t.safraId
+        safraId: t.safraId,
+        anoSafra: t.anoSafra || t.ano
       }))
     };
   } catch (error) {
