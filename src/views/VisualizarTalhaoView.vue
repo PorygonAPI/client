@@ -1,10 +1,13 @@
 <template>
   <Toast />
-  <div class="bg-white shadow-md rounded-lg p-4 my-4 w-full max-w-7xl mx-auto z-0">
-    <button @click="goBack" class="text-gray-600 hover:text-gray-800">←</button>
+  <div class="bg-white shadow-md rounded-lg p-4 my-4 w-full max-w-7xl mx-auto z-0 mt-25">
+
+
     <div class="flex flex-col">
-      <div class="text-center p-2 mt-4 lg:mb-3 mb-1">
-        <p class="text-4xl font-semibold text-gray-800">Visualizador de Talhão</p>
+      <div class="flex items-center gap-4 p-2 mt-4 lg:mb-3 mb-1">
+        <i @click="goBack" class="pi pi-angle-left text-gray-600 hover:text-gray-800 cursor-pointer"
+          style="font-size: 2.5rem"></i>
+        <p class="text-3xl font-semibold text-gray-800">Visualizador de Talhão</p>
       </div>
       <hr class="border-gray-300 mb-4">
 
@@ -20,13 +23,8 @@
         </button>
       </div>
 
-      <MapViewer
-        v-else
-        :arquivoFazenda="arquivoFazenda"
-        :arquivoDaninha="arquivoDaninha"
-        :arquivoFinalDaninha="arquivoFinalDaninha"
-        :key="mapKey"
-      />
+      <MapViewer v-else :arquivoFazenda="arquivoFazenda" :arquivoDaninha="arquivoDaninha"
+        :arquivoFinalDaninha="arquivoFinalDaninha" :key="mapKey" />
     </div>
   </div>
 </template>
@@ -36,6 +34,7 @@ import MapViewer from '@/components/MapViewer.vue';
 import { onMounted, ref } from 'vue';
 import { useRouter } from 'vue-router';
 import { useToast } from 'primevue/usetoast';
+import 'primeicons/primeicons.css';
 
 const router = useRouter();
 const toast = useToast();
@@ -59,6 +58,7 @@ const goBack = () => {
     router.push('/areasagro');
   }
 };
+
 
 const fetchData = async () => {
   if (!ID.value) {

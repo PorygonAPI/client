@@ -16,11 +16,11 @@ import Footer from './components/Footer.vue';
   margin: 0;
   padding: 0;
   box-sizing: border-box;
-  font-family: Arial, sans-serif;
+  font-family: Arial, Helvetica, sans-serif
 }
 
 body {
-  background-color: #f5f5f5;
+  background-color: #93adcf;
 }
 }
 </style>

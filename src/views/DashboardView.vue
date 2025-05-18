@@ -1,4 +1,5 @@
 <script setup>
+import Titulo from '@/components/Titulo.vue';
 import DatePicker from 'primevue/datepicker';
 import { FloatLabel } from 'primevue';
 import { ref, computed } from "vue";
@@ -56,15 +57,10 @@ const rankingEstados = computed(() => {
 </script>
 
 <template>
-
   <div class="h-full w-[90%] ml-[5%] mr-[5%] mb-10">
     <div class="flex flex-col">
 
-      <div class="text-center p-2 mt-4 lg:mb-3 mb-1">
-        <p class="text-4xl font-semibold text-gray-800">Dashboard</p>
-      </div>
-
-      <hr class="border-gray-300 mb-4">
+      <Titulo title="Dashboard"></Titulo>
 
       <div class="p-5 py-3 bg-white rounded-xl shadow min-h-fit">
 
