@@ -4,6 +4,7 @@ import { FilterMatchMode } from  '@primevue/core/api';
 import { ref, defineProps, computed } from 'vue';
 import Dialog from 'primevue/dialog';
 import { useRouter } from 'vue-router';
+import Botao from './Botao.vue';
 
 const editarTalhao = (idFazenda,id) => {
 
@@ -124,11 +125,7 @@ const visualizarImagem = (id) => {
   <Column field="imagem" header="Imagem" class="p-1">
     <template #body="{ data }" >
       <div class="flex justify-center">
-        <Button
-        @click="() => visualizarImagem(data.idFazenda)"
-        class="hover:text-gray-600 cursor-pointer p-1 m-1 px-2 bg-gray-400 text-white border-0 rounded shadow hover:bg-gray-300 transition">
-        Visualizar
-      </Button>
+        <Botao @click="() => visualizarImagem(data.idFazenda)">Visualizar</Botao>
       </div>
     </template>
   </Column>
@@ -137,11 +134,7 @@ const visualizarImagem = (id) => {
   <Column field="editar" header="Editar" class="p-1">
     <template #body="{ data }">
       <div class="flex justify-center">
-        <Button
-        @click="editarTalhao(data.idFazenda,data.id)"
-        class="hover:text-gray-600 cursor-pointer p-1 m-1 px-2 bg-gray-400 text-white border-0 rounded shadow hover:bg-gray-300 transition">
-          Editar
-        </Button>
+        <Botao @click="editarTalhao(data.idFazenda,data.id)">Editar</Botao>
       </div>
     </template>
   </Column>

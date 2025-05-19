@@ -8,7 +8,6 @@
           <h1 class="text-2xl font-semibold text-gray-800">Cadastrar Fazenda</h1>
         </div>
       </div>
-      <br>
 
       <FloatLabel variant="on" class="mb-5">
         <InputText type="text" id="nome_fazenda" class="w-full p-2 text-base rounded-md" v-model="nomeFazenda" />

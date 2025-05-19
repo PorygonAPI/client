@@ -113,6 +113,7 @@ onMounted(() => {
             <template #body="slotProps">
               <div class="flex justify-center lg:gap-2">
                 <Botao @click="cadastrarOuEditarUsuario(slotProps.data.id)" tipo="primario">Editar</Botao>
+
                 <Botao @click="deleteUsuario(slotProps.data.id)" tipo="exclusao">Excluir</Botao>
               </div>
             </template>
