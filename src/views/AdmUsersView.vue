@@ -6,6 +6,7 @@ import DataTable from 'primevue/datatable'
 import Column from 'primevue/column'
 import Toast from 'primevue/toast'
 import Titulo from '@/components/Titulo.vue'
+import Botao from '@/components/Botao.vue'
 
 const toast = useToast()
 
@@ -77,7 +78,7 @@ onMounted(() => {
   <Toast />
 
 
- <div class="h-full w-[90%] mx-auto">
+  <div class="h-full w-[90%] mx-auto">
     <div class="flex flex-col">
       <Titulo title="Gerenciamento de Usuários" @update:search="search = $event" />
       <div class="p-5 py-3 bg-white rounded-xl shadow">
@@ -89,8 +90,7 @@ onMounted(() => {
           </div>
 
           <div class="lg:my-0 flex justify-center lg:justify-start">
-            <Button label="Cadastrar Usuário" @click="cadastrarOuEditarUsuario(0)"
-              class="p-1 px-2 m-1 rounded-lg shadow text-white border-gray-300 bg-gray-400 hover:text-gray-500 hover:bg-gray-300 transition" />
+            <Botao label="Cadastrar Usuário" @click="cadastrarOuEditarUsuario(0)" tipo="primario">Cadastrar Usuário</Botao>
           </div>
         </div>
 
@@ -112,14 +112,8 @@ onMounted(() => {
           <Column class="p-1" header="Ações">
             <template #body="slotProps">
               <div class="flex justify-center lg:gap-2">
-                <button @click="cadastrarOuEditarUsuario(slotProps.data.id)"
-                  class="cursor-pointer m-1 p-1 lg:w-16 bg-gray-400 text-white rounded shadow hover:text-gray-500 hover:bg-gray-300 transition">
-                  Editar
-                </button>
-                <button @click="deleteUsuario(slotProps.data.id)"
-                  class="cursor-pointer m-1 p-1 lg:w-16 bg-orange-400 text-white rounded shadow hover:text-orange-500 hover:bg-orange-300 transition">
-                  Excluir
-                </button>
+                <Botao @click="cadastrarOuEditarUsuario(slotProps.data.id)" tipo="primario">Editar</Botao>
+                <Botao @click="deleteUsuario(slotProps.data.id)" tipo="exclusao">Excluir</Botao>
               </div>
             </template>
           </Column>

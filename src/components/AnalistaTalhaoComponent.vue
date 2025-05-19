@@ -5,6 +5,7 @@ import { ref, defineProps, computed, defineEmits } from 'vue';
 import { useRouter } from 'vue-router';
 import Dialog from 'primevue/dialog';
 import { useToast } from 'primevue/usetoast';
+import Botao from './Botao.vue';
 
 const props = defineProps({
   talhao: {
@@ -229,11 +230,7 @@ const editarTalhao = (id) => {
         <Column field="imagem" header="Imagem" class="p-1">
           <template #body="slotProps">
             <div class="flex justify-center">
-              <Button
-                @click="() => visualizarTalhao(slotProps.data.id)"
-                class="hover:text-gray-600 cursor-pointer p-1 m-1 px-2 bg-gray-400 text-white border-0 rounded shadow hover:bg-gray-300 transition">
-                Visualizar
-              </Button>
+              <Botao @click="() => visualizarTalhao(slotProps.data.id)" tipo="primario">Visualizar</Botao>
             </div>
           </template>
         </Column>

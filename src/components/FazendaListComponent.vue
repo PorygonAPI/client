@@ -4,6 +4,7 @@ import { FilterMatchMode } from '@primevue/core/api';
 import { ref, defineProps, computed } from 'vue';
 import Dialog from 'primevue/dialog';
 import { useRouter } from 'vue-router';
+import Botao from './Botao.vue';
 
 const TOKEN = localStorage.getItem('token');
 
@@ -104,11 +105,7 @@ const mostrarAlerta = (mensagem, tipo = 'success') => {
         type="text"
         v-model="filtros['global'].value"
       />
-
-      <Button @click="cadastrarOuEditarFazenda(null)" class="md:text-base text-sm p-1 px-2 rounded-lg shadow text-white border-gray-300 bg-gray-400 hover:text-gray-600 hover:bg-gray-300 transition">
-          <span class="block md:hidden">Cadastrar</span>
-          <span class="hidden md:block">Cadastrar Fazendas</span>
-      </Button>
+      <Botao @click="cadastrarOuEditarFazenda(null)" tipo="primario">Cadastrar Fazendas</Botao>
     </div>
 
     <DataTable
@@ -136,10 +133,7 @@ const mostrarAlerta = (mensagem, tipo = 'success') => {
       <Column field="imagem" header="Imagem" class="p-1">
         <template #body="{ data }">
           <div class="flex justify-center">
-            <Button  @click="() => visualizarImagem(data.id)"
-            class=" hover:text-gray-600 cursor-pointer p-1 m-1 px-2 bg-gray-400 text-white border-0 rounded shadow hover:bg-gray-300 transition">
-              Visualizar
-            </Button>
+            <Botao @click="() => visualizarImagem(data.id)" tipo="primario">Visualizar</Botao>
           </div>
         </template>
       </Column>
@@ -147,11 +141,7 @@ const mostrarAlerta = (mensagem, tipo = 'success') => {
       <Column field="editar" header="Editar" class="p-1">
         <template #body="dataBody">
           <div class="flex justify-center">
-            <Button
-            class="hover:text-gray-600 cursor-pointer p-1 m-1 px-2 bg-gray-400 text-white border-0 rounded shadow hover:bg-gray-300 transition"
-            @click="cadastrarOuEditarFazenda(dataBody.data.id)">
-              Editar
-            </Button>
+            <Botao  @click="cadastrarOuEditarFazenda(dataBody.data.id)" tipo="primario">Editar</Botao>
           </div>
         </template>
       </Column>

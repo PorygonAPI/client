@@ -1,9 +1,12 @@
 <script setup lang="ts">
 import { RouterLink } from 'vue-router';
-import { ref, onMounted } from 'vue';
+import { ref, onMounted, onUnmounted } from 'vue';
 import { useRouter } from 'vue-router';
 import { useRoute } from 'vue-router';
 import 'primeicons/primeicons.css';
+import Avatar from "primevue/avatar";
+import Botao from './Botao.vue';
+
 
 const route = useRoute();
 const router = useRouter();
@@ -63,6 +66,12 @@ const logoff = () => {
   router.push('/');
 };
 
+const handleResize = () => {
+  if (window.innerWidth > 600) {
+    showMobileMenu.value = false;
+  }
+};
+
 onMounted(() => {
   const role = localStorage.getItem('role');
   nome.value = localStorage.getItem('nome') || 'User';
@@ -75,6 +84,11 @@ onMounted(() => {
     areaRole.value = false;
     dashboardRole.value = false;
   }
+  window.addEventListener('resize', handleResize);
+});
+
+onUnmounted(() => {
+  window.removeEventListener('resize', handleResize);
 });
 
 router.beforeEach((to, from, next) => {
@@ -93,16 +107,36 @@ router.beforeEach((to, from, next) => {
   }
   next();
 });
+
+const mobileMenuRef = ref<HTMLElement | null>(null);
+
+const handleClickOutside = (event: MouseEvent) => {
+  const menuEl = mobileMenuRef.value;
+  if (menuEl && !menuEl.contains(event.target as Node)) {
+    showMobileMenu.value = false;
+  }
+};
+
+onMounted(() => {
+  window.addEventListener('resize', handleResize);
+  document.addEventListener('click', handleClickOutside);
+});
+
+onUnmounted(() => {
+  window.removeEventListener('resize', handleResize);
+  document.removeEventListener('click', handleClickOutside);
+});
+
 </script>
 
 <template>
+
   <nav v-if="route.path !== '/'" class="navbar">
     <div class="logo-container">
       <RouterLink to="/home">
         <img src="../assets/imagens/Pássaro Geométrico Abstrato.png" alt="logoPorygon" class="logo" />
       </RouterLink>
     </div>
-
     <ul class="nav-links">
       <li v-if="talhaoRole">
         <RouterLink to="/analista/talhoes">
@@ -133,28 +167,29 @@ router.beforeEach((to, from, next) => {
 
     <div class="user-container">
       <div @click="togglePopup" class="user-info">
-        <p>{{ nome }}</p>
-        <i class="pi pi-user" style="font-size: 1.5rem; padding-right: 2.2rem;"></i>
+        <Avatar :label="nome.charAt(0).toUpperCase()" class="mr-7" size="large"
+          style="background-color: #00c2bd; color: #2a1261" shape="circle" />
       </div>
 
-      <button @click="toggleMobileMenu" class="mobile-menu-btn">
-        ☰
-      </button>
+      <button @click.stop="toggleMobileMenu" class="mobile-menu-btn">☰</button>
+
 
       <div v-if="showPopUp" class="popup">
-        <p>Sessão atual como <strong>{{ cargo }}</strong></p>
-        <button @click="logoff" class="logout-btn">Sair</button>
+        <p><strong>{{nome}} | {{ cargo }}</strong></p>
+        <button @click="logoff" class="logout-btn">Encerrar Sessão</button>
       </div>
     </div>
   </nav>
 
-  <div v-if="showMobileMenu" class="mobile-menu">
+  <div v-if="showMobileMenu" class="mobile-menu" ref="mobileMenuRef">
+    <div class="mobile-user-name">Olá, {{ nome }} | {{ cargo }}</div>
     <RouterLink v-if="talhaoRole" to="/analista/talhoes" @click="toggleMobileMenu">Talhões</RouterLink>
-    <RouterLink v-if="editTalhaoRole" to="/analista/edicao-talhoes" @click="toggleMobileMenu">Editor de Talhões</RouterLink>
+    <RouterLink v-if="editTalhaoRole" to="/analista/edicao-talhoes" @click="toggleMobileMenu">Editor de Talhões
+    </RouterLink>
     <RouterLink v-if="userRole" to="/usuario" @click="toggleMobileMenu">Usuários</RouterLink>
     <RouterLink v-if="areaRole" to="/areasagro" @click="toggleMobileMenu">Áreas Agrícolas</RouterLink>
     <RouterLink v-if="dashboardRole" to="/dashboard" @click="toggleMobileMenu">Dashboard</RouterLink>
-    <button @click="logoff" class="logout-btn">Logoff</button>
+    <button @click="logoff" class="logout-btn">Encerrar sessão</button>
   </div>
 </template>
 
@@ -275,6 +310,15 @@ router.beforeEach((to, from, next) => {
   z-index: 50;
 }
 
+.mobile-user-name {
+  font-weight: 600;
+  font-size: 1.3rem;
+  padding-bottom: 0.5rem;
+  border-bottom: 1px solid #ddd;
+  margin-bottom: 0.75rem;
+  color: #333;
+}
+
 .mobile-menu a {
   color: black;
   text-decoration: none;
@@ -290,16 +334,30 @@ router.beforeEach((to, from, next) => {
   background: none;
   border: none;
   cursor: pointer;
-  color: white;
+  color: black;
 }
 
-@media (max-width: 768px) {
+/* Exibir o botão hamburger só em telas <= 600px */
+@media (max-width: 600px) {
   .nav-links {
     display: none;
   }
 
   .mobile-menu-btn {
     display: block;
+  }
+}
+
+/* Garantir que botão hamburger fique oculto em telas > 600px */
+@media (min-width: 601px) {
+  .mobile-menu-btn {
+    display: none !important;
+  }
+}
+
+@media (max-width: 600px) {
+  .user-info {
+    display: none;
   }
 }
 </style>
