@@ -87,7 +87,13 @@ const buscarDados = async () => {
       url += `?dataInicial=${dataInicial.value}&dataFinal=${dataFinal.value}`;
     }
 
-    const response = await axios.get(url);
+    const token = localStorage.getItem("token");
+
+    const response = await axios.get(url, {
+      headers: {
+        Authorization: `Bearer ${token}`
+      }
+    });
     const dados = response.data;
 
     chartData.value = setChartData(
