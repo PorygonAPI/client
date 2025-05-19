@@ -91,8 +91,8 @@ const buscarDados = async () => {
     const dados = response.data;
 
     chartData.value = setChartData(
-      dados["total pendentes"],
-      dados["totalAtribuídos"],
+      dados["totalPendentes"],
+      dados["totalAtribuidos"],
       dados["totalAprovados"]
     );
     chartOptions.value = setChartOptions();
