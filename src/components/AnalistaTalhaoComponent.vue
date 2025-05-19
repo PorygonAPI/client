@@ -251,37 +251,43 @@ const editarTalhao = (id) => {
       </DataTable>
     </div>
 
-    <Dialog v-model:visible="confirmarAtribuirDialog" modal header="Atribuir Talhão" class="w-80 lg:w-96 p-1">
-      <hr class="border-gray-200 mb-2">
-      <div class="flex flex-col gap-3 mb-4">
-        <div class="field">
-          <label class="font-semibold block mb-1">ID do Talhão:</label>
-          <span class="block pl-2">{{ talhaoSelecionado?.id }}</span>
-        </div>
+    <Dialog v-model:visible="confirmarAtribuirDialog" modal header="Atribuir Talhão" class="custom-dialog w-80 lg:w-96 p-1">
+  <div class="dialog-content">
+    <div class="field">
+      <label class="font-semibold block mb-1">ID do Talhão:</label>
+      <span>{{ talhaoSelecionado?.id }}</span>
+    </div>
 
-        <div class="field">
-          <label class="font-semibold block mb-1">Nome da Fazenda:</label>
-          <span class="block pl-2">{{ talhaoSelecionado?.nomeFazenda }}</span>
-        </div>
+    <div class="field">
+      <label class="font-semibold block mb-1">Nome da Fazenda:</label>
+      <span>{{ talhaoSelecionado?.nomeFazenda }}</span>
+    </div>
 
-        <div class="field">
-          <label class="font-semibold block mb-1">Atribuir para:</label>
-          <span class="block pl-2">{{ currentUserName }} (ID: {{ currentUserId }})</span>
-        </div>
-      </div>
+    <div class="field">
+      <label class="font-semibold block mb-1">Atribuir para:</label>
+      <span>{{ currentUserName }} (ID: {{ currentUserId }})</span>
+    </div>
 
-      <div class="flex justify-end gap-2">
-        <Button class="p-1" label="Cancelar" severity="secondary" @click="confirmarAtribuirDialog = false" :disabled="loading"/>
-        <Button
-          class="p-1"
-          label="Confirmar"
-          :loading="loading"
-          severity="success"
-          @click="confirmarAtribuicao"
-          :disabled="loading"
-        />
-      </div>
-    </Dialog>
+    <div class="flex justify-end gap-3 mt-6">
+      <Button
+        class="cancel-btn"
+        label="Cancelar"
+        severity="secondary"
+        @click="confirmarAtribuirDialog = false"
+        :disabled="loading"
+      />
+      <Button
+        class="confirm-btn"
+        label="Confirmar"
+        :loading="loading"
+        severity="success"
+        @click="confirmarAtribuicao"
+        :disabled="loading"
+      />
+    </div>
+  </div>
+</Dialog>
+
   </div>
 </template>
 
@@ -293,4 +299,63 @@ const editarTalhao = (id) => {
 .field {
   margin-bottom: 0.75rem;
 }
+
+.custom-dialog {
+  border-radius: 1rem !important;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1) !important;
+  background-color: #fff !important;
+  padding: 2rem !important;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  color: #333;
+}
+
+.custom-dialog .p-dialog-header {
+  font-weight: 700 !important;
+  font-size: 1.5rem !important;
+  border-bottom: 2px solid #f0a500 !important;
+  padding-bottom: 0.75rem !important;
+  color: #f97316 !important; /* laranja para combinar com tema */
+}
+
+.dialog-content {
+  margin-top: 1rem;
+  font-size: 1rem;
+  line-height: 1.5;
+}
+
+.dialog-content .field label {
+  color: #555;
+  font-weight: 600;
+}
+
+.dialog-content .field span {
+  padding-left: 0.5rem;
+  color: #222;
+}
+
+.cancel-btn {
+  background-color: #e5e7eb; /* cinza claro */
+  color: #374151;
+  border-radius: 0.5rem;
+  padding: 0.5rem 1.25rem;
+  font-weight: 600;
+  transition: background-color 0.3s ease;
+}
+
+.cancel-btn:hover:not(:disabled) {
+  background-color: #d1d5db;
+  color: #1f2937;
+}
+
+.confirm-btn {
+  border-radius: 0.5rem;
+  padding: 0.5rem 1.5rem;
+  font-weight: 700;
+  text-transform: uppercase;
+}
+
+.confirm-btn:hover:not(:disabled) {
+  filter: brightness(1.1);
+}
+
 </style>
