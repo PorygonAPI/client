@@ -91,9 +91,12 @@ const buscarDados = async () => {
 
     const response = await axios.get(url, {
       headers: {
-        Authorization: `Bearer ${token}`
+        Authorization: `Bearer ${token}`,
+        Accept: "application/json",
+        "Content-Type": "application/json"
       }
     });
+
     const dados = response.data;
 
     chartData.value = setChartData(
@@ -114,22 +117,3 @@ onMounted(() => {
   buscarDados();
 });
 </script>
-
-<template>
-  <div>
-    <div class="mb-4 flex items-center gap-4">
-      <label>Data Inicial:</label>
-      <input type="date" v-model="dataInicial" />
-      <label>Data Final:</label>
-      <input type="date" v-model="dataFinal" />
-      <button @click="buscarDados">Pesquisar</button>
-    </div>
-
-    <div v-if="erro" class="text-red-600">{{ erro }}</div>
-
-    <div style="height: 400px;">
-      <Chart v-if="chartData" type="bar" :data="chartData" :options="chartOptions" />
-      <div v-else-if="carregando">Carregando dados...</div>
-    </div>
-  </div>
-</template>
