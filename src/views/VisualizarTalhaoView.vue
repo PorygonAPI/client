@@ -4,13 +4,15 @@
 
 
     <div class="flex flex-col">
-      <div class="flex items-center gap-4 p-2 mt-4 lg:mb-3 mb-1">
-        <i @click="goBack" class="pi pi-angle-left text-gray-600 hover:text-gray-800 cursor-pointer"
-          style="font-size: 2.5rem"></i>
-        <p class="text-3xl font-semibold text-gray-800">Visualizador de Talhão</p>
-      </div>
-      <hr class="border-gray-300 mb-4">
 
+      <div class="flex items-start gap-3">
+        <i @click="goBack" class="pi pi-angle-left text-3xl text-gray-600 cursor-pointer hover:text-gray-800 transition"
+          aria-label="Voltar" role="button" tabindex="0" @keyup.enter="voltar" />
+        <h1 class="text-2xl font-semibold text-gray-800">Visualizador de Talhão</h1>
+      </div>
+
+      <br>
+    <br>
       <div v-if="loading" class="flex justify-center items-center p-8">
         <div class="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-orange-500"></div>
         <span class="ml-3 text-gray-700">Carregando dados do talhão...</span>
@@ -25,8 +27,11 @@
 
       <MapViewer v-else :arquivoFazenda="arquivoFazenda" :arquivoDaninha="arquivoDaninha"
         :arquivoFinalDaninha="arquivoFinalDaninha" :key="mapKey" />
+        <br>
+    <br>
     </div>
   </div>
+
 </template>
 
 <script setup>

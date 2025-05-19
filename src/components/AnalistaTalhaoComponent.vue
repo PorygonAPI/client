@@ -175,25 +175,27 @@ const editarTalhao = (id) => {
 
 <template>
   <div class="bg-white rounded-xl shadow p-5 flex flex-col gap-3">
-    <div class="flex justify-between items-center mb-3">
-      <div class="relative flex items-center">
-        <div class="relative">
-          <i v-if="!isSearchFocused && !searchById"
-            class="pi pi-search absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400"></i>
-          <InputText
-            id="searchById"
-            v-model="searchById"
-            @input="handleIdInput"
-            @focus="isSearchFocused = true"
-            @blur="isSearchFocused = false"
-            class="p-1 pl-3 border border-gray-300 rounded-lg w-40 focus-within:ring focus-within:ring-orange-400 focus:outline-none"
-            pattern="[0-9]*"
-            inputmode="numeric"
-            placeholder=""
-          />
-        </div>
-      </div>
+   <div class="flex justify-between items-center mb-3">
+  <div class="relative flex items-center">
+    <div class="relative">
+      <i
+        v-if="!isSearchFocused && !searchById"
+        class="pi pi-search absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400"
+      ></i>
+      <InputText
+        id="searchById"
+        v-model="searchById"
+        @input="handleIdInput"
+        @focus="isSearchFocused = true"
+        @blur="isSearchFocused = false"
+        class="p-1 pl-8 border border-gray-300 rounded-lg w-40 focus-within:ring focus-within:ring-orange-400 focus:outline-none"
+        pattern="[0-9]*"
+        inputmode="numeric"
+        placeholder="Buscar por ID"
+      />
     </div>
+  </div>
+</div>
 
     <div>
       <DataTable
