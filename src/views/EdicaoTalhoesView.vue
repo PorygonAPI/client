@@ -110,7 +110,7 @@ onMounted(() => {
         </div>
       </div>
 
-      <div class="count-cards grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+       <div class="count-cards grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
         <div class="count-card bg-white p-4 rounded-lg shadow-md border-l-4 border-blue-500">
           <h3 class="text-lg font-medium text-gray-700">Talhões Atribuídos</h3>
           <p class="text-3xl font-bold text-blue-600">{{ counts.atribuidos }}</p>
@@ -129,16 +129,22 @@ onMounted(() => {
           </h2>
 
           <div v-if="filteredTalhoesAtribuidos.length" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-            <div v-for="talhao in filteredTalhoesAtribuidos" :key="talhao.id"
-              class="talhao-card border border-gray-200 rounded-lg p-3">
+            <div v-for="talhao in filteredTalhoesAtribuidos" :key="talhao.id" class="talhao-card border border-gray-200 rounded-lg p-3">
               <div class="flex justify-between items-start">
                 <div>
+                  <div class="mb-2">
+                    <span class="inline-block bg-blue-100 text-blue-800 text-xs font-semibold px-2 py-1 rounded">Safra #{{ talhao.safraId }}</span>
+                    <span class="inline-block bg-gray-100 text-gray-800 text-xs font-semibold px-2 py-1 rounded ml-1">Talhão #{{ talhao.id }}</span>
+                  </div>
                   <h4 class="font-medium text-gray-800">{{ talhao.fazenda }}</h4>
-                  <p class="text-sm text-gray-600">Talhão #{{ talhao.numero }}</p>
-                  <p class="text-sm text-gray-600">{{ talhao.cultura }}</p>
+                  <p class="text-sm text-gray-600">Cultura: {{ talhao.cultura }}</p>
+                  <p class="text-sm text-gray-600">Ano: {{ talhao.anoSafra }}</p>
                 </div>
-                <button @click="editarTalhao(talhao.id)" class="bg-gray-100 hover:bg-gray-200 p-2 rounded-md"
-                  title="Editar talhão">
+                <button
+                  @click="editarTalhao(talhao.id)"
+                  class="bg-gray-100 hover:bg-gray-200 p-2 rounded-md"
+                  title="Editar talhão"
+                >
                   <i class="pi pi-pencil text-gray-600"></i>
                 </button>
               </div>
@@ -157,16 +163,22 @@ onMounted(() => {
           </h2>
 
           <div v-if="filteredTalhoesAprovados.length" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-            <div v-for="talhao in filteredTalhoesAprovados" :key="talhao.id"
-              class="talhao-card border border-gray-200 rounded-lg p-3">
+            <div v-for="talhao in filteredTalhoesAprovados" :key="talhao.id" class="talhao-card border border-gray-200 rounded-lg p-3">
               <div class="flex justify-between items-start">
                 <div>
+                  <div class="mb-2">
+                    <span class="inline-block bg-green-100 text-green-800 text-xs font-semibold px-2 py-1 rounded">Safra #{{ talhao.safraId }}</span>
+                    <span class="inline-block bg-gray-100 text-gray-800 text-xs font-semibold px-2 py-1 rounded ml-1">Talhão #{{ talhao.id }}</span>
+                  </div>
                   <h4 class="font-medium text-gray-800">{{ talhao.fazenda }}</h4>
-                  <p class="text-sm text-gray-600">Talhão #{{ talhao.numero }}</p>
-                  <p class="text-sm text-gray-600">{{ talhao.cultura }}</p>
+                  <p class="text-sm text-gray-600">Cultura: {{ talhao.cultura }}</p>
+                  <p class="text-sm text-gray-600">Ano: {{ talhao.anoSafra }}</p>
                 </div>
-                <button @click="editarTalhao(talhao.id)" class="bg-gray-100 hover:bg-gray-200 p-2 rounded-md"
-                  title="Editar talhão">
+                <button
+                  @click="editarTalhao(talhao.id)"
+                  class="bg-gray-100 hover:bg-gray-200 p-2 rounded-md"
+                  title="Editar talhão"
+                >
                   <i class="pi pi-pencil text-gray-600"></i>
                 </button>
               </div>
@@ -179,6 +191,5 @@ onMounted(() => {
         </div>
       </div>
     </div>
-
   </div>
 </template>
