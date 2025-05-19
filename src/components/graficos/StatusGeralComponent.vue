@@ -76,14 +76,18 @@ const setChartOptions = () => {
   };
 };
 
-const buscarDados = async () => {
+const buscarDados = async (comFiltro = false) => {
   carregando.value = true;
   erro.value = null;
 
   try {
     let url = "http://localhost:8080/relatorios/status";
 
-    if (dataInicial.value && dataFinal.value) {
+    if (
+      comFiltro &&
+      dataInicial.value &&
+      dataFinal.value
+    ) {
       url += `?dataInicial=${dataInicial.value}&dataFinal=${dataFinal.value}`;
     }
 
@@ -114,6 +118,25 @@ const buscarDados = async () => {
 };
 
 onMounted(() => {
-  buscarDados();
+  buscarDados(false);
 });
 </script>
+
+<template>
+  <div>
+    <div class="mb-4 flex items-center gap-4">
+      <label>Data Inicial:</label>
+      <input type="date" v-model="dataInicial" />
+      <label>Data Final:</label>
+      <input type="date" v-model="dataFinal" />
+      <button @click="buscarDados(true)">Pesquisar</button>
+    </div>
+
+    <div v-if="erro" class="text-red-600">{{ erro }}</div>
+
+    <div style="height: 400px;">
+      <Chart v-if="chartData" type="bar" :data="chartData" :options="chartOptions" />
+      <div v-else-if="carregando">Carregando dados...</div>
+    </div>
+  </div>
+</template>
