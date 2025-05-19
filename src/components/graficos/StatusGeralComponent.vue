@@ -83,15 +83,13 @@ const buscarDados = async (comFiltro = false) => {
   try {
     let url = "http://localhost:8080/relatorios/status";
 
-    if (
-      comFiltro &&
-      dataInicial.value &&
-      dataFinal.value
-    ) {
+    if (comFiltro && dataInicial.value && dataFinal.value) {
       url += `?dataInicial=${dataInicial.value}&dataFinal=${dataFinal.value}`;
     }
 
     const token = localStorage.getItem("token");
+    console.log("Token JWT:", token); // Log do token para verificar se está correto
+    console.log("URL da requisição:", url); // Log da URL para verificar se está correta
 
     const response = await axios.get(url, {
       headers: {
@@ -100,6 +98,8 @@ const buscarDados = async (comFiltro = false) => {
         "Content-Type": "application/json"
       }
     });
+
+    console.log("Resposta recebida:", response.data); // Log dos dados recebidos
 
     const dados = response.data;
 
@@ -111,7 +111,7 @@ const buscarDados = async (comFiltro = false) => {
     chartOptions.value = setChartOptions();
   } catch (err) {
     erro.value = "Erro ao carregar dados.";
-    console.error(err);
+    console.error("Erro ao buscar dados:", err); // Log detalhado do erro
   } finally {
     carregando.value = false;
   }
