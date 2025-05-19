@@ -70,45 +70,47 @@ const saveTabSelection = () => {
   localStorage.setItem(STORAGE_KEY, activeTab.value);
 };
 
-onMounted(() => {
-  fetchFazendas();
+onMounted(async () => {
+  await fetchFazendas();
+  await fetchTalhoes();
   saveTabSelection();
-  fetchTalhoes();
-  console.log(talhoes)
 });
-
 </script>
 
 <template>
   <div class="h-full w-[90%] ml-[5%] mr-[5%]">
     <div class="flex flex-col">
 
-      <Titulo title="Áreas Agrícolas"></Titulo>
+      <Titulo title="Áreas Agrícolas" />
 
       <div class="bg-white shadow rounded-xl p-5">
 
-        <div class="flex gap-3 mb-2">
-          <span :class="[
-            'p-1 px-2 rounded-lg shadow border-gray-300 transition flex items-center justify-center',
-            activeTab === 'fazendas'
-              ? 'bg-gray-300 text-gray-700 hover:bg-gray-300 transition'
-              : 'bg-gray-400 text-white hover:bg-gray-300 hover:text-gray-600 transition'
-          ]">
-            <button class="cursor-pointer" @click="activeTab = 'fazendas', saveTabSelection()">
-              Fazendas
-            </button>
-          </span>
-          <span :class="[
-            'p-1 px-2 rounded-lg shadow border-gray-300 transition flex items-center justify-center',
-            activeTab === 'talhoes'
-              ? 'bg-gray-300 text-gray-700 hover:bg-gray-300 transition'
-              : 'bg-gray-400 text-white hover:bg-gray-300 hover:text-gray-600 transition'
-          ]">
-            <button class="cursor-pointer" @click="activeTab = 'talhoes', saveTabSelection()">Talhões</button>
-          </span>
-        </div>
+        <!-- Abas estilo clássico -->
+        <div class="flex border-b border-gray-300 mb-4">
+          <button
+            @click="activeTab = 'fazendas'; saveTabSelection()"
+            :class="[
+              'py-2 px-6 -mb-px font-semibold text-gray-700 border-b-2 transition-colors duration-300',
+              activeTab === 'fazendas'
+                ? 'border-blue-500 text-blue-600'
+                : 'border-transparent hover:text-blue-500'
+            ]"
+          >
+            Fazendas
+          </button>
 
-        <hr class="border-gray-200 mb-4">
+          <button
+            @click="activeTab = 'talhoes'; saveTabSelection()"
+            :class="[
+              'py-2 px-6 -mb-px font-semibold text-gray-700 border-b-2 transition-colors duration-300',
+              activeTab === 'talhoes'
+                ? 'border-blue-500 text-blue-600'
+                : 'border-transparent hover:text-blue-500'
+            ]"
+          >
+            Talhões
+          </button>
+        </div>
 
         <div>
           <FazendaListComponent v-if="activeTab === 'fazendas'" :fazendas="fazendas" />
