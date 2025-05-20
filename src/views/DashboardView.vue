@@ -64,14 +64,8 @@ const rankingEstados = computed(() => {
       <div class="p-5 py-3 bg-white rounded-xl shadow min-h-fit">
         <div class="pt-2">
           <FloatLabel variant="on">
-            <DatePicker
-              class="w-64 h-9"
-              showButtonBar
-              showIcon="true"
-              v-model="dates"
-              selectionMode="range"
-              :manualInput="false"
-            />
+            <DatePicker class="w-64 h-9" showButtonBar showIcon="true" v-model="dates" selectionMode="range"
+              :manualInput="false" />
             <label for="on_label">Selecione o período</label>
           </FloatLabel>
         </div>
@@ -80,14 +74,10 @@ const rankingEstados = computed(() => {
 
         <div class="w-full flex flex-wrap justify-between gap-10">
           <StatusGeralComponent class="lg:w-[48%] lg:h-64" :valuesList="valuesStatusGeral" />
-          <ProgressoAnalistaComponent
-            class="lg:w-[48%] lg:h-64"
-            :valuesData="valuesProgressoAnalista"
-          />
+          <ProgressoAnalistaComponent class="lg:w-[48%] lg:h-64" :valuesData="valuesProgressoAnalista" />
 
-          <label class="flex w-full justify-center lg:text-4xl text-2xl font-semibold text-gray-700"
-            >Produtividade Média</label
-          >
+          <label class="flex w-full justify-center lg:text-4xl text-2xl font-semibold text-gray-700">Produtividade
+            Média</label>
           <div class="flex overflow-x-scroll lg:overflow-hidden h-50 lg:w-full lg:h-64">
             <ProdutividadePizzaComponent :valuesData="valuesCultura" />
             <ProdutividadePizzaComponent :valuesData="valuesEstado" />
@@ -95,9 +85,7 @@ const rankingEstados = computed(() => {
           </div>
 
           <div class="w-full flex flex-wrap gap-10">
-            <div
-              class="bg-gray-100 p-4 rounded-lg shadow w-full sm:w-[48%] flex flex-col justify-center items-center"
-            >
+            <div class="bg-gray-100 p-4 rounded-lg shadow w-full sm:w-[48%] flex flex-col justify-center items-center ml-3">
               <p class="lg:text-3xl text-lg font-semibold text-gray-700 mb-2">
                 Cultura Mais Produtiva
               </p>
@@ -112,19 +100,19 @@ const rankingEstados = computed(() => {
             <div class="bg-gray-100 p-4 rounded-lg shadow w-full sm:w-[48%]">
               <p class="text-xl font-semibold text-gray-700 mb-2">Ranking de Estados</p>
               <ul>
-                <li
-                  v-for="(estado, index) in rankingEstados"
-                  :key="index"
-                  class="flex justify-between border-b py-1"
-                >
+                <li v-for="(estado, index) in rankingEstados" :key="index" class="flex justify-between border-b py-1">
                   <span>{{ estado.estado }}</span>
                   <span>{{ estado.valor.toLocaleString('pt-BR') }}</span>
                 </li>
               </ul>
             </div>
+
           </div>
+
         </div>
+        <br>
       </div>
+      <br>
     </div>
   </div>
 </template>

@@ -1,6 +1,8 @@
 <script setup>
-import { RouterLink } from 'vue-router';
-import { ref, onMounted} from 'vue';
+import { RouterLink, useRouter } from 'vue-router';
+import { ref, onMounted } from 'vue';
+
+const router = useRouter();
 
 const userRole = ref(false);
 const vectorRole = ref(false);
@@ -9,8 +11,8 @@ const dashboardRole = ref(false);
 const talhaoRole = ref(false);
 const editTalhaoRole = ref(false);
 
-const verifyRole = (role) =>{
-  if (role == 'Administrador'){
+const verifyRole = (role) => {
+  if (role === 'Administrador') {
     userRole.value = true;
     vectorRole.value = true;
     areaRole.value = true;
@@ -18,33 +20,40 @@ const verifyRole = (role) =>{
     talhaoRole.value = true;
     editTalhaoRole.value = true;
   }
-  if (role == 'Consultor'){
+  if (role === 'Consultor') {
     areaRole.value = true;
     dashboardRole.value = true;
   }
-  if (role == 'Analista'){
+  if (role === 'Analista') {
     talhaoRole.value = true;
     editTalhaoRole.value = true;
   }
-}
+};
 
-onMounted(()=>{
+onMounted(() => {
   const role = localStorage.getItem('role');
-  verifyRole(role)
-})
+  verifyRole(role);
+
+  // Redirecionamentos por perfil
+  if (role === 'Administrador' || role === 'Consultor') {
+    router.push('/dashboard');
+  }
+  if (role === 'Analista') {
+    router.push('/analista/talhoes');
+  }
+});
 </script>
 
 <style>
-.option{
+.option {
   width: 250px;
   height: 200px;
 }
-.option:hover{
-  img{
+.option:hover {
+  img {
     transform: scale(1.1);
   }
 }
-
 </style>
 
 <template>
@@ -72,7 +81,7 @@ onMounted(()=>{
         </RouterLink>
       </li>
 
-      <li v-show="vectorRole" class="my-1 w-1/2  p-1 flex flex-col items-center text-center">
+      <li v-show="vectorRole" class="my-1 w-1/2 p-1 flex flex-col items-center text-center">
         <RouterLink to="/vetor" class="flex flex-col items-center text-center gap-5 font-sans hover:font-semibold hover:text-orange-400 option">
           <img src="../assets/imagens/design.png" alt="edicao.png" class="lg:w-30 w-20">
           <p class="lg:text-lg text-xs ">Edição de vetores</p>
@@ -81,16 +90,16 @@ onMounted(()=>{
 
       <li v-show="areaRole" class="my-1 w-1/2 p-1 flex flex-col items-center text-center">
         <RouterLink to="/areasagro" class="flex flex-col items-center text-center gap-5 font-sans hover:font-semibold hover:text-orange-400 option">
-        <img src="../assets/imagens/map.png" alt="areasAgricolas.png" class="lg:w-30 w-20">
-        <p class="lg:text-lg text-xs">Áreas Agrícolas</p>
+          <img src="../assets/imagens/map.png" alt="areasAgricolas.png" class="lg:w-30 w-20">
+          <p class="lg:text-lg text-xs">Áreas Agrícolas</p>
         </RouterLink>
       </li>
 
       <li v-show="dashboardRole" class="my-1 w-1/2 p-1 flex flex-col items-center text-center">
         <RouterLink to="/dashboard" class="flex flex-col items-center text-center gap-5 font-sans hover:font-semibold hover:text-orange-400 option">
-        <img src="../assets/imagens/dashboard.png" alt="dashboard.png" class="lg:w-30 w-20">
-        <p class="lg:text-lg text-xs ">Dashboard</p>
-      </RouterLink>
+          <img src="../assets/imagens/dashboard.png" alt="dashboard.png" class="lg:w-30 w-20">
+          <p class="lg:text-lg text-xs ">Dashboard</p>
+        </RouterLink>
       </li>
 
     </ul>
