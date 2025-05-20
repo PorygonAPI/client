@@ -6,6 +6,7 @@ import { useRouter } from 'vue-router';
 import Dialog from 'primevue/dialog';
 import { useToast } from 'primevue/usetoast';
 import Botao from './Botao.vue';
+import Tooltip from 'primevue/tooltip'
 
 const props = defineProps({
   talhao: {
@@ -175,51 +176,35 @@ const editarTalhao = (id) => {
 
 <template>
   <div class="bg-white rounded-xl shadow p-5 flex flex-col gap-3">
-   <div class="flex justify-between items-center mb-3">
-  <div class="relative flex items-center">
-    <div class="relative">
-      <i
-        v-if="!isSearchFocused && !searchById"
-        class="pi pi-search absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400"
-      ></i>
-      <InputText
-        id="searchById"
-        v-model="searchById"
-        @input="handleIdInput"
-        @focus="isSearchFocused = true"
-        @blur="isSearchFocused = false"
-        class="p-1 pl-8 border border-gray-300 rounded-lg w-40 focus-within:ring focus-within:ring-orange-400 focus:outline-none"
-        pattern="[0-9]*"
-        inputmode="numeric"
-        placeholder="Buscar por ID"
-      />
+    <div class="flex justify-between items-center mb-3">
+      <div class="relative flex items-center">
+        <div class="relative">
+          <i v-if="!isSearchFocused && !searchById"
+            class="pi pi-search absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400"></i>
+          <InputText id="searchById" v-model="searchById" @input="handleIdInput" @focus="isSearchFocused = true"
+            @blur="isSearchFocused = false"
+            class="p-1 pl-8 border border-gray-300 rounded-lg w-40 focus-within:ring focus-within:ring-orange-400 focus:outline-none"
+            pattern="[0-9]*" inputmode="numeric" placeholder="Buscar por ID" />
+        </div>
+      </div>
     </div>
-  </div>
-</div>
 
     <div>
-      <DataTable
-        v-model:filters="filtros"
-        :value="filteredTalhoes"
-        removableSort
-        paginator
-        :rows="10"
-        stripedRows
-        class="p-datatable-gridlines"
-        :global-filter-fields="['id', 'nomeFazenda', 'cultura', 'produtividade', 'area', 'tipoSolo', 'cidade', 'estado', 'status']"
-      >
-        <Column field="id" header="ID" sortable class="p-1 w-24"/>
-        <Column field="nomeFazenda" header="Nome Fazenda" sortable class="p-1 min-w-40"/>
-        <Column field="cultura" header="Cultura" sortable class="p-1"/>
+      <DataTable v-model:filters="filtros" :value="filteredTalhoes" removableSort paginator :rows="10" stripedRows
+        class="p-3 min-w-[6rem] text-center"
+        :global-filter-fields="['id', 'nomeFazenda', 'cultura', 'produtividade', 'area', 'tipoSolo', 'cidade', 'estado', 'status']">
+        <Column field="id" header="ID" sortable class="p-1 w-24" />
+        <Column field="nomeFazenda" header="Nome Fazenda" sortable class="p-1 min-w-40" />
+        <Column field="cultura" header="Cultura" sortable class="p-1" />
         <Column field="produtividade" header="Produtividade" sortable class="p-1">
           <template #body="{ data }">
             {{ formatNumber(data.produtividade) }}
           </template>
         </Column>
-        <Column field="area" header="Área" sortable class="p-1"/>
-        <Column field="tipoSolo" header="Tipo de Solo" sortable class="p-1"/>
-        <Column field="cidade" header="Cidade" sortable class="p-1"/>
-        <Column field="estado" header="Estado" sortable class="p-1"/>
+        <Column field="area" header="Área" sortable class="p-1" />
+        <Column field="tipoSolo" header="Tipo de Solo" sortable class="p-1" />
+        <Column field="cidade" header="Cidade" sortable class="p-1" />
+        <Column field="estado" header="Estado" sortable class="p-1" />
 
         <Column field="status" header="Status" sortable class="p-1">
           <template #body="{ data }">
@@ -229,66 +214,56 @@ const editarTalhao = (id) => {
           </template>
         </Column>
 
-        <Column field="imagem" header="Imagem" class="p-1">
+        <Column field="imagem" header="" class="p-1">
           <template #body="slotProps">
-            <div class="flex justify-center">
-              <Botao @click="() => visualizarTalhao(slotProps.data.id)" tipo="primario">Visualizar</Botao>
+
+            <div @click="() => visualizarTalhao(slotProps.data.id)"
+              class="w-12 h-12 flex items-center justify-center rounded-full bg-blue-100 hover:bg-blue-200 cursor-pointer transition" title="Visualizar Imagem">
+              <i class="pi pi-image text-blue-600" style="font-size: 1.8rem;"></i>
             </div>
+
           </template>
         </Column>
 
-        <Column field="atribuir" header="Atribuir" class="p-1">
+        <Column field="atribuir" header="" class="p-1">
           <template #body="slotProps">
-            <div class="flex justify-center">
-              <Button
-                @click="() => abrirDialogAtribuir(slotProps.data)"
-                class="hover:text-gray-600 cursor-pointer p-2 m-1 bg-gray-400 text-white border-0 rounded-full shadow hover:bg-gray-300 transition"
-                icon="pi pi-user-plus"
-                aria-label="Atribuir para mim"
-                tooltip="Atribuir para mim"
-              />
+            <div @click="() => abrirDialogAtribuir(slotProps.data)"
+              class="w-12 h-12 flex items-center justify-center rounded-full bg-green-100 hover:bg-green-200 cursor-pointer transition"
+              title="Atribuir">
+              <i class="pi pi-user-plus text-green-600" style="font-size: 1.8rem;"></i>
             </div>
+
           </template>
         </Column>
       </DataTable>
     </div>
 
-    <Dialog v-model:visible="confirmarAtribuirDialog" modal header="Atribuir Talhão" class="custom-dialog w-80 lg:w-96 p-1">
-  <div class="dialog-content">
-    <div class="field">
-      <label class="font-semibold block mb-1">ID do Talhão:</label>
-      <span>{{ talhaoSelecionado?.id }}</span>
-    </div>
+    <Dialog v-model:visible="confirmarAtribuirDialog" modal header="Atribuir Talhão"
+      class="custom-dialog w-80 lg:w-96 p-1">
+      <div class="dialog-content">
+        <div class="field">
+          <label class="font-semibold block mb-1">ID do Talhão:</label>
+          <span>{{ talhaoSelecionado?.id }}</span>
+        </div>
 
-    <div class="field">
-      <label class="font-semibold block mb-1">Nome da Fazenda:</label>
-      <span>{{ talhaoSelecionado?.nomeFazenda }}</span>
-    </div>
+        <div class="field">
+          <label class="font-semibold block mb-1">Nome da Fazenda:</label>
+          <span>{{ talhaoSelecionado?.nomeFazenda }}</span>
+        </div>
 
-    <div class="field">
-      <label class="font-semibold block mb-1">Atribuir para:</label>
-      <span>{{ currentUserName }} (ID: {{ currentUserId }})</span>
-    </div>
+        <div class="field">
+          <label class="font-semibold block mb-1">Atribuir para:</label>
+          <span>{{ currentUserName }} (ID: {{ currentUserId }})</span>
+        </div>
 
-    <div class="flex justify-end gap-3 mt-6">
-      <Button
-        class="cancel-btn"
-        label="Cancelar"
-        severity="secondary"
-        @click="confirmarAtribuirDialog = false"
-        :disabled="loading"
-      />
-      <Button
-        class="confirm-btn"
-        label="Confirmar"
-        :loading="loading"
-        severity="success"
-        @click="confirmarAtribuicao"
-        :disabled="loading"
-      />
-    </div>
-  </div>
-</Dialog>
+        <div class="flex justify-end gap-3 mt-6">
+          <Button class="cancel-btn" label="Cancelar" severity="secondary" @click="confirmarAtribuirDialog = false"
+            :disabled="loading" />
+          <Button class="confirm-btn" label="Confirmar" :loading="loading" severity="success"
+            @click="confirmarAtribuicao" :disabled="loading" />
+        </div>
+      </div>
+    </Dialog>
 
   </div>
 </template>
@@ -316,7 +291,8 @@ const editarTalhao = (id) => {
   font-size: 1.5rem !important;
   border-bottom: 2px solid #f0a500 !important;
   padding-bottom: 0.75rem !important;
-  color: #f97316 !important; /* laranja para combinar com tema */
+  color: #f97316 !important;
+  /* laranja para combinar com tema */
 }
 
 .dialog-content {
@@ -336,7 +312,8 @@ const editarTalhao = (id) => {
 }
 
 .cancel-btn {
-  background-color: #e5e7eb; /* cinza claro */
+  background-color: #e5e7eb;
+  /* cinza claro */
   color: #374151;
   border-radius: 0.5rem;
   padding: 0.5rem 1.25rem;
@@ -359,5 +336,4 @@ const editarTalhao = (id) => {
 .confirm-btn:hover:not(:disabled) {
   filter: brightness(1.1);
 }
-
 </style>
