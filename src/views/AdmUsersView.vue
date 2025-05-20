@@ -80,8 +80,10 @@ onMounted(() => {
 
   <div class="h-full w-[90%] mx-auto">
     <div class="flex flex-col">
-      <Titulo title="Gerenciamento de Usuários" @update:search="search = $event" />
+      <Titulo title="Gerenciamento de Usuários" />
+
       <div class="p-5 py-3 bg-white rounded-xl shadow">
+        <br>
         <div class="flex items-center lg:justify-between gap-5 mb-2">
           <div
             class="flex gap-2 items-center border border-gray-300 rounded-lg w-44 lg:w-96 p-1 focus-within:ring focus-within:ring-orange-200">

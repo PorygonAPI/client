@@ -134,7 +134,7 @@ onUnmounted(() => {
   <nav v-if="route.path !== '/'" class="navbar">
     <div class="logo-container">
       <RouterLink to="/home">
-        <img src="../assets/imagens/Pássaro Geométrico Abstrato.png" alt="logoPorygon" class="logo" />
+        <img src="../assets/imagens/Porygon__1_-removebg-preview.png" alt="logoPorygon" class="logo" />
       </RouterLink>
     </div>
     <ul class="nav-links">
@@ -168,7 +168,7 @@ onUnmounted(() => {
     <div class="user-container">
       <div @click="togglePopup" class="user-info">
         <Avatar :label="nome.charAt(0).toUpperCase()" class="mr-7" size="large"
-          style="background-color: #00c2bd; color: #2a1261" shape="circle" />
+          style="background-color:  #004a80; color: #ffff" shape="circle" />
       </div>
 
       <button @click.stop="toggleMobileMenu" class="mobile-menu-btn">☰</button>
@@ -226,18 +226,18 @@ onUnmounted(() => {
   list-style: none;
   flex: 2;
   justify-content: space-evenly;
-  font-size: 1.3rem;
+  font-size: 1.4rem;
   font-weight: 500;
 }
 
 .nav-links a {
   text-decoration: none;
-  color: #3B5998;
+  color: #1b3a71;
   transition: color 0.3s;
 }
 
 .nav-links a:hover {
-  font-weight: 700;
+  font-weight: 900;
 }
 
 .user-container {

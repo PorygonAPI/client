@@ -20,7 +20,7 @@ import Footer from './components/Footer.vue';
 }
 
 body {
-  background-color: #93adcf;
+  background-color: #6384af;
 }
 }
 </style>
