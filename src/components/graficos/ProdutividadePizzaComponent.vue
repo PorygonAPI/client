@@ -13,22 +13,22 @@ const chartData = ref({});
 const chartOptions = ref({});
 
 const colorPalette = [
-  '#34d399', // Verde-menta moderno
-  '#3b82f6', // Azul claro moderno
-  '#c4b5fd', // Lilás pastel elegante
-  '#0ea5e9', // Azul ciano leve
-  '#7c3aed', // Roxo violeta sofisticado
-  '#15803d', // Verde escuro elegante
-  '#60a5fa', // Azul pastel sofisticado
-  '#8b5cf6', // Roxo lavanda forte
-  '#22d3ee', // Azul piscina suave
-  '#94a3b8', // Cinza claro com fundo azul
-  '#a78bfa', // Lavanda claro elegante
-  '#6ee7b7', // Verde água claro sofisticado
-  '#2563eb', // Azul vibrante elegante
-  '#1e3a8a', // Azul royal escuro
-  '#d1fae5', // Verde pastel elegante
-  '#cbd5e1'  // Neutro elegante (off-white azulado)
+'#34d399',
+'#3b82f6',
+'#c4b5fd',
+'#0ea5e9',
+'#7c3aed',
+'#15803d',
+'#60a5fa',
+'#8b5cf6',
+'#22d3ee',
+'#94a3b8',
+'#a78bfa',
+'#6ee7b7',
+'#2563eb',
+'#1e3a8a',
+'#d1fae5',
+'#cbd5e1'
 ];
 
 const setChartData = () => {

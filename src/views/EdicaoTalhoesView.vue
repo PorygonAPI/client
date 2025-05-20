@@ -2,7 +2,6 @@
 import { ref, computed, onMounted } from 'vue';
 import { useRouter } from 'vue-router';
 import { listarTalhoesPorUsuario } from '@/services/talhaoService';
-import Titulo from '@/components/Titulo.vue';
 
 const router = useRouter();
 const searchQuery = ref('');

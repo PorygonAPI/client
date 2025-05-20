@@ -5,7 +5,6 @@ import { useRouter } from 'vue-router';
 import { useRoute } from 'vue-router';
 import 'primeicons/primeicons.css';
 import Avatar from "primevue/avatar";
-import Botao from './Botao.vue';
 
 
 const route = useRoute();

@@ -98,7 +98,7 @@ const confirmarAtribuicao = async () => {
     if (!response.ok) {
       let errorMessage = `Erro ${response.status}`;
       try {
-        const text = await response.text(); // Pegar o texto bruto primeiro
+        const text = await response.text();
 
         if (text && text.trim().length > 0) {
           try {
@@ -292,7 +292,6 @@ const editarTalhao = (id) => {
   border-bottom: 2px solid #f0a500 !important;
   padding-bottom: 0.75rem !important;
   color: #f97316 !important;
-  /* laranja para combinar com tema */
 }
 
 .dialog-content {

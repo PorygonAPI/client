@@ -19,31 +19,31 @@ const valuesAtribuidos = computed(() => props.valuesData.atribuidos);
 const valuesAprovados = computed(() => props.valuesData.aprovados);
 
 const setChartData = () =>  {
-
     return {
         labels: valueLabels.value,
         datasets: [
-{
-    type: 'bar',
-    label: 'Pendentes',
-    backgroundColor: '#7c3aed', // Roxo violeta sofisticado
-    data: valuesPendentes.value
-},
-{
-    type: 'bar',
-    label: 'Atribuídos',
-    backgroundColor: '#34d399', // Verde-menta moderno
-    data: valuesAtribuidos.value
-},
-{
-    type: 'bar',
-    label: 'Aprovados',
-    backgroundColor: '#c4b5fd', // Azul vibrante elegante
-    data: valuesAprovados.value
-}
+            {
+                type: 'bar',
+                label: 'Pendentes',
+                backgroundColor: '#7c3aed',
+                data: valuesPendentes.value
+            },
+            {
+                type: 'bar',
+                label: 'Atribuídos',
+                backgroundColor: '#34d399',
+                data: valuesAtribuidos.value
+            },
+            {
+                type: 'bar',
+                label: 'Aprovados',
+                backgroundColor: '#c4b5fd',
+                data: valuesAprovados.value
+            }
         ]
     };
 };
+
 const setChartOptions = () =>  {
     const documentStyle = getComputedStyle(document.documentElement);
     const textColor = documentStyle.getPropertyValue('--p-text-color');
