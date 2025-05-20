@@ -90,13 +90,14 @@ onMounted(() => {
           </div>
 
           <div class="lg:my-0 flex justify-center lg:justify-start">
-            <Botao label="Cadastrar Usuário" @click="cadastrarOuEditarUsuario(0)" tipo="primario">Cadastrar Usuário</Botao>
+            <Botao label="Cadastrar Usuário" @click="cadastrarOuEditarUsuario(0)" tipo="primario">Cadastrar Usuário
+            </Botao>
           </div>
         </div>
 
 
         <DataTable :value="filteredUsuarios" removableSort paginator :rows="15" stripedRows
-          class="p-datatable-gridlines">
+          class="p-3 min-w-[6rem] text-center">
           <Column field="nome" header="Nome" sortable class="text-center p-1 col-span-2 w-1/3 lg:w-3/5">
             <template #body="slotProps">
               <span class="text-gray-700 font-medium flex justify-start lg:pl-1">{{ slotProps.data.nome }}</span>
@@ -109,15 +110,28 @@ onMounted(() => {
             </template>
           </Column>
 
-          <Column class="p-1" header="Ações">
-            <template #body="slotProps">
-              <div class="flex justify-center lg:gap-2">
-                <Botao @click="cadastrarOuEditarUsuario(slotProps.data.id)" tipo="primario">Editar</Botao>
+          <Column field="Editar Usuário" header="" class="p-1">
+          <template #body="slotProps">
 
-                <Botao @click="deleteUsuario(slotProps.data.id)" tipo="exclusao">Excluir</Botao>
-              </div>
-            </template>
-          </Column>
+            <div @click="cadastrarOuEditarUsuario(slotProps.data.id)"
+                  class="w-12 h-12 flex items-center justify-center rounded-full bg-blue-100 hover:bg-blue-200 cursor-pointer transition"
+                  title="Editar Usuário">
+                  <i class="pi pi-pen-to-square text-blue-600" style="font-size: 1.8rem;"></i>
+                </div>
+
+          </template>
+        </Column>
+
+        <Column field="Excluir usuário" header="" class="p-1">
+          <template #body="slotProps">
+            <div @click="deleteUsuario(slotProps.data.id)"
+                  class="w-12 h-12 flex items-center justify-center rounded-full bg-red-100 hover:bg-red-200 cursor-pointer transition"
+                  title="Excluir Usuário">
+                  <i class="pi pi-trash text-red-600" style="font-size: 1.8rem;"></i>
+                </div>
+
+          </template>
+        </Column>
         </DataTable>
       </div>
     </div>
