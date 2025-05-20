@@ -238,32 +238,45 @@ const editarTalhao = (id) => {
       </DataTable>
     </div>
 
-    <Dialog v-model:visible="confirmarAtribuirDialog" modal header="Atribuir Talhão"
-      class="custom-dialog w-80 lg:w-96 p-1">
-      <div class="dialog-content">
-        <div class="field">
-          <label class="font-semibold block mb-1">ID do Talhão:</label>
-          <span>{{ talhaoSelecionado?.id }}</span>
-        </div>
+    <Dialog
+  v-model:visible="confirmarAtribuirDialog"
+  modal
+  dismissableMask="false"
+  :closeOnEscape="false"
+  header="Atribuir Talhão"
+  class="custom-dialog w-96 lg:w-[30rem] p-6 rounded-lg shadow-lg bg-white max-h-[90vh] overflow-y-auto overflow-x-hidden"
+>
+  <div class="dialog-content space-y-6">
+    <div class="field flex justify-between items-center">
+      <label class="font-semibold text-gray-700 w-40">ID do Talhão:</label>
+      <span class="text-gray-900 font-medium truncate">{{ talhaoSelecionado?.id }}</span>
+    </div>
 
-        <div class="field">
-          <label class="font-semibold block mb-1">Nome da Fazenda:</label>
-          <span>{{ talhaoSelecionado?.nomeFazenda }}</span>
-        </div>
+    <div class="field flex justify-between items-center">
+      <label class="font-semibold text-gray-700 w-40">Nome da Fazenda:</label>
+      <span class="text-gray-900 font-medium truncate">{{ talhaoSelecionado?.nomeFazenda }}</span>
+    </div>
 
-        <div class="field">
-          <label class="font-semibold block mb-1">Atribuir para:</label>
-          <span>{{ currentUserName }} (ID: {{ currentUserId }})</span>
-        </div>
+    <div class="field flex justify-between items-center">
+      <label class="font-semibold text-gray-700 w-40">Atribuir para:</label>
+      <span class="text-gray-900 font-medium truncate">{{ currentUserName }} (ID: {{ currentUserId }})</span>
+    </div>
 
-        <div class="flex justify-end gap-3 mt-6">
-          <Button class="cancel-btn" label="Cancelar" severity="secondary" @click="confirmarAtribuirDialog = false"
-            :disabled="loading" />
-          <Button class="confirm-btn" label="Confirmar" :loading="loading" severity="success"
-            @click="confirmarAtribuicao" :disabled="loading" />
-        </div>
-      </div>
-    </Dialog>
+    <div class="flex justify-end gap-6 mt-8">
+      <Botao @click="confirmarAtribuirDialog = false"
+        :disabled="loading" tipo="exclusao">Cancelar</Botao>
+      <Botao label="Confirmar"
+        :loading="loading"
+        severity="success"
+        @click="confirmarAtribuicao"
+        :disabled="loading" tipo="primario">Confirmar</Botao>
+    </div>
+  </div>
+</Dialog>
+
+
+
+
 
   </div>
 </template>
