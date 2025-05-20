@@ -23,24 +23,24 @@ const setChartData = () =>  {
     return {
         labels: valueLabels.value,
         datasets: [
-            {
-                type: 'bar',
-                label: 'Pendentes',
-                backgroundColor: 'rgb(249, 115, 22)',
-                data: valuesPendentes.value
-            },
-            {
-                type: 'bar',
-                label: 'Atribuidos',
-                backgroundColor: 'rgb(6, 182, 212)',
-                data: valuesAtribuidos.value
-            },
-            {
-                type: 'bar',
-                label: 'Aprovados',
-                backgroundColor: 'rgb(107, 114, 128)',
-                data: valuesAprovados.value
-            }
+{
+    type: 'bar',
+    label: 'Pendentes',
+    backgroundColor: '#7c3aed', // Roxo violeta sofisticado
+    data: valuesPendentes.value
+},
+{
+    type: 'bar',
+    label: 'Atribuídos',
+    backgroundColor: '#34d399', // Verde-menta moderno
+    data: valuesAtribuidos.value
+},
+{
+    type: 'bar',
+    label: 'Aprovados',
+    backgroundColor: '#c4b5fd', // Azul vibrante elegante
+    data: valuesAprovados.value
+}
         ]
     };
 };

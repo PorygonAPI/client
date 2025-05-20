@@ -13,12 +13,22 @@ const chartData = ref({});
 const chartOptions = ref({});
 
 const colorPalette = [
-  '#1abc9c', '#2ecc71', '#3498db', '#9b59b6', '#34495e',
-  '#16a085', '#27ae60', '#2980b9', '#8e44ad', '#2c3e50',
-  '#f1c40f', '#e67e22', '#e74c3c', '#ecf0f1', '#95a5a6',
-  '#f39c12', '#d35400', '#c0392b', '#bdc3c7', '#7f8c8d',
-  '#ff6384', '#36a2eb', '#cc65fe', '#ffce56', '#66bb6a',
-  '#ef5350', '#ab47bc', '#ffa726', '#26c6da', '#d4e157'
+  '#34d399', // Verde-menta moderno
+  '#3b82f6', // Azul claro moderno
+  '#c4b5fd', // Lilás pastel elegante
+  '#0ea5e9', // Azul ciano leve
+  '#7c3aed', // Roxo violeta sofisticado
+  '#15803d', // Verde escuro elegante
+  '#60a5fa', // Azul pastel sofisticado
+  '#8b5cf6', // Roxo lavanda forte
+  '#22d3ee', // Azul piscina suave
+  '#94a3b8', // Cinza claro com fundo azul
+  '#a78bfa', // Lavanda claro elegante
+  '#6ee7b7', // Verde água claro sofisticado
+  '#2563eb', // Azul vibrante elegante
+  '#1e3a8a', // Azul royal escuro
+  '#d1fae5', // Verde pastel elegante
+  '#cbd5e1'  // Neutro elegante (off-white azulado)
 ];
 
 const setChartData = () => {
