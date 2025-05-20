@@ -112,22 +112,26 @@ const visualizarImagem = (id) => {
           </template>
         </Column>
 
-        <Column field="imagem" header="Imagem" class="p-1">
+
+        <Column field="imagem" header="" class="p-1">
           <template #body="{ data }">
-            <div class="flex justify-center">
-              <Botao @click="() => visualizarImagem(data.idFazenda)">Visualizar</Botao>
+            <div @click="() => visualizarImagem(data.idFazenda)"
+              class="w-12 h-12 flex items-center justify-center rounded-full bg-blue-100 hover:bg-blue-200 cursor-pointer transition"
+              title="Visualizar Imagem">
+              <i class="pi pi-image text-blue-600" style="font-size: 1.8rem;"></i>
             </div>
           </template>
         </Column>
 
-
-        <Column field="editar" header="Editar" class="p-1">
-          <template #body="{ data }">
-            <div class="flex justify-center">
-              <Botao @click="editarTalhao(data.idFazenda, data.id)">Editar</Botao>
-            </div>
-          </template>
-        </Column>
+        <Column field="Editar Usuário" header="" class="p-1">
+        <template #body="{ data }">
+          <div @click="editarTalhao(data.idFazenda, data.id)"
+            class="w-12 h-12 flex items-center justify-center rounded-full bg-blue-100 hover:bg-blue-200 cursor-pointer transition"
+            title="Editar Talhão">
+            <i class="pi pi-pen-to-square text-blue-600" style="font-size: 1.8rem;"></i>
+          </div>
+        </template>
+      </Column>
 
         <!-- <Column field="excluir" header="Excluir" class="p-1">
     <template #body="{ data }">
