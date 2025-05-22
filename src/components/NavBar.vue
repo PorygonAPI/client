@@ -20,6 +20,9 @@ const talhaoRole = ref(false);
 const editTalhaoRole = ref(false);
 const cargo = ref('Usuário');
 
+const hideIcons = ref(false);
+const hideText = ref(false);
+
 const verifyRole = (role) => {
   if (role === 'Administrador') {
     userRole.value = true;
@@ -64,10 +67,25 @@ const logoff = () => {
   router.push('/');
 };
 
+const updateIconVisibility = () => {
+  const width = window.innerWidth;
+  if (width < 1313) {
+    hideIcons.value = false;
+    hideText.value = true;
+  } else if (width < 1592) {
+    hideIcons.value = true;
+    hideText.value = false;
+  } else {
+    hideIcons.value = false;
+    hideText.value = false;
+  }
+};
+
 const handleResize = () => {
   if (window.innerWidth > 600) {
     showMobileMenu.value = false;
   }
+  updateIconVisibility();
 };
 
 onMounted(() => {
@@ -82,11 +100,14 @@ onMounted(() => {
     areaRole.value = false;
     dashboardRole.value = false;
   }
+  updateIconVisibility();
   window.addEventListener('resize', handleResize);
+  document.addEventListener('click', handleClickOutside);
 });
 
 onUnmounted(() => {
   window.removeEventListener('resize', handleResize);
+  document.removeEventListener('click', handleClickOutside);
 });
 
 router.beforeEach((to, from, next) => {
@@ -114,16 +135,6 @@ const handleClickOutside = (event: MouseEvent) => {
     showMobileMenu.value = false;
   }
 };
-
-onMounted(() => {
-  window.addEventListener('resize', handleResize);
-  document.addEventListener('click', handleClickOutside);
-});
-
-onUnmounted(() => {
-  window.removeEventListener('resize', handleResize);
-  document.removeEventListener('click', handleClickOutside);
-});
 </script>
 
 <template>
@@ -136,27 +147,32 @@ onUnmounted(() => {
     <ul class="nav-links">
       <li v-if="talhaoRole">
         <RouterLink to="/analista/talhoes">
-          <i class="pi pi-map" style="font-size: 1.4rem"></i> Talhões
+          <i v-if="!hideIcons" class="pi pi-map" style="font-size: 1.4rem"></i>
+          <span v-if="!hideText">Talhões</span>
         </RouterLink>
       </li>
       <li v-if="editTalhaoRole">
         <RouterLink to="/analista/edicao-talhoes">
-          <i class="pi pi-file-edit" style="font-size: 1.4rem"></i> Edição de Talhões
+          <i v-if="!hideIcons" class="pi pi-file-edit" style="font-size: 1.4rem"></i>
+          <span v-if="!hideText">Edição de Talhões</span>
         </RouterLink>
       </li>
       <li v-if="userRole">
         <RouterLink to="/usuario">
-          <i class="pi pi-users" style="font-size: 1.4rem"></i> Usuários
+          <i v-if="!hideIcons" class="pi pi-users" style="font-size: 1.4rem"></i>
+          <span v-if="!hideText">Usuários</span>
         </RouterLink>
       </li>
       <li v-if="areaRole">
         <RouterLink to="/areasagro">
-          <i class="pi pi-map-marker" style="font-size: 1.4rem"></i> Áreas Agrícolas
+          <i v-if="!hideIcons" class="pi pi-map-marker" style="font-size: 1.4rem"></i>
+          <span v-if="!hideText">Áreas Agrícolas</span>
         </RouterLink>
       </li>
       <li v-if="dashboardRole">
         <RouterLink to="/dashboard">
-          <i class="pi pi-chart-line" style="font-size: 1.4rem"></i> Dashboard
+          <i v-if="!hideIcons" class="pi pi-chart-line" style="font-size: 1.4rem"></i>
+          <span v-if="!hideText">Dashboard</span>
         </RouterLink>
       </li>
     </ul>
@@ -230,6 +246,9 @@ onUnmounted(() => {
   color: #1b3a71;
   font-weight: 700; /* peso intermediário para evitar salto */
   transition: color 0.3s, font-weight 0.3s;
+  display: flex;
+  align-items: center;
+  gap: 0.3rem;
 }
 
 .nav-links a:hover {
