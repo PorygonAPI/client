@@ -142,15 +142,15 @@ const confirmarAtribuicao = async () => {
 };
 
 const getStatusSeverity = (status) => {
-  switch (status) {
-    case 'APROVADO':
-      return 'success'
-    case 'PENDENTE':
-      return 'warn'
-    case 'ATRIBUIDO':
-      return 'info'
+  switch (status.toLowerCase()) {
+    case 'aprovado':
+      return 'success';
+    case 'pendente':
+      return 'danger';
+    case 'atribuido':
+      return 'warn';
     default:
-      return 'secondary'
+      return 'info';
   }
 };
 

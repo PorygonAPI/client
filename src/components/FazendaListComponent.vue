@@ -112,14 +112,6 @@ const mostrarAlerta = (mensagem, tipo = 'success') => {
       <Column field="cidade" header="Cidade" sortable class="p-1" />
       <Column field="estado" header="Estado" sortable class="p-1" />
 
-      <Column field="status" header="Status" sortable class="p-1">
-        <template #body="{ data }">
-          <div class="flex justify-center">
-            <Tag :value="data.status" :severity="getStatusSeverity(data.status)" class="p-1" />
-          </div>
-        </template>
-      </Column>
-
       <Column field="imagem" header="" class="p-1">
         <template #body="{ data }">
           <div @click="() => visualizarImagem(data.id)"

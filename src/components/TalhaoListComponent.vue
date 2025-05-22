@@ -60,17 +60,17 @@ const confirmarExclusao = async () => {
 };
 
 const getStatusSeverity = (status) => {
-  switch (status) {
-    case 'Aprovada':
-      return 'success'
-    case 'Pendente':
-      return 'danger'
-    case 'Em análise':
-      return 'warn'
+  switch (status.toLowerCase()) {
+    case 'aprovado':
+      return 'success';
+    case 'pendente':
+      return 'danger';
+    case 'atribuido':
+      return 'warn';
     default:
-      return 'info'
+      return 'info';
   }
-}
+};
 
 const visualizarImagem = (id) => {
   localStorage.setItem('id_visualizacao', id);
@@ -106,7 +106,7 @@ const visualizarImagem = (id) => {
 
         <Column field="status" header="Status" sortable class="p-1">
           <template #body="{ data }">
-            <div class="flex justify-center">
+            <div class="flex justify">
               <Tag :value="data.status" :severity="getStatusSeverity(data.status)" class="p-1" />
             </div>
           </template>
