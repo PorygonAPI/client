@@ -77,37 +77,63 @@ export default defineComponent({
 
     const fetchData = async () => {
       try {
-        const response = await fetch(`/api/areas-agricolas/${props.id}/detalhes-completos`, {
+
+        //*ENDPOINT ANTIGO*
+        // const response = await fetch(`/api/areas-agricolas/${props.id}/detalhes-completos`, {
+        //   headers: {
+        //     'Accept': 'application/json',
+        //     'Content-Type': 'application/json',
+        //     'Authorization': 'Bearer ' + TOKEN
+        //   }
+        // })
+
+
+        // *ENDPOINT NOVO*
+        const response = await fetch(`/api/safras/4/vetor`, {
           headers: {
-            'Accept': 'application/json',
-            'Content-Type': 'application/json',
             'Authorization': 'Bearer ' + TOKEN
           }
         })
 
         if (!response.ok) throw new Error('Erro ao carregar dados')
 
-        const data = await response.json()
-        console.log('Dados recebidos:', data)
+        // *TRATAMENTO ENDPOINT ANTIGO
+        // const data = await response.json()
+        // console.log('Dados recebidos:', data)
 
-        const fazendaGeometry = JSON.parse(data.fazenda.arquivoFazenda)
+        // const fazendaGeometry = JSON.parse(data.fazenda.arquivoFazenda)
 
         // const talhao = data.talhao?.find(t => t.id > 0)
-        const talhao = data.talhao?.find(t => t.id === Number(props.id))
+        // const talhao = data.talhao?.find(t => t.id === Number(props.id))
 
-        if (talhao?.safras?.[0]) {
-          safraInfo.value = {
-            safraId: talhao.safras[0].id,
-            cultura: talhao.safras[0].cultura || 'N/A',
-            ano: talhao.safras[0].ano || 'N/A'
-          }
-          
-          const daninhaGeometry = JSON.parse(talhao.safras[0].arquivoDaninha)
-          const finalDaninhaGeometry = JSON.parse(talhao.safras[0].arquivoFinalDaninha)
-          createMapLayer(fazendaGeometry, daninhaGeometry, finalDaninhaGeometry)
-        } else {
-          createMapLayer(fazendaGeometry)
-        }
+        // if (talhao?.safras?.[0]) {
+        //   safraInfo.value = {
+        //     safraId: talhao.safras[0].id,
+        //     cultura: talhao.safras[0].cultura || 'N/A',
+        //     ano: talhao.safras[0].ano || 'N/A'
+        //   }
+
+        //   console.log('Talhao: ',)
+
+        //   const daninhaGeometry = JSON.parse(talhao.safras[0].arquivoDaninha)
+        //   const finalDaninhaGeometry = JSON.parse(talhao.safras[0].arquivoFinalDaninha)
+        //   createMapLayer(fazendaGeometry, daninhaGeometry, finalDaninhaGeometry)
+        // } else {
+        //   createMapLayer(fazendaGeometry)
+        // }
+
+        // *TRATAMENTO PARA EDNPOINT NOVO*
+        let data = (await response.text()).split('--')
+
+        let arquivoFazenda = data[2].substring(data[2].indexOf('{"type":'))
+        let arquivoDaninha = data[3].substring(data[3].indexOf('{"type":'))
+        let arquivoFinalDaninha = data[4].substring(data[4].indexOf('{"type":'))
+
+        const fazendaGeometry = JSON.parse(arquivoFazenda)
+        const daninhaGeometry = JSON.parse(arquivoDaninha)
+        const finalDaninhaGeometry = JSON.parse(arquivoFinalDaninha)
+
+        createMapLayer(fazendaGeometry, daninhaGeometry, finalDaninhaGeometry)
       } catch (error) {
         console.error('Erro:', error)
       }
@@ -144,7 +170,7 @@ export default defineComponent({
         const daninhaLayer = L.geoJSON(daninhaGeometry, {
           style: { color: DaninhaColor }
         })
-        
+
         overlayMaps["Imagem Original"] = L.layerGroup([daninhaLayer]).addTo(map)
       }
 
@@ -152,8 +178,8 @@ export default defineComponent({
       let finalDaninhaInput = (finalDaninhaGeometry ? finalDaninhaGeometry : daninhaGeometry)
 
       let finalDaninhaLayer = L.geoJSON(finalDaninhaInput, {
-          style: { color: DaninhaFinalColor }
-        })
+        style: { color: DaninhaFinalColor }
+      })
 
       //Função que configura os polígonos para serem editados
       transformGeoJsonIntoEditableLayer(finalDaninhaLayer, drawnFeatures)
@@ -205,12 +231,18 @@ export default defineComponent({
 
       geoJson.eachLayer(function (layer) {
 
-        layer.toGeoJSON().geometry.coordinates.forEach(function (coordinateArray) {
+        if (layer.toGeoJSON().geometry.type.toLowerCase() == "multipolygon") {
+          layer.toGeoJSON().geometry.coordinates.forEach(function (coordinateArray) {
 
-          revertCoordinates(coordinateArray)
-          let newPolygon = L.polygon(coordinateArray, {color: DaninhaFinalColor})
-          polyLayers.push(newPolygon)
-        })
+            revertCoordinates(coordinateArray)
+            let newPolygon = L.polygon(coordinateArray, { color: DaninhaFinalColor })
+            polyLayers.push(newPolygon)
+          })
+        }
+        else {
+          polyLayers.push(layer)
+        }
+
       });
 
       // Add the layers to the feature group 
@@ -223,7 +255,7 @@ export default defineComponent({
       multipolygonArray.forEach(function (coordinateArray) {
         coordinateArray.forEach(function (coordinate) {
           coordinate.reverse()
-        })   
+        })
       })
     }
 
@@ -253,7 +285,7 @@ export default defineComponent({
     }
 
     const salvar = () => {
-      console.log(generateUpdatedGeoJson())
+      console.log('GEOJSON Editado: ', JSON.stringify(generateUpdatedGeoJson()))
     }
 
     return { voltar, salvar, safraInfo }
