@@ -6,7 +6,6 @@ import { useRoute } from 'vue-router';
 import 'primeicons/primeicons.css';
 import Avatar from "primevue/avatar";
 
-
 const route = useRoute();
 const router = useRouter();
 const nome = ref('User');
@@ -125,11 +124,9 @@ onUnmounted(() => {
   window.removeEventListener('resize', handleResize);
   document.removeEventListener('click', handleClickOutside);
 });
-
 </script>
 
 <template>
-
   <nav v-if="route.path !== '/'" class="navbar">
     <div class="logo-container">
       <RouterLink to="/home">
@@ -171,7 +168,6 @@ onUnmounted(() => {
       </div>
 
       <button @click.stop="toggleMobileMenu" class="mobile-menu-btn">☰</button>
-
 
       <div v-if="showPopUp" class="popup">
         <p><strong>{{nome}} | {{ cargo }}</strong></p>
@@ -225,18 +221,20 @@ onUnmounted(() => {
   list-style: none;
   flex: 2;
   justify-content: space-evenly;
-  font-size: 1.4rem;
+  font-size: 1.2rem;
   font-weight: 500;
 }
 
 .nav-links a {
   text-decoration: none;
   color: #1b3a71;
-  transition: color 0.3s;
+  font-weight: 700; /* peso intermediário para evitar salto */
+  transition: color 0.3s, font-weight 0.3s;
 }
 
 .nav-links a:hover {
-  font-weight: 900;
+  font-weight: 900; /* negrito forte */
+  color: #000;
 }
 
 .user-container {
@@ -344,19 +342,6 @@ onUnmounted(() => {
 
   .mobile-menu-btn {
     display: block;
-  }
-}
-
-/* Garantir que botão hamburger fique oculto em telas > 600px */
-@media (min-width: 601px) {
-  .mobile-menu-btn {
-    display: none !important;
-  }
-}
-
-@media (max-width: 600px) {
-  .user-info {
-    display: none;
   }
 }
 </style>

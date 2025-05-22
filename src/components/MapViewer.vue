@@ -64,6 +64,8 @@ export default defineComponent({
 
       //Inserindo o geoJson no mapa
       setTalhoes()
+
+
     }
 
     const setTalhoes = () => {
@@ -98,6 +100,8 @@ export default defineComponent({
       };
 
       var layerControl = L.control.layers(null, overlayMaps).addTo(map);
+            map.fitBounds(arquivoFazendaLayer.getBounds())
+
     }
 
     const setLocalizacaoMapa = () => {
