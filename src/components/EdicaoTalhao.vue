@@ -6,7 +6,7 @@
           <i class="pi pi-arrow-left"></i>
         </button>
         <div>
-          <h1 class="text-2xl font-semibold text-gray-800">Edição do Talhão #{{ id }}</h1>
+          <h1 class="text-2xl font-semibold text-gray-800">Edição do Talhão #{{ talhaoId }}</h1>
           <div v-if="safraInfo" class="mt-1 flex">
             <span class="inline-block bg-blue-100 text-blue-800 text-sm font-medium px-2 py-1 rounded">
               Safra #{{ safraInfo.idSafra }}
@@ -44,7 +44,11 @@ import 'leaflet-draw'
 
 export default defineComponent({
   props: {
-    id: {
+    talhaoId: {
+      type: [String, Number],
+      required: true
+    },
+    safraId: {
       type: [String, Number],
       required: true
     }
@@ -81,7 +85,7 @@ export default defineComponent({
     const fetchData = async () => {
       try {
 
-        const response = await fetch(`/api/safras/${props.id}/vetor`, {
+        const response = await fetch(`/api/safras/${props.safraId}/vetor`, {
           headers: {
             'Authorization': 'Bearer ' + TOKEN
           }

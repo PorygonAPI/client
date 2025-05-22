@@ -60,8 +60,8 @@ const filteredTalhoesAprovados = computed(() => {
   );
 });
 
-const editarTalhao = (id) => {
-  router.push(`/talhao/editar/${id}`);
+const editarTalhao = (talhaoId, safraId) => {
+  router.push(`/talhao/editar/${talhaoId}/${safraId}`);
 };
 
 onMounted(() => {
@@ -141,7 +141,7 @@ onMounted(() => {
                   <p class="text-sm text-gray-600">Ano: {{ talhao.anoSafra }}</p>
                 </div>
                 <button
-                  @click="editarTalhao(talhao.id)"
+                  @click="editarTalhao(talhao.id, talhao.safraId)"
                   class="bg-gray-100 hover:bg-gray-200 p-2 rounded-md"
                   title="Editar talhão"
                 >
@@ -175,7 +175,7 @@ onMounted(() => {
                   <p class="text-sm text-gray-600">Ano: {{ talhao.anoSafra }}</p>
                 </div>
                 <button
-                  @click="editarTalhao(talhao.id)"
+                  @click="editarTalhao(talhao.id, talhao.safraId)"
                   class="bg-gray-100 hover:bg-gray-200 p-2 rounded-md"
                   title="Editar talhão"
                 >
