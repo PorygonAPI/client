@@ -147,7 +147,7 @@ const getStatusSeverity = (status) => {
       return 'success'
     case 'PENDENTE':
       return 'warn'
-    case 'EM_ANALISE':
+    case 'ATRIBUIDO':
       return 'info'
     default:
       return 'secondary'
@@ -208,7 +208,7 @@ const editarTalhao = (id) => {
 
         <Column field="status" header="Status" sortable class="p-1">
           <template #body="{ data }">
-            <div class="flex justify-center">
+            <div class="flex justify">
               <Tag :value="formatStatus(data.status)" :severity="getStatusSeverity(data.status)" class="p-1" />
             </div>
           </template>
