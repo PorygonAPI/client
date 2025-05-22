@@ -9,7 +9,6 @@ import ProdutividadePizzaComponent from '@/components/graficos/ProdutividadePizz
 
 const dates = ref()
 
-//Ordem - pendente, atribuido, aprovado
 const valuesStatusGeral = ref([430, 300, 220])
 
 const valuesProgressoAnalista = ref({

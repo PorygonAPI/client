@@ -84,8 +84,6 @@ onMounted(async () => {
       <Titulo title="Áreas Agrícolas" />
 
       <div class="bg-white shadow rounded-xl p-5">
-
-        <!-- Abas estilo clássico -->
         <div class="flex border-b border-gray-300 mb-4">
           <button
             @click="activeTab = 'fazendas'; saveTabSelection()"
