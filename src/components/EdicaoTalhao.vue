@@ -9,10 +9,13 @@
           <h1 class="text-2xl font-semibold text-gray-800">Edição do Talhão #{{ id }}</h1>
           <div v-if="safraInfo" class="mt-1 flex">
             <span class="inline-block bg-blue-100 text-blue-800 text-sm font-medium px-2 py-1 rounded">
-              Safra #{{ safraInfo.safraId }}
+              Safra #{{ safraInfo.idSafra }}
             </span>
             <span class="inline-block bg-gray-100 text-gray-700 text-sm px-2 py-1 rounded ml-2">
-              {{ safraInfo.cultura }} - {{ safraInfo.ano }}
+              Data Cadastro: {{ safraInfo.dataCadastro }}
+            </span>
+            <span class="inline-block bg-gray-100 text-gray-700 text-sm px-2 py-1 rounded ml-2">
+              Data da Última Atualização: {{ safraInfo.dataUltimaVersao }}
             </span>
           </div>
         </div>
@@ -78,53 +81,17 @@ export default defineComponent({
     const fetchData = async () => {
       try {
 
-        //*ENDPOINT ANTIGO*
-        // const response = await fetch(`/api/areas-agricolas/${props.id}/detalhes-completos`, {
-        //   headers: {
-        //     'Accept': 'application/json',
-        //     'Content-Type': 'application/json',
-        //     'Authorization': 'Bearer ' + TOKEN
-        //   }
-        // })
-
-
-        // *ENDPOINT NOVO*
-        const response = await fetch(`/api/safras/4/vetor`, {
+        const response = await fetch(`/api/safras/${props.id}/vetor`, {
           headers: {
             'Authorization': 'Bearer ' + TOKEN
           }
         })
 
         if (!response.ok) throw new Error('Erro ao carregar dados')
-
-        // *TRATAMENTO ENDPOINT ANTIGO
-        // const data = await response.json()
-        // console.log('Dados recebidos:', data)
-
-        // const fazendaGeometry = JSON.parse(data.fazenda.arquivoFazenda)
-
-        // const talhao = data.talhao?.find(t => t.id > 0)
-        // const talhao = data.talhao?.find(t => t.id === Number(props.id))
-
-        // if (talhao?.safras?.[0]) {
-        //   safraInfo.value = {
-        //     safraId: talhao.safras[0].id,
-        //     cultura: talhao.safras[0].cultura || 'N/A',
-        //     ano: talhao.safras[0].ano || 'N/A'
-        //   }
-
-        //   console.log('Talhao: ',)
-
-        //   const daninhaGeometry = JSON.parse(talhao.safras[0].arquivoDaninha)
-        //   const finalDaninhaGeometry = JSON.parse(talhao.safras[0].arquivoFinalDaninha)
-        //   createMapLayer(fazendaGeometry, daninhaGeometry, finalDaninhaGeometry)
-        // } else {
-        //   createMapLayer(fazendaGeometry)
-        // }
-
-        // *TRATAMENTO PARA EDNPOINT NOVO*
+        
         let data = (await response.text()).split('--')
 
+        safraInfo.value = JSON.parse(data[1].substring(data[1].indexOf('{"idSafra')))
         let arquivoFazenda = data[2].substring(data[2].indexOf('{"type":'))
         let arquivoDaninha = data[3].substring(data[3].indexOf('{"type":'))
         let arquivoFinalDaninha = data[4].substring(data[4].indexOf('{"type":'))
