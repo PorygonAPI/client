@@ -253,7 +253,7 @@ const handleClickOutside = (event: MouseEvent) => {
 
 .nav-links a:hover {
   font-weight: 900; /* negrito forte */
-  color: #000;
+  color: #315faf
 }
 
 .user-container {

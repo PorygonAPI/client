@@ -48,11 +48,6 @@ const visualizarImagem = (id) => {
 
 const nomeFazendaSelecionada = computed(() => fazendaSelecionada.value?.nome);
 
-// const abrirDialog = (data) => {
-//   fazendaSelecionada.value = data
-//   visibleExcluir.value = true
-// };
-
 const confirmarExclusao = async () => {
   try {
     const response = await fetch(`/api/areas-agricolas/${fazendaSelecionada.value.id}`, {
@@ -128,27 +123,12 @@ const mostrarAlerta = (mensagem, tipo = 'success') => {
           <div @click="cadastrarOuEditarFazenda(data.id)"
             class="w-12 h-12 flex items-center justify-center rounded-full bg-blue-100 hover:bg-blue-200 cursor-pointer transition"
             title="Editar Fazenda">
-            <i class="pi pi-pen-to-square text-blue-600" style="font-size: 1.8rem;"></i>
+            <i class="pi pi-pen-to-square text-purple-600" style="font-size: 1.8rem;"></i>
           </div>
         </template>
       </Column>
 
-
-      <!-- <Column field="excluir" header="Excluir" class="p-1">
-        <template #body="{ data }">
-          <div class="flex justify-center">
-            <Button
-              class="cursor-pointer p-1 m-1 px-2 bg-orange-400 text-white border-0 rounded shadow hover:text-orange-500 hover:bg-orange-300 transition"
-              @click="() => { abrirDialog(data) }"
-            >
-              Excluir
-            </Button>
-          </div>
-        </template>
-      </Column> -->
-
     </DataTable>
-
 
     <Dialog v-model:visible="visibleExcluir" modal header="Confirmar Exclusão" class="w-80 lg:w-96 p-1">
       <hr class="border-gray-200 mb-2">

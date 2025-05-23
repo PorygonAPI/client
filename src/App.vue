@@ -21,7 +21,8 @@ import Footer from './components/Footer.vue';
 
 
 body {
-  background-color: #6384af;
+  background-color: #9eb9dd
+;
 }
 }
 </style>
