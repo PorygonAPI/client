@@ -1,119 +1,70 @@
 <template>
-  <div class="bg-white shadow-md rounded-lg p-4 my-4 w-full max-w-lg mx-auto z-0">
+  <div class="bg-white shadow-xl rounded-2xl p-6 my-6 w-full max-w-2xl mx-auto mt-23">
     <form>
-      <div class="mb-3">
-        <RouterLink to="/areasagro">&larr;</RouterLink>
-        <p class="text-center text-3xl font-semibold text-gray-800">
-          {{ isEditing ? 'Editar Fazenda' : 'Cadastrar Fazenda' }}
-        </p>
+      <div class="mb-6 flex items-center gap-2">
+        <div class="flex items-start gap-3">
+          <i @click="voltar"
+            class="pi pi-angle-left text-3xl text-gray-600 cursor-pointer hover:text-gray-800 transition" />
+          <h1 class="text-2xl font-semibold text-gray-800">Cadastrar Fazenda</h1>
+        </div>
       </div>
 
-      <Divider type="solid" class="mb-5" />
-
-      <FloatLabel variant="on" class="mb-3">
-        <InputText type="text" id="nome_fazenda" class="w-full p-1.5" v-model="nomeFazenda" />
+      <FloatLabel variant="on" class="mb-5">
+        <InputText type="text" id="nome_fazenda" class="w-full p-2 text-base rounded-md" v-model="nomeFazenda" />
         <label for="nome_fazenda">Nome da Fazenda</label>
       </FloatLabel>
 
-      <div class="flex w-full gap-1.5">
-        <span class="w-1/2">
-          <FloatLabel variant="on">
-            <Select
-              editable
-              id="estado"
-              class="w-full rounded shadow p-1.5 z-0"
-              v-model="estadoSelecionado"
-              :options="estados"
-              optionLabel="nome"
-              optionValue="sigla"
-            />
-            <label for="estado">Estado</label>
-          </FloatLabel>
-        </span>
+      <div class="flex flex-col md:flex-row gap-4">
+        <FloatLabel variant="on" class="flex-1">
+          <Select editable id="estado" class="w-full p-2 rounded-md shadow-sm" v-model="estadoSelecionado"
+            :options="estados" optionLabel="nome" optionValue="sigla" />
+          <label for="estado">Estado</label>
+        </FloatLabel>
 
-        <span class="w-1/2">
-          <FloatLabel variant="on">
-            <Select
-              editable
-              id="cidade"
-              class="w-full rounded shadow p-1.5 z-0"
-              v-model="cidadeSelecionada"
-              :options="cidades"
-              optionLabel="nome"
-              optionValue="nome"
-              :disabled="!estadoSelecionado"
-            />
-            <label for="cidade">Cidade</label>
-          </FloatLabel>
-        </span>
+        <FloatLabel variant="on" class="flex-1">
+          <Select editable id="cidade" class="w-full p-2 rounded-md shadow-sm" v-model="cidadeSelecionada"
+            :options="cidades" optionLabel="nome" optionValue="nome" :disabled="!estadoSelecionado" />
+          <label for="cidade">Cidade</label>
+        </FloatLabel>
       </div>
 
-      <div v-if="!isEditing" class="flex mt-4 gap-1.5 w-full">
-        <div class="w-1/2 border border-gray-300 rounded-md p-3 flex flex-col items-center justify-center text-center">
-          <p class="text-xs mb-0.5">Upload - Arquivo GeoJSON de Saída</p>
-          <input
-            ref="geojsonInput"
-            type="file"
-            accept=".geojson"
-            class="hidden"
-            @change="handleGeoJSONUpload"
-          />
-          <button
-            type="button"
-            class="bg-gray-400 hover:bg-gray-500 text-white font-semibold py-2 px-4 rounded w-full cursor-pointer"
-            @click="triggerGeoJSONUpload"
-          >
+      <div v-if="!isEditing" class="flex flex-col md:flex-row gap-4 mt-6">
+        <div class="flex-1 border border-gray-200 rounded-xl p-4 text-center bg-gray-50">
+          <p class="text-sm text-gray-600 mb-2">Upload - GeoJSON de Saída</p>
+          <input ref="geojsonInput" type="file" accept=".geojson" class="hidden" @change="handleGeoJSONUpload" />
+          <Botao type="button"
+            @click="triggerGeoJSONUpload">
             {{ geojsonFile ? 'Trocar Arquivo' : 'Selecionar Arquivo' }}
-          </button>
-          <div v-if="geojsonFile" class="mt-2 relative w-full">
-            <p class="text-sm text-gray-700 truncate w-full">{{ geojsonFile.name }}</p>
-            <button
-              type="button"
-              class="absolute top-0 right-0 text-red-500 text-lg font-bold"
-              @click="removeGeoJSON"
-            >
+          </Botao>
+          <div v-if="geojsonFile" class="mt-2 relative">
+            <p class="text-sm text-gray-700 truncate">{{ geojsonFile.name }}</p>
+            <button type="button" class="absolute top-0 right-0 text-red-500 font-bold" @click="removeGeoJSON">
               ×
             </button>
           </div>
         </div>
 
-        <div class="w-1/2 border border-gray-300 rounded-md p-3 flex flex-col items-center justify-center text-center">
-          <p class="text-xs mb-0.5">Upload - Mapa de Classif. Automática</p>
-          <input
-            ref="imageInput"
-            type="file"
-            accept=".geojson"
-            class="hidden"
-            @change="handleImageUpload"
-          />
-          <button
-            type="button"
-            class="bg-gray-400 hover:bg-gray-500 text-white font-semibold py-2 px-4 rounded w-full cursor-pointer"
-            @click="triggerImageUpload"
-          >
+        <div class="flex-1 border border-gray-200 rounded-xl p-4 text-center bg-gray-50">
+          <p class="text-sm text-gray-600 mb-2">Upload - Mapa Classificação Automática</p>
+          <input ref="imageInput" type="file" accept=".geojson" class="hidden" @change="handleImageUpload" />
+          <Botao type="button"
+            @click="triggerImageUpload">
             {{ imageFile ? 'Trocar Arquivo' : 'Selecionar Arquivo' }}
-          </button>
-          <div v-if="imageFile" class="mt-2 relative w-full">
-            <p class="text-sm text-gray-700 truncate w-full">{{ imageFile.name }}</p>
-            <button
-              type="button"
-              class="absolute top-0 right-0 text-red-500 text-lg font-bold"
-              @click="removeImage"
-            >
+          </Botao>
+          <div v-if="imageFile" class="mt-2 relative">
+            <p class="text-sm text-gray-700 truncate">{{ imageFile.name }}</p>
+            <button type="button" class="absolute top-0 right-0 text-red-500 font-bold" @click="removeImage">
               ×
             </button>
           </div>
         </div>
       </div>
 
-      <div class="flex justify-center mt-6">
-        <button
-          type="button"
-          class="bg-orange-400 text-white rounded shadow hover:bg-orange-300 transition px-6 py-2"
-          @click="cadastrarOuAtualizarFazenda"
-        >
-        {{ isEditing ? 'Salvar Alterações' : 'Cadastrar Fazenda' }}
-        </button>
+      <div class="flex justify-center mt-8">
+        <Botao type="button"
+            @click="cadastrarOuAtualizarFazenda">
+            {{ isEditing ? 'Salvar Alterações' : 'Cadastrar Fazenda' }}
+          </Botao>
       </div>
     </form>
   </div>
@@ -126,6 +77,7 @@ import { ref, onMounted, watch } from 'vue';
 import { FloatLabel, InputText, Divider, Select, Toast } from 'primevue';
 import { useToast } from 'primevue/usetoast';
 import { useRoute, useRouter } from 'vue-router';
+import Botao from './Botao.vue';
 
 const route = useRoute()
 const router = useRouter()
@@ -276,7 +228,7 @@ const cadastrarOuAtualizarFazenda = async () => {
         estado: estadoSelecionado.value,
         cidadeNome: cidadeSelecionada.value,
         status: statusFazenda.value,
-        arquivoFazenda:geojsonFile.value
+        arquivoFazenda: geojsonFile.value
       };
     } else {
       const geojsonContent = await readFileAsText(geojsonFile.value);
@@ -321,6 +273,10 @@ const cadastrarOuAtualizarFazenda = async () => {
     console.error(error);
     toast.add({ severity: 'error', summary: 'Erro', detail: 'Falha ao salvar fazenda.', life: 3000 });
   }
+};
+
+const voltar = () => {
+  router.push('/areasagro'); // ou use router.back() para voltar à página anterior
 };
 
 </script>

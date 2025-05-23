@@ -1,134 +1,141 @@
+<script setup>
+import { ref, computed, onMounted } from 'vue'
+import { useToast } from 'primevue/usetoast'
+import Button from 'primevue/button'
+import DataTable from 'primevue/datatable'
+import Column from 'primevue/column'
+import Toast from 'primevue/toast'
+import Titulo from '@/components/Titulo.vue'
+import Botao from '@/components/Botao.vue'
+
+const toast = useToast()
+
+const usuarios = ref([])
+const search = ref("")
+const error = ref(null)
+
+const TOKEN = localStorage.getItem('token')
+
+const fetchData = async () => {
+  try {
+    const response = await fetch('/api/usuarios', {
+      headers: {
+        'Accept': 'application/json',
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer ' + TOKEN
+      }
+    })
+    const data = await response.json()
+    usuarios.value = data
+  } catch (err) {
+    error.value = 'Erro ao carregar os dados'
+    showToast('error', error.value)
+  }
+}
+
+const deleteUsuario = async (id) => {
+  try {
+    const response = await fetch('/api/usuarios/' + id, {
+      method: 'DELETE',
+      headers: {
+        'Accept': 'application/json',
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer ' + TOKEN
+      }
+    })
+
+    if (!response.ok) throw new Error('Erro ao excluir registro')
+
+    usuarios.value = usuarios.value.filter(user => user.id !== id)
+    showToast('success', 'Exclusão realizada com sucesso')
+  } catch (err) {
+    showToast('error', 'Erro ao excluir registro')
+  }
+}
+
+const cadastrarOuEditarUsuario = (id) => {
+  window.location.href = `/cadastroUsuario?id=${id}`
+}
+
+const showToast = (severity, message) => {
+  toast.add({ severity, summary: 'Informando:', detail: message, life: 5000 })
+}
+
+const filteredUsuarios = computed(() => {
+  if (!search.value) return usuarios.value
+  return usuarios.value.filter(user =>
+    user.nome.toLowerCase().includes(search.value.toLowerCase()) ||
+    user.cargoNome.toLowerCase().includes(search.value.toLowerCase())
+  )
+})
+
+onMounted(() => {
+  fetchData()
+})
+</script>
+
 <template>
   <Toast />
-  <div class="h-full w-[90%] ml-[5%] mr-[5%]">
+
+
+  <div class="h-full w-[90%] mx-auto">
     <div class="flex flex-col">
-      <div class="text-center p-2 mt-4 lg:mb-3 mb-1">
-        <p class="text-4xl font-semibold text-gray-800">Gerenciamento de Usuários</p>
-      </div>
-      <hr class="border-gray-300 mb-4">
+      <Titulo title="Gerenciamento de Usuários" />
+
       <div class="p-5 py-3 bg-white rounded-xl shadow">
-        <div class="flex  items-center lg:justify-between gap-5 mb-2">
+        <br>
+        <div class="flex items-center lg:justify-between gap-5 mb-2">
           <div
             class="flex gap-2 items-center border border-gray-300 rounded-lg w-44 lg:w-96 p-1 focus-within:ring focus-within:ring-orange-200">
-            <input v-model="search" type="text" placeholder="Pesquisar" class="w-full outline-none bg-transparent ml-1">
+            <input v-model="search" type="text" placeholder="Pesquisar"
+              class="w-full outline-none bg-transparent ml-1" />
           </div>
-          <div class="lg:my-0 flex flex-col justify-center lg:justify-start">
-            <Button label="Cadastrar Usuário" @click="cadastrarOuEditarUsuario (0)"
-              class="p-1 px-2 m-1 rounded-lg shadow text-white border-gray-300 bg-gray-400 hover:text-gray-500 hover:bg-gray-300 transition flex items-center justify-center " />
+
+          <div class="lg:my-0 flex justify-center lg:justify-start">
+            <Botao label="Cadastrar Usuário" @click="cadastrarOuEditarUsuario(0)" tipo="primario">Cadastrar Usuário
+            </Botao>
           </div>
         </div>
 
+
         <DataTable :value="filteredUsuarios" removableSort paginator :rows="15" stripedRows
-          class="p-datatable-gridlines">
+          class="p-3 min-w-[6rem] text-center">
           <Column field="nome" header="Nome" sortable class="text-center p-1 col-span-2 w-1/3 lg:w-3/5">
             <template #body="slotProps">
               <span class="text-gray-700 font-medium flex justify-start lg:pl-1">{{ slotProps.data.nome }}</span>
             </template>
           </Column>
+
           <Column field="cargoNome" header="Cargo" sortable class="text-center p-1 lg:w-1/5">
             <template #body="slotProps">
               <span class="text-gray-600 flex justify-start px-0.5 lg:pl-1">{{ slotProps.data.cargoNome }}</span>
             </template>
           </Column>
-          <Column class="p-1" header="Ações">
-            <template #body="slotProps">
-              <div class="flex justify-center lg:gap-2">
-                <button @click="cadastrarOuEditarUsuario (slotProps.data.id)"
-                  class="cursor-pointer m-1 p-1 lg:w-16 bg-gray-400 text-white rounded shadow hover:text-gray-500  hover:bg-gray-300 transition">Editar</button>
-                <button @click="deleteUsuario (slotProps.data.id)"
-                  class="cursor-pointer m-1 p-1 lg:w-16 bg-orange-400 text-white rounded shadow hover:text-orange-500 hover:bg-orange-300 transition">Excluir</button>
-              </div>
-            </template>
-          </Column>
+
+          <Column field="Editar Usuário" header="" class="p-1">
+          <template #body="slotProps">
+
+            <div @click="cadastrarOuEditarUsuario(slotProps.data.id)"
+                  class="w-12 h-12 flex items-center justify-center rounded-full bg-blue-100 hover:bg-blue-200 cursor-pointer transition"
+                  title="Editar Usuário">
+                  <i class="pi pi-pen-to-square text-blue-600" style="font-size: 1.8rem;"></i>
+                </div>
+
+          </template>
+        </Column>
+
+        <Column field="Excluir usuário" header="" class="p-1">
+          <template #body="slotProps">
+            <div @click="deleteUsuario(slotProps.data.id)"
+                  class="w-12 h-12 flex items-center justify-center rounded-full bg-red-100 hover:bg-red-200 cursor-pointer transition"
+                  title="Excluir Usuário">
+                  <i class="pi pi-trash text-red-600" style="font-size: 1.8rem;"></i>
+                </div>
+
+          </template>
+        </Column>
         </DataTable>
       </div>
     </div>
   </div>
 </template>
-
-<script>
-import { ref, computed } from 'vue';
-import Button from 'primevue/button';
-import DataTable from 'primevue/datatable';
-import Column from 'primevue/column';
-import Toast from 'primevue/toast';
-import axios from 'axios'
-
-const TOKEN =  localStorage.getItem('token')
-
-export default {
-  components: {
-    Button,
-    DataTable,
-    Column,
-    Toast,
-  },
-  setup() {
-
-
-    const usuarios = ref();
-
-    const fetchData = async () => {
-      try {
-        const response = await fetch('api/usuarios', {
-          headers: {
-            'Accept': 'application/json',
-            'Content-Type': 'application/json',
-            'Authorization': 'Bearer '+ TOKEN
-          }
-        });
-        usuarios.value = await response.json();
-      } catch (error) {
-        error.value = 'Erro ao carregar os dados';
-      } 
-    };
-
-    fetchData()
-
-    const search = ref("");
-
-    const filteredUsuarios = computed(() => {
-      if (!search.value) return usuarios.value;
-      return usuarios.value.filter(user =>
-        user.nome.toLowerCase().includes(search.value.toLowerCase()) ||
-        user.cargoNome.toLowerCase().includes(search.value.toLowerCase())
-      );
-    });
-
-    return { usuarios, search, filteredUsuarios };
-  },
-  methods:{
-    async deleteUsuario (id)
-   {
-      try {
-        const response = await fetch('/api/usuarios/' + id, {
-          headers: {
-            'Accept': 'application/json',
-            'Content-Type': 'application/json',
-            'Authorization': 'Bearer '+ TOKEN
-          },
-          method: 'DELETE'
-        }).then((response => {
-          window.location.reload();
-          this.showToast('success','Exclusão realizada com sucesso')
-        })).catch((response) => {
-          this.showToast('error','Erro ao excluir registro')
-        }) 
-      } catch (error) {
-        error.value = 'Erro ao excluir registro';
-      } 
-   },
-
-   cadastrarOuEditarUsuario(id)
-   {
-    this.$router.push({ path: 'cadastroUsuario', query: { id: id } })
-   },
-
-   showToast(strSeverity,strMensagem) 
-   {
-    this.$toast.add({ severity: strSeverity, summary: 'Informando:', detail: strMensagem, life: 5000 })
-   }
-}
-  }
-
-</script>
