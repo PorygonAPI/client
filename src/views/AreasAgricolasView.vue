@@ -1,7 +1,8 @@
 <script setup>
 import TalhaoListComponent from '@/components/TalhaoListComponent.vue';
 import FazendaListComponent from '@/components/FazendaListComponent.vue';
-import { ref,onMounted } from 'vue';
+import { ref, onMounted } from 'vue';
+import Titulo from '@/components/Titulo.vue';
 
 const STORAGE_KEY = 'selectedTab';
 const TOKEN = localStorage.getItem('token');
@@ -57,7 +58,7 @@ const fetchTalhoes = async () => {
         cidade: fazenda ? fazenda.cidade : 'Cidade não encontrada',
         estado: fazenda ? fazenda.estado : 'Estado não encontrado',
         status: talhao.status,
-        idFazenda: fazenda? fazenda.id : "Id não existente."
+        idFazenda: fazenda ? fazenda.id : "Id não existente."
       };
     });
   } catch (error) {
@@ -69,61 +70,49 @@ const saveTabSelection = () => {
   localStorage.setItem(STORAGE_KEY, activeTab.value);
 };
 
-onMounted(() => {
-  fetchFazendas();
+onMounted(async () => {
+  await fetchFazendas();
+  await fetchTalhoes();
   saveTabSelection();
-  fetchTalhoes();
-  console.log(talhoes)
 });
-
 </script>
 
 <template>
   <div class="h-full w-[90%] ml-[5%] mr-[5%]">
     <div class="flex flex-col">
 
-      <div class="text-center p-2 mt-4 lg:mb-3 mb-1">
-        <p class="text-4xl font-semibold text-gray-800">Áreas Agrícolas</p>
-      </div>
-
-      <hr class="border-gray-300 mb-4">
+      <Titulo title="Áreas Agrícolas" />
 
       <div class="bg-white shadow rounded-xl p-5">
-
-        <div class="flex gap-3 mb-2">
-          <span
-          :class="[
-              'p-1 px-2 rounded-lg shadow border-gray-300 transition flex items-center justify-center',
+        <div class="flex border-b border-gray-300 mb-4">
+          <button
+            @click="activeTab = 'fazendas'; saveTabSelection()"
+            :class="[
+              'py-2 px-6 -mb-px font-semibold text-gray-700 border-b-2 transition-colors duration-300',
               activeTab === 'fazendas'
-                ? 'bg-gray-300 text-gray-700 hover:bg-gray-300 transition'
-                : 'bg-gray-400 text-white hover:bg-gray-300 hover:text-gray-600 transition'
-            ]">
-            <button
-            class="cursor-pointer"
-            @click="activeTab='fazendas',saveTabSelection()"
-            >
+                ? 'border-blue-500 text-blue-600'
+                : 'border-transparent hover:text-blue-500'
+            ]"
+          >
             Fazendas
-            </button>
-          </span>
-          <span
-          :class="[
-              'p-1 px-2 rounded-lg shadow border-gray-300 transition flex items-center justify-center',
+          </button>
+
+          <button
+            @click="activeTab = 'talhoes'; saveTabSelection()"
+            :class="[
+              'py-2 px-6 -mb-px font-semibold text-gray-700 border-b-2 transition-colors duration-300',
               activeTab === 'talhoes'
-                ? 'bg-gray-300 text-gray-700 hover:bg-gray-300 transition'
-                : 'bg-gray-400 text-white hover:bg-gray-300 hover:text-gray-600 transition'
-            ]">
-            <button
-            class="cursor-pointer"
-            @click="activeTab='talhoes',saveTabSelection()"
-            >Talhões</button>
-          </span>
+                ? 'border-blue-500 text-blue-600'
+                : 'border-transparent hover:text-blue-500'
+            ]"
+          >
+            Talhões
+          </button>
         </div>
 
-        <hr class="border-gray-200 mb-4">
-
         <div>
-          <FazendaListComponent v-if="activeTab === 'fazendas'" :fazendas="fazendas"/>
-          <TalhaoListComponent v-if="activeTab === 'talhoes'" :talhao="talhoes"/>
+          <FazendaListComponent v-if="activeTab === 'fazendas'" :fazendas="fazendas" />
+          <TalhaoListComponent v-if="activeTab === 'talhoes'" :talhao="talhoes" />
         </div>
 
       </div>

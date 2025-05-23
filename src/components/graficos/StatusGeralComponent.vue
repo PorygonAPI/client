@@ -17,13 +17,17 @@ const setChartData = () => {
     return {
         labels: ['Pendentes', 'Atribuidos', 'Aprovados'],
         datasets: [
-            {
-                label: 'Status',
-                data: valuesLista.value,
-                backgroundColor: ['rgb(249, 115, 22)', 'rgb(6, 182, 212)', 'rgb(107, 114, 128)'],
-                borderWidth: 1
-            }
-        ]
+  {
+    label: 'Status',
+    data: valuesLista.value,
+    backgroundColor: [
+      '#7c3aed', // Roxo violeta sofisticado
+      '#34d399', // Verde-menta moderno
+      '#2563eb'  // Azul vibrante elegante
+    ],
+    borderWidth: 1
+  }
+]
     };
 };
 const setChartOptions = () => {
