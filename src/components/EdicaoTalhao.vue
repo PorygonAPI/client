@@ -29,7 +29,7 @@
         <button @click="salvar" class="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600">
           Salvar
         </button>
-        <button class="px-4 py-2 bg-green-500 text-white rounded hover:bg-green-600">
+        <button @click="aprovar" class="px-4 py-2 bg-green-500 text-white rounded hover:bg-green-600">
           Aprovar
         </button>
       </div>
@@ -94,7 +94,7 @@ export default defineComponent({
         })
 
         if (!response.ok) throw new Error('Erro ao carregar dados')
-        
+
         let data = (await response.text()).split('--')
 
         safraInfo.value = JSON.parse(data[1].substring(data[1].indexOf('{"idSafra')))
@@ -103,8 +103,8 @@ export default defineComponent({
         let arquivoFinalDaninha = data[4].substring(data[4].indexOf('{"type":'))
 
         const fazendaGeometry = JSON.parse(arquivoFazenda)
-        const daninhaGeometry = JSON.parse(arquivoDaninha)
-        const finalDaninhaGeometry = JSON.parse(arquivoFinalDaninha)
+        const daninhaGeometry = JSON.parse(arquivoDaninha).geometries[0]
+        const finalDaninhaGeometry = JSON.parse(arquivoFinalDaninha).geometries[0]
 
         createMapLayer(fazendaGeometry, daninhaGeometry, finalDaninhaGeometry)
       } catch (error) {
@@ -258,11 +258,43 @@ export default defineComponent({
       return outputGeoJson
     }
 
-    const salvar = () => {
-      console.log('GEOJSON Editado: ', JSON.stringify(generateUpdatedGeoJson()))
+    const atualizarSafra = async (endpoint) => {
+      try {
+        let geoJsonTemplate = '{ "type": "FeatureCollection", "features": [{"type": "Feature", "properties": {}, "geometry": {"coordinates": [ [] ],"type": "Polygon" }    } ]}'
+
+        let finalgeoJson = geoJsonTemplate.replace('[]', JSON.stringify(generateUpdatedGeoJson().geometry.coordinates))
+        let filename = 'finalgeoJson.geojson';
+
+        // console.log('finalgeoJson',finalgeoJson)
+
+        let formData = new FormData();
+        formData.append('geoJsonFile', new File([new Blob([finalgeoJson])], filename));
+
+        const response = await fetch(endpoint, {
+          headers: {
+            'Authorization': 'Bearer ' + TOKEN
+          },
+          method: 'PUT',
+          body: formData
+        })
+
+        if (!response.ok) throw new Error('Erro ao atualizar dados')
+
+        console.log('resposta: ',await response.text() )
+      } catch (error) {
+        console.error('Erro:', error)
+      }
     }
 
-    return { voltar, salvar, safraInfo }
+    const salvar = () => {
+      atualizarSafra(`/api/safras/${props.safraId}/salvar`)
+    }
+
+    const aprovar = () => {
+      atualizarSafra(`/api/safras/${props.safraId}/aprovar`)
+    }
+
+    return { voltar, salvar, aprovar, safraInfo }
   }
 })
 </script>
