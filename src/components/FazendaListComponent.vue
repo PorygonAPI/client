@@ -123,7 +123,7 @@ const mostrarAlerta = (mensagem, tipo = 'success') => {
           <div @click="cadastrarOuEditarFazenda(data.id)"
             class="w-12 h-12 flex items-center justify-center rounded-full bg-blue-100 hover:bg-blue-200 cursor-pointer transition"
             title="Editar Fazenda">
-            <i class="pi pi-pen-to-square text-purple-600" style="font-size: 1.8rem;"></i>
+            <i class="pi pi-pen-to-square text-blue-600" style="font-size: 1.8rem;"></i>
           </div>
         </template>
       </Column>
