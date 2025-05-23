@@ -1,7 +1,6 @@
-
 <script setup>
 import Chart from 'primevue/chart';
-import { ref, onMounted, defineProps, computed } from "vue";
+import { ref, onMounted, defineProps, computed, watch } from "vue";
 
 const props = defineProps({
   valuesData: {
@@ -107,6 +106,12 @@ onMounted(() => {
     chartData.value = setChartData();
     chartOptions.value = setChartOptions();
 });
+
+watch(() => props.valuesData, (newData) => {
+  if (newData) {
+    chartData.value = setChartData();
+  }
+}, { deep: true });
 
 </script>
 

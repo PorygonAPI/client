@@ -2,20 +2,133 @@
 import Titulo from '@/components/Titulo.vue'
 import DatePicker from 'primevue/datepicker'
 import { FloatLabel } from 'primevue'
-import { ref, computed } from 'vue'
+import { ref, computed, onMounted, watch } from 'vue'
+import axios from 'axios'
 import StatusGeralComponent from '@/components/graficos/StatusGeralComponent.vue'
 import ProgressoAnalistaComponent from '@/components/graficos/ProgressoAnalistaComponent.vue'
 import ProdutividadePizzaComponent from '@/components/graficos/ProdutividadePizzaComponent.vue'
 
 const dates = ref()
+const loading = ref(false)
 
-const valuesStatusGeral = ref([430, 300, 220])
-
+const valuesStatusGeral = ref([0, 0, 0])
 const valuesProgressoAnalista = ref({
-  labels: ['Ana', 'Carlos', 'Rafaela'],
-  pendentes: [20, 15, 30],
-  atribuidos: [5, 10, 3],
-  aprovados: [12, 18, 14],
+  labels: [],
+  pendentes: [],
+  atribuidos: [],
+  aprovados: [],
+})
+
+const loadingStatusGeral = ref(false)
+const loadingProgressoAnalista = ref(false)
+const errorStatusGeral = ref(null)
+const errorProgressoAnalista = ref(null)
+const debugStatusGeral = ref(null)
+const debugProgressoAnalista = ref(null)
+
+const formatDate = (date) => {
+  if (!date) return null
+  return date.toISOString().split('T')[0]
+}
+
+const fetchStatusData = async () => {
+  try {
+    loadingStatusGeral.value = true
+    errorStatusGeral.value = null
+    
+    let params = {}
+    if (dates.value && dates.value[0]) {
+      params.dataInicial = formatDate(dates.value[0])
+    }
+    if (dates.value && dates.value[1]) {
+      params.dataFinal = formatDate(dates.value[1])
+    }
+    
+    console.log('Chamando API /relatorios/status com params:', params)
+    
+    const response = await axios.get('/api/relatorios/status', { 
+      params,
+      headers: {
+        'Authorization': 'Bearer ' + localStorage.getItem('token')
+      }
+    })
+    
+    console.log('Resposta da API /relatorios/status:', response.data)
+    debugStatusGeral.value = JSON.stringify(response.data, null, 2)
+    
+    valuesStatusGeral.value = [
+      response.data.totalPendentes || 0,
+      response.data.totalAtribuidos || 0, 
+      response.data.totalAprovados || 0
+    ]
+  } catch (error) {
+    console.error('Erro ao buscar dados de status:', error)
+    errorStatusGeral.value = `Erro: ${error.message || 'Falha ao buscar dados'}`
+    if (error.response) {
+      console.error('Resposta de erro:', error.response.data)
+      debugStatusGeral.value = `Status: ${error.response.status}, Detalhes: ${JSON.stringify(error.response.data)}`
+    }
+  } finally {
+    loadingStatusGeral.value = false
+  }
+}
+
+const fetchAnalistasData = async () => {
+  try {
+    loadingProgressoAnalista.value = true
+    errorProgressoAnalista.value = null
+    
+    let params = {}
+    if (dates.value && dates.value[0]) {
+      params.dataInicial = formatDate(dates.value[0])
+    }
+    if (dates.value && dates.value[1]) {
+      params.dataFinal = formatDate(dates.value[1])
+    }
+    
+    console.log('Chamando API /relatorios/analistas com params:', params)
+    
+    const response = await axios.get('/api/relatorios/analistas', { 
+      params,
+      headers: {
+        'Authorization': 'Bearer ' + localStorage.getItem('token')
+      }
+    })
+    
+    console.log('Resposta da API /relatorios/analistas:', response.data)
+    debugProgressoAnalista.value = JSON.stringify(response.data, null, 2)
+    
+    const labels = response.data.map(analista => analista.nomeAnalista)
+    const pendentes = response.data.map(analista => analista.quantidadePendentes || 0)
+    const atribuidos = response.data.map(analista => analista.quantidadeAtribuidos || 0)
+    const aprovados = response.data.map(analista => analista.quantidadeAprovados || 0)
+    
+    valuesProgressoAnalista.value = {
+      labels,
+      pendentes,
+      atribuidos,
+      aprovados
+    }
+  } catch (error) {
+    console.error('Erro ao buscar dados de analistas:', error)
+    errorProgressoAnalista.value = `Erro: ${error.message || 'Falha ao buscar dados'}`
+    if (error.response) {
+      console.error('Resposta de erro:', error.response.data)
+      debugProgressoAnalista.value = `Status: ${error.response.status}, Detalhes: ${JSON.stringify(error.response.data)}`
+    }
+  } finally {
+    loadingProgressoAnalista.value = false
+  }
+}
+
+onMounted(() => {
+  fetchStatusData()
+  fetchAnalistasData()
+})
+
+watch(dates, () => {
+  fetchStatusData()
+  fetchAnalistasData()
 })
 
 const valuesCultura = ref({
@@ -24,14 +137,12 @@ const valuesCultura = ref({
   data: [540, 325, 702, 198, 450],
 })
 
-// Dados para gráfico por Estado
 const valuesEstado = ref({
   title: 'por Estado',
   labels: ['São Paulo', 'Minas Gerais', 'Paraná', 'Bahia', 'Goiás'],
   data: [320, 410, 275, 190, 360],
 })
 
-// Dados para gráfico por Solo
 const valuesSolo = ref({
   title: 'por Tipo de Solo',
   labels: ['Arenoso', 'Argiloso', 'Massapê', 'Latossolo', 'Glei'],
@@ -71,10 +182,60 @@ const rankingEstados = computed(() => {
 
         <hr class="border-gray-300 my-5" />
 
-        <div class="w-full flex flex-wrap justify-between gap-10">
-          <StatusGeralComponent class="lg:w-[48%] lg:h-64" :valuesList="valuesStatusGeral" />
-          <ProgressoAnalistaComponent class="lg:w-[48%] lg:h-64" :valuesData="valuesProgressoAnalista" />
+        <div v-if="loading" class="flex justify-center items-center py-4">
+          <span class="text-gray-600">Carregando dados...</span>
+        </div>
 
+        <div class="w-full flex flex-wrap justify-between gap-10">
+          <!-- Status Geral Component -->
+          <div class="lg:w-[48%] lg:h-64 flex flex-col">
+            <StatusGeralComponent :valuesList="valuesStatusGeral" />
+            
+            <div v-if="loadingStatusGeral" class="flex justify-center items-center mt-2">
+              <div class="animate-spin rounded-full h-6 w-6 border-t-2 border-b-2 border-orange-500"></div>
+              <span class="ml-2 text-gray-600 text-sm">Carregando dados de status...</span>
+            </div>
+            
+            <div v-else-if="errorStatusGeral" class="text-red-500 text-sm mt-2 p-2 bg-red-50 rounded">
+              {{ errorStatusGeral }}
+              <button @click="fetchStatusData" class="text-blue-500 hover:underline ml-2">Tentar novamente</button>
+            </div>
+            
+            <div v-else-if="valuesStatusGeral.every(v => v === 0)" class="text-amber-600 text-sm mt-2 p-2 bg-amber-50 rounded">
+              Nenhum dado disponível para o período selecionado.
+            </div>
+            
+            <details v-if="debugStatusGeral" class="text-xs mt-2 p-2 bg-gray-100 rounded">
+              <summary class="cursor-pointer text-gray-700">Detalhes da resposta (debug)</summary>
+              <pre class="whitespace-pre-wrap overflow-auto max-h-40">{{ debugStatusGeral }}</pre>
+            </details>
+          </div>
+          
+          <!-- Progresso Analista Component -->
+          <div class="lg:w-[48%] lg:h-64 flex flex-col">
+            <ProgressoAnalistaComponent :valuesData="valuesProgressoAnalista" />
+            
+            <div v-if="loadingProgressoAnalista" class="flex justify-center items-center mt-2">
+              <div class="animate-spin rounded-full h-6 w-6 border-t-2 border-b-2 border-orange-500"></div>
+              <span class="ml-2 text-gray-600 text-sm">Carregando dados de analistas...</span>
+            </div>
+            
+            <div v-else-if="errorProgressoAnalista" class="text-red-500 text-sm mt-2 p-2 bg-red-50 rounded">
+              {{ errorProgressoAnalista }}
+              <button @click="fetchAnalistasData" class="text-blue-500 hover:underline ml-2">Tentar novamente</button>
+            </div>
+            
+            <div v-else-if="valuesProgressoAnalista.labels.length === 0" class="text-amber-600 text-sm mt-2 p-2 bg-amber-50 rounded">
+              Nenhum analista encontrado para o período selecionado.
+            </div>
+            
+            <details v-if="debugProgressoAnalista" class="text-xs mt-2 p-2 bg-gray-100 rounded">
+              <summary class="cursor-pointer text-gray-700">Detalhes da resposta (debug)</summary>
+              <pre class="whitespace-pre-wrap overflow-auto max-h-40">{{ debugProgressoAnalista }}</pre>
+            </details>
+          </div>
+
+          <!-- Produtividade Media -->
           <label class="flex w-full justify-center lg:text-4xl text-2xl font-semibold text-gray-700">Produtividade
             Média</label>
           <div class="flex overflow-x-scroll lg:overflow-hidden h-50 lg:w-full lg:h-64">
