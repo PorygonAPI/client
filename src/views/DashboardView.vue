@@ -23,8 +23,6 @@ const loadingStatusGeral = ref(false)
 const loadingProgressoAnalista = ref(false)
 const errorStatusGeral = ref(null)
 const errorProgressoAnalista = ref(null)
-const debugStatusGeral = ref(null)
-const debugProgressoAnalista = ref(null)
 
 const formatDate = (date) => {
   if (!date) return null
@@ -35,7 +33,7 @@ const fetchStatusData = async () => {
   try {
     loadingStatusGeral.value = true
     errorStatusGeral.value = null
-    
+
     let params = {}
     if (dates.value && dates.value[0]) {
       params.dataInicial = formatDate(dates.value[0])
@@ -43,22 +41,21 @@ const fetchStatusData = async () => {
     if (dates.value && dates.value[1]) {
       params.dataFinal = formatDate(dates.value[1])
     }
-    
+
     console.log('Chamando API /relatorios/status com params:', params)
-    
-    const response = await axios.get('/api/relatorios/status', { 
+
+    const response = await axios.get('/api/relatorios/status', {
       params,
       headers: {
         'Authorization': 'Bearer ' + localStorage.getItem('token')
       }
     })
-    
+
     console.log('Resposta da API /relatorios/status:', response.data)
-    debugStatusGeral.value = JSON.stringify(response.data, null, 2)
-    
+
     valuesStatusGeral.value = [
       response.data.totalPendentes || 0,
-      response.data.totalAtribuidos || 0, 
+      response.data.totalAtribuidos || 0,
       response.data.totalAprovados || 0
     ]
   } catch (error) {
@@ -66,7 +63,6 @@ const fetchStatusData = async () => {
     errorStatusGeral.value = `Erro: ${error.message || 'Falha ao buscar dados'}`
     if (error.response) {
       console.error('Resposta de erro:', error.response.data)
-      debugStatusGeral.value = `Status: ${error.response.status}, Detalhes: ${JSON.stringify(error.response.data)}`
     }
   } finally {
     loadingStatusGeral.value = false
@@ -75,49 +71,45 @@ const fetchStatusData = async () => {
 
 const fetchAnalistasData = async () => {
   try {
-    loadingProgressoAnalista.value = true
-    errorProgressoAnalista.value = null
-    
-    let params = {}
+    loadingProgressoAnalista.value = true;
+    errorProgressoAnalista.value = null;
+
+    let params = {};
     if (dates.value && dates.value[0]) {
-      params.dataInicial = formatDate(dates.value[0])
+      params.dataInicial = formatDate(dates.value[0]);
     }
     if (dates.value && dates.value[1]) {
-      params.dataFinal = formatDate(dates.value[1])
+      params.dataFinal = formatDate(dates.value[1]);
     }
-    
-    console.log('Chamando API /relatorios/analistas com params:', params)
-    
-    const response = await axios.get('/api/relatorios/analistas', { 
+
+    const response = await axios.get('/api/relatorios/analistas', {
       params,
       headers: {
         'Authorization': 'Bearer ' + localStorage.getItem('token')
       }
-    })
-    
-    console.log('Resposta da API /relatorios/analistas:', response.data)
-    debugProgressoAnalista.value = JSON.stringify(response.data, null, 2)
-    
-    const labels = response.data.map(analista => analista.nomeAnalista)
-    const pendentes = response.data.map(analista => analista.quantidadePendentes || 0)
-    const atribuidos = response.data.map(analista => analista.quantidadeAtribuidos || 0)
-    const aprovados = response.data.map(analista => analista.quantidadeAprovados || 0)
-    
+    });
+
+    const sortedData = response.data.sort((a, b) => {
+      const totalA = (a.quantidadePendentes || 0) + (a.quantidadeAtribuidos || 0) + (a.quantidadeAprovados || 0);
+      const totalB = (b.quantidadePendentes || 0) + (b.quantidadeAtribuidos || 0) + (b.quantidadeAprovados || 0);
+      return totalB - totalA;
+    });
+
+    const labels = sortedData.map(analista => analista.nomeAnalista);
+    const pendentes = sortedData.map(analista => analista.quantidadePendentes || 0);
+    const atribuidos = sortedData.map(analista => analista.quantidadeAtribuidos || 0);
+    const aprovados = sortedData.map(analista => analista.quantidadeAprovados || 0);
+
     valuesProgressoAnalista.value = {
       labels,
       pendentes,
       atribuidos,
       aprovados
-    }
+    };
   } catch (error) {
-    console.error('Erro ao buscar dados de analistas:', error)
-    errorProgressoAnalista.value = `Erro: ${error.message || 'Falha ao buscar dados'}`
-    if (error.response) {
-      console.error('Resposta de erro:', error.response.data)
-      debugProgressoAnalista.value = `Status: ${error.response.status}, Detalhes: ${JSON.stringify(error.response.data)}`
-    }
+    errorProgressoAnalista.value = `Erro: ${error.message || 'Falha ao buscar dados'}`;
   } finally {
-    loadingProgressoAnalista.value = false
+    loadingProgressoAnalista.value = false;
   }
 }
 
@@ -190,49 +182,11 @@ const rankingEstados = computed(() => {
           <!-- Status Geral Component -->
           <div class="lg:w-[48%] lg:h-64 flex flex-col">
             <StatusGeralComponent :valuesList="valuesStatusGeral" />
-            
-            <div v-if="loadingStatusGeral" class="flex justify-center items-center mt-2">
-              <div class="animate-spin rounded-full h-6 w-6 border-t-2 border-b-2 border-orange-500"></div>
-              <span class="ml-2 text-gray-600 text-sm">Carregando dados de status...</span>
-            </div>
-            
-            <div v-else-if="errorStatusGeral" class="text-red-500 text-sm mt-2 p-2 bg-red-50 rounded">
-              {{ errorStatusGeral }}
-              <button @click="fetchStatusData" class="text-blue-500 hover:underline ml-2">Tentar novamente</button>
-            </div>
-            
-            <div v-else-if="valuesStatusGeral.every(v => v === 0)" class="text-amber-600 text-sm mt-2 p-2 bg-amber-50 rounded">
-              Nenhum dado disponível para o período selecionado.
-            </div>
-            
-            <details v-if="debugStatusGeral" class="text-xs mt-2 p-2 bg-gray-100 rounded">
-              <summary class="cursor-pointer text-gray-700">Detalhes da resposta (debug)</summary>
-              <pre class="whitespace-pre-wrap overflow-auto max-h-40">{{ debugStatusGeral }}</pre>
-            </details>
           </div>
-          
+
           <!-- Progresso Analista Component -->
           <div class="lg:w-[48%] lg:h-64 flex flex-col">
             <ProgressoAnalistaComponent :valuesData="valuesProgressoAnalista" />
-            
-            <div v-if="loadingProgressoAnalista" class="flex justify-center items-center mt-2">
-              <div class="animate-spin rounded-full h-6 w-6 border-t-2 border-b-2 border-orange-500"></div>
-              <span class="ml-2 text-gray-600 text-sm">Carregando dados de analistas...</span>
-            </div>
-            
-            <div v-else-if="errorProgressoAnalista" class="text-red-500 text-sm mt-2 p-2 bg-red-50 rounded">
-              {{ errorProgressoAnalista }}
-              <button @click="fetchAnalistasData" class="text-blue-500 hover:underline ml-2">Tentar novamente</button>
-            </div>
-            
-            <div v-else-if="valuesProgressoAnalista.labels.length === 0" class="text-amber-600 text-sm mt-2 p-2 bg-amber-50 rounded">
-              Nenhum analista encontrado para o período selecionado.
-            </div>
-            
-            <details v-if="debugProgressoAnalista" class="text-xs mt-2 p-2 bg-gray-100 rounded">
-              <summary class="cursor-pointer text-gray-700">Detalhes da resposta (debug)</summary>
-              <pre class="whitespace-pre-wrap overflow-auto max-h-40">{{ debugProgressoAnalista }}</pre>
-            </details>
           </div>
 
           <!-- Produtividade Media -->
@@ -266,13 +220,9 @@ const rankingEstados = computed(() => {
                 </li>
               </ul>
             </div>
-
           </div>
-
         </div>
-        <br>
       </div>
-      <br>
     </div>
   </div>
 </template>
