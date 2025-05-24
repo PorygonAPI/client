@@ -100,6 +100,8 @@ export default defineComponent({
     onMounted(() => {
       try {
         fetchData()
+        //Remove as labels que ficam em cima dos botões de editar/ adicionar polígonos
+        ajusteToolBar()
       } catch (error) {
         console.error('Erro ao montar mapa:', error)
       }
@@ -326,6 +328,13 @@ export default defineComponent({
 
     const cancelar = () => {
       mostrarModal.value = false
+    }
+
+    const ajusteToolBar = () => {
+      const spans = document.getElementsByClassName("sr-only")
+      for (const element of spans) {
+        element.innerHTML = ""
+      }
     }
 
     return { voltar, atualizarAprovarSafra, cancelar,safraInfo, mostrarModal, operacao }
