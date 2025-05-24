@@ -11,6 +11,13 @@ const props = defineProps({
 
 const tabelaDados = ref([]);
 
+function formatarHorasParaDiasHoras(horasTotais) {
+  const totalHoras = Math.floor(horasTotais);
+  const dias = Math.floor(totalHoras / 24);
+  const horas = totalHoras % 24;
+  return `${dias} dia(s) ${horas} h`;
+}
+
 const fetchData = async () => {
   const TOKEN = localStorage.getItem('token');
 
@@ -50,18 +57,19 @@ const fetchData = async () => {
         .filter(safra => safra.nomeAnalista === analista.nomeAnalista)
         .map(safra => {
           const minutosTotal = safra.tempoTotal.dias * 1440 + safra.tempoTotal.horas * 60 + safra.tempoTotal.minutos;
+          const horas = minutosTotal / 60;
           return {
             idSafra: safra.idSafra,
-            tempoHoras: (minutosTotal / 60).toFixed(2)
+            tempoFormatado: formatarHorasParaDiasHoras(horas)
           };
         });
 
       const mediaMinutos = analista.mediaDuracao.dias * 1440 + analista.mediaDuracao.horas * 60 + analista.mediaDuracao.minutos;
-      const mediaHoras = (mediaMinutos / 60).toFixed(2);
+      const mediaHoras = mediaMinutos / 60;
 
       return {
         nomeAnalista: analista.nomeAnalista,
-        mediaHoras,
+        mediaFormatada: formatarHorasParaDiasHoras(mediaHoras),
         safras: safrasDoAnalista
       };
     });
@@ -83,23 +91,24 @@ watch(() => props.datasSelecionadas, fetchData, { deep: true });
       Relatório - Tempo Médio p/ Analista e Safra
     </p>
 
+    <!-- Tabela para desktop -->
     <div class="hidden md:block overflow-x-auto">
       <table class="min-w-full table-auto border border-gray-300">
         <thead>
           <tr class="bg-gray-100">
             <th class="border border-gray-300 px-4 py-2 text-left">Nome</th>
-            <th class="border border-gray-300 px-4 py-2 text-center">Tempo Médio (Horas)</th>
+            <th class="border border-gray-300 px-4 py-2 text-center">Tempo Médio</th>
             <th class="border border-gray-300 px-4 py-2 text-left">Safras</th>
           </tr>
         </thead>
         <tbody>
           <tr v-for="analista in tabelaDados" :key="analista.nomeAnalista">
             <td class="border border-gray-300 px-4 py-2 font-medium">{{ analista.nomeAnalista }}</td>
-            <td class="border border-gray-300 px-4 py-2 text-center">{{ analista.mediaHoras }}</td>
+            <td class="border border-gray-300 px-4 py-2 text-center">{{ analista.mediaFormatada }}</td>
             <td class="border border-gray-300 px-4 py-2">
               <ul class="list-disc ml-5">
                 <li v-for="safra in analista.safras" :key="safra.idSafra">
-                  Safra {{ safra.idSafra }} — <strong>{{ safra.tempoHoras }}</strong> horas
+                  Safra {{ safra.idSafra }} — <strong>{{ safra.tempoFormatado }}</strong>
                 </li>
               </ul>
             </td>
@@ -113,6 +122,7 @@ watch(() => props.datasSelecionadas, fetchData, { deep: true });
       </table>
     </div>
 
+    <!-- Cards para mobile -->
     <div class="flex flex-col gap-4 md:hidden">
       <div
         v-for="analista in tabelaDados"
@@ -121,13 +131,13 @@ watch(() => props.datasSelecionadas, fetchData, { deep: true });
       >
         <p class="text-lg font-semibold text-gray-800">{{ analista.nomeAnalista }}</p>
         <p class="text-sm text-gray-600 mb-2">
-          Tempo médio: <strong>{{ analista.mediaHoras }}</strong> horas
+          Tempo médio: <strong>{{ analista.mediaFormatada }}</strong>
         </p>
         <div>
           <p class="font-medium text-gray-700 mb-1">Safras:</p>
           <ul class="list-disc ml-5">
             <li v-for="safra in analista.safras" :key="safra.idSafra">
-              Safra {{ safra.idSafra }} — <strong>{{ safra.tempoHoras }}</strong> horas
+              Safra {{ safra.idSafra }} — <strong>{{ safra.tempoFormatado }}</strong>
             </li>
           </ul>
         </div>
