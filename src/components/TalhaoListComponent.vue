@@ -4,11 +4,10 @@ import { FilterMatchMode } from '@primevue/core/api';
 import { ref, defineProps, computed } from 'vue';
 import Dialog from 'primevue/dialog';
 import { useRouter } from 'vue-router';
-import Botao from './Botao.vue';
 
 const editarTalhao = (idFazenda, id) => {
 
-  router.push({ path: '/areasagro/cadastrotalhao', query: { idFazenda: idFazenda, id: id } });
+  router.push({ path: '/areasagro/cadastrotalhao', query: { idFazenda: idFazenda, id: id} });
 };
 
 const TOKEN = localStorage.getItem('token');
@@ -30,11 +29,6 @@ const visibleExcluir = ref(false);
 const talhaoSelecionado = ref(null);
 
 const nomeTalhaoSelecionada = computed(() => talhaoSelecionado.value?.nome);
-
-// const abrirDialog = (data) => {
-//   talhaoSelecionado.value = data
-//   visibleExcluir.value = true
-// };
 
 const confirmarExclusao = async () => {
   try {
@@ -94,9 +88,10 @@ const visualizarImagem = (id) => {
     <div>
       <DataTable v-model:filters="filtros" :value="props.talhao" removableSort paginator :rows="10" stripedRows
         class="p-3 min-w-[6rem] text-center"
-        :global-filter-fields="['nome', 'cultura', 'produtividade', 'area', 'cidade', 'estado', 'status', 'solo']">
+        :global-filter-fields="['nome', 'ano', 'cultura', 'produtividade', 'area', 'cidade', 'estado', 'status', 'solo']">
 
         <Column field="nome" header="Nome" sortable class="p-1 min-w-40 max-w-40" />
+        <Column field="ano" header="Ano" sortable class="p-1" />
         <Column field="cultura" header="Cultura" sortable class="p-1" />
         <Column field="produtividade" header="Produtividade" sortable class="p-1" />
         <Column field="area" header="Área" sortable class="p-1" />
@@ -124,14 +119,14 @@ const visualizarImagem = (id) => {
         </Column>
 
         <Column field="Editar Usuário" header="" class="p-1">
-        <template #body="{ data }">
-          <div @click="editarTalhao(data.idFazenda, data.id)"
-            class="w-12 h-12 flex items-center justify-center rounded-full bg-blue-100 hover:bg-blue-200 cursor-pointer transition"
-            title="Editar Talhão">
-            <i class="pi pi-pen-to-square text-blue-600" style="font-size: 1.8rem;"></i>
-          </div>
-        </template>
-      </Column>
+          <template #body="{ data }">
+            <div @click="editarTalhao(data.idFazenda, data.id)"
+              class="w-12 h-12 flex items-center justify-center rounded-full bg-blue-100 hover:bg-blue-200 cursor-pointer transition"
+              title="Editar Talhão">
+              <i class="pi pi-pen-to-square text-blue-600" style="font-size: 1.8rem;"></i>
+            </div>
+          </template>
+        </Column>
 
         <!-- <Column field="excluir" header="Excluir" class="p-1">
     <template #body="{ data }">
