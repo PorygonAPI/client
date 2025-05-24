@@ -1,6 +1,25 @@
 <template>
   <Toast />
   <div class="p-">
+
+    <div v-if="mostrarModal" class="fixed inset-0 flex items-center justify-center bg-gray-200/[var(--bg-opacity)] [--bg-opacity:50%] z-50">
+      <div class="bg-white rounded-lg shadow-lg p-6 w-full max-w-md z-50 relative">
+        <h2 class="text-lg font-semibold text-gray-800 mb-4">Confirmar operação de {{ operacao }}</h2>
+        <p class="text-gray-700 mb-6">
+          Ao salvar a versão atual, a última versão será excluída.<br>
+          Tem certeza que deseja {{operacao}}?
+        </p>
+        <div class="flex justify-end gap-4">
+          <button @click="cancelar" class="px-4 py-2 bg-gray-300 text-gray-800 rounded hover:bg-gray-400">
+            Cancelar
+          </button>
+          <button @click="atualizarAprovarSafra(operacao)" class="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600">
+            Confirmar
+          </button>
+        </div>
+      </div>
+    </div>
+
     <div class="bg-white rounded-lg shadow-md p-6 w-[90%] mx-auto mt-23">
       <div class="flex items-center mb-6">
         <div class="flex flex-col">
@@ -23,13 +42,13 @@
 
       </div>
 
-      <div id="map" class="w-full h-[500px] mb-6 rounded-lg shadow"></div>
+      <div id="map" class="w-full h-[500px] mb-6 rounded-lg shadow z-0"></div>
 
       <div class="flex justify-end gap-4">
-        <button @click="atualizarAprovarSafra(`salvar`)" class="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600">
+        <button @click="mostrarModal = true, operacao = 'salvar'" class="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600">
           Salvar
         </button>
-        <button @click="atualizarAprovarSafra(`aprovar`)" class="px-4 py-2 bg-green-500 text-white rounded hover:bg-green-600">
+        <button @click="mostrarModal = true, operacao = 'aprovar'" class="px-4 py-2 bg-green-500 text-white rounded hover:bg-green-600">
           Aprovar
         </button>
       </div>
@@ -71,6 +90,8 @@ export default defineComponent({
     var drawnFeatures = new L.FeatureGroup();
     const safraInfo = ref(null)
     const toast = useToast();
+    const mostrarModal = ref(false)
+    const operacao = ref(null)
 
     const voltar = () => {
       router.push('/analista/edicao-talhoes')
@@ -266,6 +287,8 @@ export default defineComponent({
 
     const atualizarAprovarSafra = async (endpoint) => {
       try {
+        mostrarModal.value = false
+
         let geoJsonTemplate = '{ "type": "FeatureCollection", "features": [{"type": "Feature", "properties": {}, "geometry": {"coordinates": [ [] ],"type": "Polygon" }    } ]}'
 
         let finalgeoJson = geoJsonTemplate.replace('[]', JSON.stringify(generateUpdatedGeoJson().geometry.coordinates))
@@ -301,7 +324,11 @@ export default defineComponent({
        toast.add({ severity: strSeverity, summary: 'Informando:', detail: strMensagem, life: 5000 });
     }
 
-    return { voltar, atualizarAprovarSafra, safraInfo }
+    const cancelar = () => {
+      mostrarModal.value = false
+    }
+
+    return { voltar, atualizarAprovarSafra, cancelar,safraInfo, mostrarModal, operacao }
   }
 })
 </script>
@@ -311,5 +338,9 @@ export default defineComponent({
   width: 100%;
   height: 500px;
   border-radius: 0.5rem;
+}
+
+.z-50 {
+  z-index: 1000;
 }
 </style>
