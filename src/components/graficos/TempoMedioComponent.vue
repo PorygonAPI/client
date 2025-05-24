@@ -110,12 +110,12 @@ watch(() => props.datasSelecionadas, fetchData, { deep: true });
   <div class="flex flex-wrap gap-6 w-full">
 
     <div class="p-4 w-full lg:w-[48%]">
-      <p class="text-2xl font-semibold text-gray-700 mb-2 text-center">Tempo Médio - Analistas</p>
+      <p class="text-2xl font-semibold text-gray-700 mb-2 text-center">Tempo Médio de Aprovação - Analistas</p>
       <Chart type="bar" :data="chartDataAnalista" :options="chartOptions" class="h-64"/>
     </div>
 
     <div class="p-4 w-full lg:w-[48%]">
-      <p class="text-2xl font-semibold text-gray-700 mb-2 text-center">Tempo Médio - Safras</p>
+      <p class="text-2xl font-semibold text-gray-700 mb-2 text-center">Tempo Médio de Aprovação - Safras</p>
       <Chart type="bar" :data="chartDataSafras" :options="chartOptions" class="h-64"/>
     </div>
 
