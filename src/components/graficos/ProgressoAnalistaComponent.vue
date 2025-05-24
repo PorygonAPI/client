@@ -98,7 +98,7 @@ const setChartOptions = () => {
         display: true,
         text: "Progresso por Analistas",
         font: {
-          size: 18,
+          size: 25,
           weight: 'bold'
         },
         color: textColor,

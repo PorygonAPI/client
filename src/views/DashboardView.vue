@@ -7,6 +7,8 @@ import axios from 'axios'
 import StatusGeralComponent from '@/components/graficos/StatusGeralComponent.vue'
 import ProgressoAnalistaComponent from '@/components/graficos/ProgressoAnalistaComponent.vue'
 import ProdutividadePizzaComponent from '@/components/graficos/ProdutividadePizzaComponent.vue'
+import TempoMedioComponent from '@/components/graficos/TempoMedioComponent.vue'
+
 
 const dates = ref()
 const loading = ref(false)
@@ -180,17 +182,17 @@ const rankingEstados = computed(() => {
 
         <div class="w-full flex flex-wrap justify-between gap-10">
           <!-- Status Geral Component -->
-          <div class="lg:w-[48%] lg:h-64 flex flex-col">
+          <div class="lg:w-[48%] lg:h-40 flex flex-col">
             <StatusGeralComponent :valuesList="valuesStatusGeral" />
           </div>
 
           <!-- Progresso Analista Component -->
-          <div class="lg:w-[48%] lg:h-64 flex flex-col">
+          <div class="lg:w-[48%] h-36 lg:h-40 flex flex-col">
             <ProgressoAnalistaComponent :valuesData="valuesProgressoAnalista" />
           </div>
 
           <!-- Produtividade Media -->
-          <label class="flex w-full justify-center lg:text-4xl text-2xl font-semibold text-gray-700">Produtividade
+          <label class="flex w-full justify-center lg:text-3xl text-2xl font-semibold text-gray-700">Produtividade
             Média</label>
           <div class="flex overflow-x-scroll lg:overflow-hidden h-50 lg:w-full lg:h-64">
             <ProdutividadePizzaComponent :valuesData="valuesCultura" />
@@ -198,7 +200,7 @@ const rankingEstados = computed(() => {
             <ProdutividadePizzaComponent :valuesData="valuesSolo" />
           </div>
 
-          <div class="w-full flex flex-wrap gap-10">
+          <div class="w-full flex flex-wrap gap-5 p-2">
             <div class="bg-gray-100 p-4 rounded-lg shadow w-full sm:w-[48%] flex flex-col justify-center items-center ml-3">
               <p class="lg:text-3xl text-lg font-semibold text-gray-700 mb-2">
                 Cultura Mais Produtiva
@@ -221,6 +223,8 @@ const rankingEstados = computed(() => {
               </ul>
             </div>
           </div>
+
+          <TempoMedioComponent :datasSelecionadas="dates" />
         </div>
       </div>
     </div>
