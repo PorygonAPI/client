@@ -1,4 +1,5 @@
 <template>
+  <Toast />
   <div class="p-">
     <div class="bg-white rounded-lg shadow-md p-6 w-[90%] mx-auto mt-23">
       <div class="flex items-center mb-6">
@@ -7,7 +8,6 @@
             <i @click="voltar" class="pi pi-angle-left text-3xl text-gray-600"></i>
             <h1 class="text-2xl font-semibold text-gray-800">Edição do Talhão #{{ talhaoId }}</h1>
           </div>
-
           <div v-if="safraInfo" class="mt-2 ml-9 flex flex-wrap gap-2">
             <span class="inline-block bg-blue-100 text-blue-800 text-sm font-medium px-2 py-1 rounded">
               Safra #{{ safraInfo.idSafra }}
@@ -26,10 +26,10 @@
       <div id="map" class="w-full h-[500px] mb-6 rounded-lg shadow"></div>
 
       <div class="flex justify-end gap-4">
-        <button @click="salvar" class="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600">
+        <button @click="atualizarAprovarSafra(`salvar`)" class="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600">
           Salvar
         </button>
-        <button @click="aprovar" class="px-4 py-2 bg-green-500 text-white rounded hover:bg-green-600">
+        <button @click="atualizarAprovarSafra(`aprovar`)" class="px-4 py-2 bg-green-500 text-white rounded hover:bg-green-600">
           Aprovar
         </button>
       </div>
@@ -43,6 +43,8 @@ import { useRouter } from 'vue-router';
 import 'leaflet/dist/leaflet.css';
 import L from 'leaflet';
 import 'leaflet-draw'
+import { useToast } from "primevue/usetoast";
+import Toast from 'primevue/toast';
 
 export default defineComponent({
   props: {
@@ -55,6 +57,9 @@ export default defineComponent({
       required: true
     }
   },
+  components: {
+    Toast,
+  },
   setup(props) {
     const router = useRouter()
     let map = null
@@ -65,6 +70,7 @@ export default defineComponent({
     const DaninhaFinalColor = "#ffa500"
     var drawnFeatures = new L.FeatureGroup();
     const safraInfo = ref(null)
+    const toast = useToast();
 
     const voltar = () => {
       router.push('/analista/edicao-talhoes')
@@ -258,7 +264,7 @@ export default defineComponent({
       return outputGeoJson
     }
 
-    const atualizarSafra = async (endpoint) => {
+    const atualizarAprovarSafra = async (endpoint) => {
       try {
         let geoJsonTemplate = '{ "type": "FeatureCollection", "features": [{"type": "Feature", "properties": {}, "geometry": {"coordinates": [ [] ],"type": "Polygon" }    } ]}'
 
@@ -270,7 +276,7 @@ export default defineComponent({
         let formData = new FormData();
         formData.append('geoJsonFile', new File([new Blob([finalgeoJson])], filename));
 
-        const response = await fetch(endpoint, {
+        const response = await fetch(`/api/safras/${props.safraId}/${endpoint}`, {
           headers: {
             'Authorization': 'Bearer ' + TOKEN
           },
@@ -278,23 +284,24 @@ export default defineComponent({
           body: formData
         })
 
-        if (!response.ok) throw new Error('Erro ao atualizar dados')
+        let msg = await response.text() 
 
-        console.log('resposta: ',await response.text() )
+         if (response.status == 200) {
+          showToast('success', msg);
+        } else {
+          showToast('error', msg);
+        }
       } catch (error) {
         console.error('Erro:', error)
+        showToast('error', error);
       }
     }
 
-    const salvar = () => {
-      atualizarSafra(`/api/safras/${props.safraId}/salvar`)
+    const showToast = (strSeverity, strMensagem) => {
+       toast.add({ severity: strSeverity, summary: 'Informando:', detail: strMensagem, life: 5000 });
     }
 
-    const aprovar = () => {
-      atualizarSafra(`/api/safras/${props.safraId}/aprovar`)
-    }
-
-    return { voltar, salvar, aprovar, safraInfo }
+    return { voltar, atualizarAprovarSafra, safraInfo }
   }
 })
 </script>
