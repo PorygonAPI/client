@@ -18,7 +18,7 @@
 
       <div class="grid grid-cols-2 gap-6">
         <FloatLabel variant="on">
-          <InputText type="number" id="talhao" v-model="safra" class="w-full p-2 rounded-md border border-gray-300" />
+          <InputText type="text" id="talhao" v-model="safra" class="w-full p-2 rounded-md border border-gray-300" />
           <label for="talhao">Safra</label>
         </FloatLabel>
 

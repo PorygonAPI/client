@@ -4,7 +4,7 @@ import { FilterMatchMode } from '@primevue/core/api';
 import { ref, defineProps, computed } from 'vue';
 import Dialog from 'primevue/dialog';
 import { useRouter } from 'vue-router';
-import Botao from './Botao.vue';
+
 
 const editarTalhao = (idFazenda, id) => {
 
@@ -103,6 +103,7 @@ const visualizarImagem = (id) => {
         <Column field="solo" header="Solo" sortable class="p-1" />
         <Column field="cidade" header="Cidade" sortable class="p-1" />
         <Column field="estado" header="Estado" sortable class="p-1" />
+        <Column field="ano" header="Ano" sortable class="p-1"/>
 
         <Column field="status" header="Status" sortable class="p-1">
           <template #body="{ data }">
