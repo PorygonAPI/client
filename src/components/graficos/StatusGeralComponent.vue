@@ -1,6 +1,6 @@
 <script setup>
 import Chart from 'primevue/chart';
-import { ref, onMounted, defineProps, computed} from "vue";
+import { ref, onMounted, defineProps, computed, watch} from "vue";
 
 const props = defineProps({
   valuesList: {
@@ -17,17 +17,17 @@ const setChartData = () => {
     return {
         labels: ['Pendentes', 'Atribuidos', 'Aprovados'],
         datasets: [
-  {
-    label: 'Status',
-    data: valuesLista.value,
-    backgroundColor: [
-      '#7c3aed', // Roxo violeta sofisticado
-      '#34d399', // Verde-menta moderno
-      '#2563eb'  // Azul vibrante elegante
-    ],
-    borderWidth: 1
-  }
-]
+            {
+                label: 'Unidades',
+                data: valuesLista.value,
+                backgroundColor: [
+                    '#F97316',
+                    '#3B82F6',
+                    '#10B981'
+                ],
+                borderWidth: 1
+            }
+        ]
     };
 };
 const setChartOptions = () => {
@@ -42,7 +42,7 @@ const setChartOptions = () => {
         plugins: {
             title:{
               display: true,
-              text: "Status Geral",
+              text: "Talhões",
               font:{
                 size:25,
                 weight:'bold',
@@ -86,6 +86,12 @@ onMounted(() => {
     chartData.value = setChartData();
     chartOptions.value = setChartOptions();
 });
+
+watch(valuesLista, (newValue) => {
+  if (newValue) {
+    chartData.value = setChartData();
+  }
+}, { deep: true });
 
 </script>
 

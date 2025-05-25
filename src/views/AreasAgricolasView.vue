@@ -58,7 +58,8 @@ const fetchTalhoes = async () => {
         cidade: fazenda ? fazenda.cidade : 'Cidade não encontrada',
         estado: fazenda ? fazenda.estado : 'Estado não encontrado',
         status: talhao.status,
-        idFazenda: fazenda ? fazenda.id : "Id não existente."
+        idFazenda: fazenda ? fazenda.id : "Id não existente.",
+        ano:talhao.ano,
       };
     });
   } catch (error) {
