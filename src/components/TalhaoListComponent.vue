@@ -98,6 +98,7 @@ const visualizarImagem = (id) => {
         <Column field="solo" header="Solo" sortable class="p-1" />
         <Column field="cidade" header="Cidade" sortable class="p-1" />
         <Column field="estado" header="Estado" sortable class="p-1" />
+        <Column field="ano" header="Ano" sortable class="p-1"/>
 
         <Column field="status" header="Status" sortable class="p-1">
           <template #body="{ data }">
