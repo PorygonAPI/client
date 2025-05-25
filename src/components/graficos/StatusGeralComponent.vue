@@ -18,12 +18,12 @@ const setChartData = () => {
         labels: ['Pendentes', 'Atribuidos', 'Aprovados'],
         datasets: [
             {
-                label: 'Status',
+                label: 'Unidades',
                 data: valuesLista.value,
                 backgroundColor: [
-                    '#F97316', 
-                    '#3B82F6', 
-                    '#10B981'  
+                    '#F97316',
+                    '#3B82F6',
+                    '#10B981'
                 ],
                 borderWidth: 1
             }
