@@ -2,18 +2,20 @@
   <Toast />
   <div class="p-">
 
-    <div v-if="mostrarModal" class="fixed inset-0 flex items-center justify-center bg-gray-200/[var(--bg-opacity)] [--bg-opacity:50%] z-50">
+    <div v-if="mostrarModal"
+      class="fixed inset-0 flex items-center justify-center bg-gray-200/[var(--bg-opacity)] [--bg-opacity:50%] z-50">
       <div class="bg-white rounded-lg shadow-lg p-6 w-full max-w-md z-50 relative">
         <h2 class="text-lg font-semibold text-gray-800 mb-4">Confirmar operação de {{ operacao }}</h2>
         <p class="text-gray-700 mb-6">
           Ao salvar a versão atual, a última versão será excluída.<br>
-          Tem certeza que deseja {{operacao}}?
+          Tem certeza que deseja {{ operacao }}?
         </p>
         <div class="flex justify-end gap-4">
           <button @click="cancelar" class="px-4 py-2 bg-gray-300 text-gray-800 rounded hover:bg-gray-400">
             Cancelar
           </button>
-          <button @click="atualizarAprovarSafra(operacao)" class="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600">
+          <button @click="atualizarAprovarSafra(operacao)"
+            class="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600">
             Confirmar
           </button>
         </div>
@@ -45,10 +47,12 @@
       <div id="map" class="w-full h-[500px] mb-6 rounded-lg shadow z-0"></div>
 
       <div class="flex justify-end gap-4">
-        <button @click="mostrarModal = true, operacao = 'salvar'" class="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600">
+        <button @click="mostrarModal = true, operacao = 'salvar'"
+          class="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600">
           Salvar
         </button>
-        <button @click="mostrarModal = true, operacao = 'aprovar'" class="px-4 py-2 bg-green-500 text-white rounded hover:bg-green-600">
+        <button @click="mostrarModal = true, operacao = 'aprovar'"
+          class="px-4 py-2 bg-green-500 text-white rounded hover:bg-green-600">
           Aprovar
         </button>
       </div>
@@ -129,11 +133,17 @@ export default defineComponent({
         safraInfo.value = JSON.parse(data[1].substring(data[1].indexOf('{"idSafra')))
         let arquivoFazenda = data[2].substring(data[2].indexOf('{"type":'))
         let arquivoDaninha = data[3].substring(data[3].indexOf('{"type":'))
-        let arquivoFinalDaninha = data[4].substring(data[4].indexOf('{"type":'))
 
         const fazendaGeometry = JSON.parse(arquivoFazenda)
-        const daninhaGeometry = JSON.parse(arquivoDaninha).geometries[0]
-        const finalDaninhaGeometry = JSON.parse(arquivoFinalDaninha).geometries[0]
+        const daninhaGeometry = JSON.parse(arquivoDaninha)//.geometries[0]
+        let finalDaninhaGeometry = null
+
+
+        let arquivoFinalDaninha = null
+        if (data.length > 6) {
+          arquivoFinalDaninha = data[4].substring(data[4].indexOf('{"type":'))
+          finalDaninhaGeometry = JSON.parse(arquivoFinalDaninha)//.geometries[0]
+        }
 
         createMapLayer(fazendaGeometry, daninhaGeometry, finalDaninhaGeometry)
       } catch (error) {
@@ -178,34 +188,28 @@ export default defineComponent({
       }
 
       map.addLayer(drawnFeatures);
-      let finalDaninhaInput = (finalDaninhaGeometry ? finalDaninhaGeometry : daninhaGeometry)
 
-      let finalDaninhaLayer = L.geoJSON(finalDaninhaInput, {
-        style: { color: DaninhaFinalColor }
-      })
+      
+        let finalDaninhaInput = (finalDaninhaGeometry ? finalDaninhaGeometry : daninhaGeometry)
 
-      //Função que configura os polígonos para serem editados
-      transformGeoJsonIntoEditableLayer(finalDaninhaLayer, drawnFeatures)
+        let finalDaninhaLayer = L.geoJSON(finalDaninhaInput, {
+          style: { color: DaninhaFinalColor }
+        })
+
+        // Função que configura os polígonos para serem editados
+        transformGeoJsonIntoEditableLayer(finalDaninhaLayer, drawnFeatures)
 
       overlayMaps["Imagem Editada"] = L.layerGroup([drawnFeatures]).addTo(map)
 
       var drawControl = new L.Control.Draw({
         draw: {
-          polyline: {
-            shapeOptions: {
-              color: DaninhaFinalColor
-            }
-          },
           polygon: {
             shapeOptions: {
               color: DaninhaFinalColor
             }
           },
-          circle: {
-            shapeOptions: {
-              color: DaninhaFinalColor
-            }
-          },
+          polyline: false,
+          circle: false,
           rectangle: false,
           circlemarker: false,
           marker: false
@@ -234,7 +238,9 @@ export default defineComponent({
 
       geoJson.eachLayer(function (layer) {
 
-        if (layer.toGeoJSON().geometry.type.toLowerCase() == "multipolygon") {
+        const layerType = layer.toGeoJSON().geometry.type.toLowerCase()
+
+        if (layerType == "multipolygon") {
           layer.toGeoJSON().geometry.coordinates.forEach(function (coordinateArray) {
 
             revertCoordinates(coordinateArray)
@@ -263,40 +269,67 @@ export default defineComponent({
     }
 
     const generateUpdatedGeoJson = () => {
-      let newCoordinates = null
+      
       let outputGeoJson = null
-      drawnFeatures.eachLayer(function (layer) {
+      let newCoordinates = null
+      let out = '{"type": "FeatureCollection", "features": [[]]}'
+      let feature = ''
+   
+      // drawnFeatures.eachLayer(function (layer) {
+      //   console.log("layer.toGeoJSON(): ",layer.toGeoJSON())
+      //   if (outputGeoJson == null) {
+      //     outputGeoJson = layer.toGeoJSON()
+      //   }
 
-        if (outputGeoJson == null) {
-          outputGeoJson = layer.toGeoJSON()
-        }
+      //   if (newCoordinates == null) {
+      //     newCoordinates = layer.toGeoJSON().geometry.coordinates[0]
+      //   }
+      //   else {
+      //     var newLayer = layer.toGeoJSON().geometry.coordinates[0]
+      //     newLayer.forEach(coordinate => {
+      //       newCoordinates.push(coordinate)
+      //     });
+      //   }
+      // });
 
-        if (newCoordinates == null) {
-          newCoordinates = layer.toGeoJSON().geometry.coordinates[0]
-        }
-        else {
-          var newLayer = layer.toGeoJSON().geometry.coordinates[0]
-          newLayer.forEach(coordinate => {
-            newCoordinates.push(coordinate)
-          });
-        }
+      // outputGeoJson.geometry.coordinates = newCoordinates
+
+       drawnFeatures.eachLayer(function (layer) {
+        console.log("layer.toGeoJSON(): ",layer.toGeoJSON())
+        feature += JSON.stringify( layer.toGeoJSON() )
+        feature += ','
       });
 
-      outputGeoJson.geometry.coordinates = newCoordinates
+      out = out.replace('[]',feature)
+      // console.log("feature: ", feature)
+      // console.log('replace: ', out)
 
-      return outputGeoJson
+      let ajuste = out.slice(-3)
+      out = out.replace(ajuste,']}')
+      
+      // console.log('idk: ', out)
+      
+      // outputGeoJson.geometry.coordinates = newCoordinates
+
+      // return outputGeoJson
+      return out
     }
 
     const atualizarAprovarSafra = async (endpoint) => {
       try {
         mostrarModal.value = false
+        // const updatedGeoJson = generateUpdatedGeoJson()
 
-        let geoJsonTemplate = '{ "type": "FeatureCollection", "features": [{"type": "Feature", "properties": {}, "geometry": {"coordinates": [ [] ],"type": "Polygon" }    } ]}'
+        // console.log('generateUpdatedGeoJson: ', JSON.stringify(updatedGeoJson))
 
-        let finalgeoJson = geoJsonTemplate.replace('[]', JSON.stringify(generateUpdatedGeoJson().geometry.coordinates))
+        // let geoJsonTemplate = '{ "type": "FeatureCollection", "features": [{"type": "Feature", "properties": {}, "geometry": {"coordinates": [ [] ],"type": "MultiPolygon" }    } ]}'
+
+        // let finalgeoJson = geoJsonTemplate.replace('[]', JSON.stringify(updatedGeoJson.geometry.coordinates))
+
+        let finalgeoJson = generateUpdatedGeoJson()
         let filename = 'finalgeoJson.geojson';
 
-        // console.log('finalgeoJson',finalgeoJson)
+        console.log('finalgeoJson', finalgeoJson)
 
         let formData = new FormData();
         formData.append('geoJsonFile', new File([new Blob([finalgeoJson])], filename));
@@ -309,9 +342,9 @@ export default defineComponent({
           body: formData
         })
 
-        let msg = await response.text() 
+        let msg = await response.text()
 
-         if (response.status == 200) {
+        if (response.status == 200) {
           showToast('success', msg);
         } else {
           showToast('error', msg);
@@ -323,7 +356,7 @@ export default defineComponent({
     }
 
     const showToast = (strSeverity, strMensagem) => {
-       toast.add({ severity: strSeverity, summary: 'Informando:', detail: strMensagem, life: 5000 });
+      toast.add({ severity: strSeverity, summary: 'Informando:', detail: strMensagem, life: 5000 });
     }
 
     const cancelar = () => {
@@ -337,7 +370,7 @@ export default defineComponent({
       }
     }
 
-    return { voltar, atualizarAprovarSafra, cancelar,safraInfo, mostrarModal, operacao }
+    return { voltar, atualizarAprovarSafra, cancelar, safraInfo, mostrarModal, operacao }
   }
 })
 </script>
