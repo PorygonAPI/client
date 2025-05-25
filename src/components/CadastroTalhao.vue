@@ -175,42 +175,31 @@ onMounted(() => {
 });
 
 const cadastrarTalhao = async () => {
-  if (
-    !fazendaSelecionada.value ||
-    !safra.value ||
-    !cultura.value ||
-    !produtividadePorAno.value ||
-    !ano.value ||
-    !tipoSolo.value ||
-    !area.value
-  ) {
-    toast.add({
-      severity: 'error',
-      summary: 'Erro',
-      detail: 'Por favor, preencha todos os campos.',
-      life: 3000,
-    });
-    return;
-  }
+  if (!validarCampos()) return;
 
   try {
-    const fetchData = {
-      idTalhao: talhaoId,
-      anoSafra: ano.value,
-      culturaNome: cultura.value,
-      produtividadeAno: produtividadePorAno.value,
-      tipoSoloNome: tipoSolo.value,
-      area: area.value,
-    };
-    await fetch(`/api/safras/${talhaoId}/atualizar`, {
-      method: 'PUT',
+    const formData = new FormData();
+    formData.append('idTalhao', talhaoId || '');
+    formData.append('anoSafra', ano.value);
+    formData.append('culturaNome', cultura.value);
+    formData.append('produtividadeAno', produtividadePorAno.value);
+    formData.append('tipoSoloNome', tipoSolo.value);
+    formData.append('area', area.value);
+
+    if (imagemDaninha.value instanceof File) {
+      formData.append('arquivoDaninha', imagemDaninha.value);
+    }
+
+    const response = await fetch('/api/talhoes', {
+      method: 'POST',
       headers: {
-        Accept: 'application/json',
-        'Content-Type': 'application/json',
-        Authorization: `Bearer ${localStorage.getItem('token')}`,
+        'Authorization': `Bearer ${localStorage.getItem('token')}`
       },
-      body: JSON.stringify(fetchData),
+      body: formData
     });
+
+    if (!response.ok) throw new Error('Erro ao cadastrar talhão');
+
     toast.add({
       severity: 'success',
       summary: 'Sucesso',
@@ -219,7 +208,7 @@ const cadastrarTalhao = async () => {
     });
     retornoPagina();
   } catch (error) {
-    console.log(error);
+    console.error(error);
     toast.add({
       severity: 'error',
       summary: 'Erro',

@@ -31,7 +31,13 @@
       <div v-if="!isEditing" class="flex flex-col md:flex-row gap-4 mt-6">
         <div class="flex-1 border border-gray-200 rounded-xl p-4 text-center bg-gray-50">
           <p class="text-sm text-gray-600 mb-2">Upload - GeoJSON de Saída</p>
-          <input ref="geojsonInput" type="file" accept=".geojson" class="hidden" @change="handleGeoJSONUpload" />
+<input
+  ref="geojsonInput"
+  type="file"
+  accept=".geojson,.json"
+  class="hidden"
+  @change="handleGeoJSONUpload"
+/>
           <Botao type="button"
             @click="triggerGeoJSONUpload">
             {{ geojsonFile ? 'Trocar Arquivo' : 'Selecionar Arquivo' }}
@@ -46,7 +52,13 @@
 
         <div class="flex-1 border border-gray-200 rounded-xl p-4 text-center bg-gray-50">
           <p class="text-sm text-gray-600 mb-2">Upload - Mapa Classificação Automática</p>
-          <input ref="imageInput" type="file" accept=".geojson" class="hidden" @change="handleImageUpload" />
+<input
+  ref="imageInput"
+  type="file"
+  accept=".geojson,.json"
+  class="hidden"
+  @change="handleImageUpload"
+/>
           <Botao type="button"
             @click="triggerImageUpload">
             {{ imageFile ? 'Trocar Arquivo' : 'Selecionar Arquivo' }}
@@ -61,10 +73,13 @@
       </div>
 
       <div class="flex justify-center mt-8">
-        <Botao type="button"
-            @click="cadastrarOuAtualizarFazenda">
-            {{ isEditing ? 'Salvar Alterações' : 'Cadastrar Fazenda' }}
-          </Botao>
+        <Botao
+  type="button"
+  @click="cadastrarOuAtualizarFazenda"
+  :disabled="loading"
+>
+  {{ isEditing ? 'Salvar Alterações' : 'Cadastrar Fazenda' }}
+</Botao>
       </div>
     </form>
   </div>
@@ -103,13 +118,27 @@ const triggerGeoJSONUpload = () => {
   geojsonInput.value.click();
 };
 
-const handleGeoJSONUpload = (event) => {
+const compressGeoJson = async (geoJson) => {
+  const compressed = pako.gzip(JSON.stringify(geoJson));
+  return new Blob([compressed], { type: 'application/gzip' });
+};
+
+const handleGeoJSONUpload = async (event) => {
   const file = event.target.files[0];
   if (file) {
-    geojsonFile.value = file;
-    toast.add({ severity: 'success', summary: 'Sucesso', detail: 'GeoJSON carregado!', life: 3000 });
-  } else {
-    toast.add({ severity: 'error', summary: 'Erro', detail: 'Falha ao carregar GeoJSON.', life: 3000 });
+    try {
+      toast.add({ severity: 'info', summary: 'Processando', detail: 'Carregando arquivo...', life: 3000 });
+      // Valida se é um JSON válido
+      const text = await file.text();
+      JSON.parse(text);
+      geojsonFile.value = file;
+      toast.add({ severity: 'success', summary: 'Sucesso', detail: 'GeoJSON carregado!', life: 3000 });
+    } catch (error) {
+      console.error('Erro ao processar arquivo:', error);
+      toast.add({ severity: 'error', summary: 'Erro', detail: 'Arquivo GeoJSON inválido', life: 3000 });
+      geojsonFile.value = null;
+      event.target.value = ''; // Limpa input
+    }
   }
 };
 
@@ -122,13 +151,22 @@ const triggerImageUpload = () => {
   imageInput.value.click();
 };
 
-const handleImageUpload = (event) => {
+const handleImageUpload = async (event) => {
   const file = event.target.files[0];
   if (file) {
-    imageFile.value = file;
-    toast.add({ severity: 'success', summary: 'Sucesso', detail: 'Imagem carregada!', life: 3000 });
-  } else {
-    toast.add({ severity: 'error', summary: 'Erro', detail: 'Falha ao carregar imagem.', life: 3000 });
+    try {
+      toast.add({ severity: 'info', summary: 'Processando', detail: 'Carregando arquivo...', life: 3000 });
+      // Valida se é um JSON válido
+      const text = await file.text();
+      JSON.parse(text);
+      imageFile.value = file;
+      toast.add({ severity: 'success', summary: 'Sucesso', detail: 'Arquivo carregado!', life: 3000 });
+    } catch (error) {
+      console.error('Erro ao processar arquivo:', error);
+      toast.add({ severity: 'error', summary: 'Erro', detail: 'Arquivo GeoJSON inválido', life: 3000 });
+      imageFile.value = null;
+      event.target.value = ''; // Limpa input
+    }
   }
 };
 
@@ -203,75 +241,96 @@ onMounted(() => {
   }
 });
 
-const readFileAsText = (file) => {
-  return new Promise((resolve, reject) => {
-    const reader = new FileReader();
-    reader.onload = (event) => resolve(event.target.result);
-    reader.onerror = (error) => reject(error);
-    reader.readAsText(file);
-  });
-};
+// const readFileAsText = (file) => {
+//   return new Promise((resolve, reject) => {
+//     const reader = new FileReader();
+//     reader.onload = (event) => resolve(event.target.result);
+//     reader.onerror = (error) => reject(error);
+//     reader.readAsText(file);
+//   });
+// };
+
+const loading = ref(false);
 
 const cadastrarOuAtualizarFazenda = async () => {
-  if (!geojsonFile.value || (!imageFile.value && !isEditing.value) || !estadoSelecionado.value || !cidadeSelecionada.value) {
-    toast.add({ severity: 'error', summary: 'Erro', detail: 'Preencha todos os campos.', life: 3000 });
-    return;
-  }
-
   try {
-    let fetchData = {};
+    if (loading.value) return;
+    loading.value = true;
 
-    if (isEditing.value) {
-
-      fetchData = {
-        nomeFazenda: nomeFazenda.value,
-        estado: estadoSelecionado.value,
-        cidadeNome: cidadeSelecionada.value,
-        status: statusFazenda.value,
-        arquivoFazenda: geojsonFile.value
-      };
-    } else {
-      const geojsonContent = await readFileAsText(geojsonFile.value);
-      const imageContent = await readFileAsText(imageFile.value);
-      fetchData = {
-        nomeFazenda: nomeFazenda.value,
-        estado: estadoSelecionado.value,
-        cidadeNome: cidadeSelecionada.value,
-        status: statusFazenda.value,
-        arquivoFazenda: geojsonContent,
-        arquivoErvaDaninha: imageContent
-      };
+    // Validações iniciais
+    if (!nomeFazenda.value?.trim()) {
+      toast.add({ severity: 'error', summary: 'Erro', detail: 'Nome da fazenda é obrigatório', life: 3000 });
+      return;
     }
 
-    if (isEditing.value) {
-      await fetch(`/api/areas-agricolas/${id}`, {
-        method: 'PUT',
-        headers: {
-          'Accept': 'application/json',
-          'Content-Type': 'application/json',
-          'Authorization': 'Bearer ' + TOKEN
-        },
-        body: JSON.stringify(fetchData)
-      });
-      toast.add({ severity: 'success', summary: 'Sucesso', detail: 'Fazenda atualizada!', life: 3000 });
-    } else {
-      await fetch('/api/areas-agricolas', {
-        method: 'POST',
-        headers: {
-          'Accept': 'application/json',
-          'Content-Type': 'application/json',
-          'Authorization': 'Bearer ' + TOKEN
-        },
-        body: JSON.stringify(fetchData)
-      });
-      toast.add({ severity: 'success', summary: 'Sucesso', detail: 'Fazenda cadastrada!', life: 3000 });
+    if (!estadoSelecionado.value || !cidadeSelecionada.value) {
+      toast.add({ severity: 'error', summary: 'Erro', detail: 'Estado e cidade são obrigatórios', life: 3000 });
+      return;
     }
 
-    router.push('/areasagro');
+    if (!isEditing.value && (!geojsonFile.value || !imageFile.value)) {
+      toast.add({ severity: 'error', summary: 'Erro', detail: 'Os arquivos são obrigatórios', life: 3000 });
+      return;
+    }
+
+    const formData = new FormData();
+
+    // Agrupa os dados em um objeto JSON
+    const dados = {
+      nomeFazenda: nomeFazenda.value.trim(),
+      estado: estadoSelecionado.value,
+      cidadeNome: cidadeSelecionada.value,
+    };
+
+    // Adiciona o objeto JSON como uma parte chamada 'dados'
+    formData.append('dados', JSON.stringify(dados));
+
+    // Adiciona os arquivos sem converter para Blob
+    if (geojsonFile.value instanceof File) {
+      formData.append('arquivoFazenda', geojsonFile.value);
+    }
+
+    if (imageFile.value instanceof File) {
+      formData.append('arquivoErvaDaninha', imageFile.value);
+    }
+
+    const response = await fetch(
+      isEditing.value ? `/api/areas-agricolas/${id}` : '/api/areas-agricolas',
+      {
+        method: isEditing.value ? 'PUT' : 'POST',
+        headers: {
+          'Authorization': `Bearer ${TOKEN}`
+        },
+        body: formData
+      }
+    );
+
+    if (!response.ok) {
+      const errorData = await response.json().catch(() => null);
+      throw new Error(errorData?.message || `Erro ${response.status}: ${response.statusText}`);
+    }
+
+    toast.add({
+      severity: 'success',
+      summary: 'Sucesso',
+      detail: isEditing.value ? 'Fazenda atualizada!' : 'Fazenda cadastrada!',
+      life: 3000
+    });
+
+    setTimeout(() => {
+      router.push('/areasagro');
+    }, 1000);
 
   } catch (error) {
-    console.error(error);
-    toast.add({ severity: 'error', summary: 'Erro', detail: 'Falha ao salvar fazenda.', life: 3000 });
+    console.error('Erro ao salvar fazenda:', error);
+    toast.add({
+      severity: 'error',
+      summary: 'Erro',
+      detail: error.message || 'Falha ao salvar fazenda.',
+      life: 3000
+    });
+  } finally {
+    loading.value = false;
   }
 };
 
