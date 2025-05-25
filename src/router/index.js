@@ -84,9 +84,10 @@ const router = createRouter({
       component: EdicaoTalhoesView
     },
     {
-      path:'/talhao/editar/:id',
+      path:'/talhao/editar/:talhaoId/:safraId',
       name: 'editarTalhao',
-      component: () => import('@/views/EditarTalhaoView.vue')
+      component: () => import('@/views/EditarTalhaoView.vue'),
+      props: true 
     },
     {
       path:'/analista/talhoes',

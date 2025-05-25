@@ -2,56 +2,217 @@
 import Titulo from '@/components/Titulo.vue'
 import DatePicker from 'primevue/datepicker'
 import { FloatLabel } from 'primevue'
-import { ref, computed } from 'vue'
+import { ref, onMounted, watch } from 'vue'
+import axios from 'axios'
 import StatusGeralComponent from '@/components/graficos/StatusGeralComponent.vue'
 import ProgressoAnalistaComponent from '@/components/graficos/ProgressoAnalistaComponent.vue'
 import ProdutividadePizzaComponent from '@/components/graficos/ProdutividadePizzaComponent.vue'
+import TempoMedioComponent from '@/components/graficos/TempoMedioComponent.vue'
+
 
 const dates = ref()
+const loading = ref(false)
 
-const valuesStatusGeral = ref([430, 300, 220])
-
+const valuesStatusGeral = ref([0, 0, 0])
 const valuesProgressoAnalista = ref({
-  labels: ['Ana', 'Carlos', 'Rafaela'],
-  pendentes: [20, 15, 30],
-  atribuidos: [5, 10, 3],
-  aprovados: [12, 18, 14],
+  labels: [],
+  pendentes: [],
+  atribuidos: [],
+  aprovados: [],
 })
+
+const loadingStatusGeral = ref(false)
+const loadingProgressoAnalista = ref(false)
+const errorStatusGeral = ref(null)
+const errorProgressoAnalista = ref(null)
+
+const formatDate = (date) => {
+  if (!date) return null
+  return date.toISOString().split('T')[0]
+}
+
+const fetchStatusData = async () => {
+  try {
+    loadingStatusGeral.value = true
+    errorStatusGeral.value = null
+
+    let params = {}
+    if (dates.value && dates.value[0]) {
+      params.dataInicial = formatDate(dates.value[0])
+    }
+    if (dates.value && dates.value[1]) {
+      params.dataFinal = formatDate(dates.value[1])
+    }
+
+    const response = await axios.get('/api/relatorios/status', {
+      params,
+      headers: {
+        'Authorization': 'Bearer ' + localStorage.getItem('token')
+      }
+    })
+
+    valuesStatusGeral.value = [
+      response.data.totalPendentes || 0,
+      response.data.totalAtribuidos || 0,
+      response.data.totalAprovados || 0
+    ]
+  } catch (error) {
+    errorStatusGeral.value = `Erro: ${error.message || 'Falha ao buscar dados'}`
+    if (error.response) {
+      console.error('Resposta de erro:', error.response.data)
+    }
+  } finally {
+    loadingStatusGeral.value = false
+  }
+}
+
+const fetchAnalistasData = async () => {
+  try {
+    loadingProgressoAnalista.value = true;
+    errorProgressoAnalista.value = null;
+
+    let params = {};
+    if (dates.value && dates.value[0]) {
+      params.dataInicial = formatDate(dates.value[0]);
+    }
+    if (dates.value && dates.value[1]) {
+      params.dataFinal = formatDate(dates.value[1]);
+    }
+
+    const response = await axios.get('/api/relatorios/analistas', {
+      params,
+      headers: {
+        'Authorization': 'Bearer ' + localStorage.getItem('token')
+      }
+    });
+
+    const sortedData = response.data.sort((a, b) => {
+      const totalA = (a.quantidadePendentes || 0) + (a.quantidadeAtribuidos || 0) + (a.quantidadeAprovados || 0);
+      const totalB = (b.quantidadePendentes || 0) + (b.quantidadeAtribuidos || 0) + (b.quantidadeAprovados || 0);
+      return totalB - totalA;
+    });
+
+    const labels = sortedData.map(analista => analista.nomeAnalista);
+    const pendentes = sortedData.map(analista => analista.quantidadePendentes || 0);
+    const atribuidos = sortedData.map(analista => analista.quantidadeAtribuidos || 0);
+    const aprovados = sortedData.map(analista => analista.quantidadeAprovados || 0);
+
+    valuesProgressoAnalista.value = {
+      labels,
+      pendentes,
+      atribuidos,
+      aprovados
+    };
+  } catch (error) {
+    errorProgressoAnalista.value = `Erro: ${error.message || 'Falha ao buscar dados'}`;
+  } finally {
+    loadingProgressoAnalista.value = false;
+  }
+}
 
 const valuesCultura = ref({
   title: 'por Cultura',
-  labels: ['Milho', 'Soja', 'Cana-de-açúcar', 'Algodão', 'Feijão'],
-  data: [540, 325, 702, 198, 450],
+  labels: [],
+  data: [],
 })
 
-// Dados para gráfico por Estado
 const valuesEstado = ref({
   title: 'por Estado',
-  labels: ['São Paulo', 'Minas Gerais', 'Paraná', 'Bahia', 'Goiás'],
-  data: [320, 410, 275, 190, 360],
+  labels: [],
+  data: [],
 })
 
-// Dados para gráfico por Solo
 const valuesSolo = ref({
   title: 'por Tipo de Solo',
-  labels: ['Arenoso', 'Argiloso', 'Massapê', 'Latossolo', 'Glei'],
-  data: [200, 500, 300, 420, 180],
+  labels: [],
+  data: [],
 })
 
-const culturaMaisProdutiva = computed(() => {
-  const maxIndex = valuesCultura.value.data.indexOf(Math.max(...valuesCultura.value.data))
-  return {
-    nome: valuesCultura.value.labels[maxIndex],
-    valor: valuesCultura.value.data[maxIndex],
-  }
+const culturaMaisProdutiva = ref({
+  nome: '',
+  valor: 0,
 })
 
-// Estrutura para ranking dos estados
-const rankingEstados = computed(() => {
-  return valuesEstado.value.labels.map((label, i) => ({
-    estado: label,
-    valor: valuesEstado.value.data[i],
+const ordenarRankingEstados = (ranking) => {
+  return ranking.slice().sort((a, b) => b.valor - a.valor)
+}
+
+const rankingEstados = ref([])
+
+const loadingProdutividade = ref(false)
+const errorProdutividade = ref(null)
+
+const fetchProdutividadeData = async () => {
+  try {
+    loadingProdutividade.value = true
+    errorProdutividade.value = null
+
+    const params = {}
+    if (dates.value && dates.value[0]) {
+      params.dataInicial = formatDate(dates.value[0])
+    }
+    if (dates.value && dates.value[1]) {
+      params.dataFinal = formatDate(dates.value[1])
+    }
+
+    const response = await axios.get('/api/relatorios/produtividade', {
+      params,
+      headers: {
+        'Authorization': 'Bearer ' + localStorage.getItem('token')
+      }
+    })
+
+    const data = response.data
+
+    valuesCultura.value = {
+      title: 'por Cultura',
+      labels: data.produtividadePorCultura.map(item => item.nomeCultura),
+      data: data.produtividadePorCultura.map(item => item.produtividadeMedia),
+    }
+
+    valuesEstado.value = {
+      title: 'por Estado',
+      labels: data.produtividadePorEstado.map(item => item.nomeEstado),
+      data: data.produtividadePorEstado.map(item => item.produtividadeMedia),
+    }
+
+    valuesSolo.value = {
+      title: 'por Tipo de Solo',
+      labels: data.produtividadePorTipoSolo.map(item => item.nomeTipoSolo),
+      data: data.produtividadePorTipoSolo.map(item => item.produtividadeMedia),
+    }
+
+    culturaMaisProdutiva.value = {
+      nome: data.culturaMaisProdutiva.nomeCultura,
+      valor: data.culturaMaisProdutiva.produtividadeMedia,
+    }
+
+rankingEstados.value = ordenarRankingEstados(
+  data.rankingTop5Estados.map(item => ({
+    estado: item.nomeEstado,
+    valor: item.produtividadeMedia,
   }))
+)
+  } catch (error) {
+    errorProdutividade.value = `Erro: ${error.message || 'Falha ao buscar dados'}`
+    if (error.response) {
+      console.error('Resposta de erro:', error.response.data)
+    }
+  } finally {
+    loadingProdutividade.value = false
+  }
+}
+
+onMounted(() => {
+  fetchStatusData()
+  fetchAnalistasData()
+  fetchProdutividadeData()
+})
+
+watch(dates, () => {
+  fetchStatusData()
+  fetchAnalistasData()
+  fetchProdutividadeData()
 })
 </script>
 
@@ -71,19 +232,29 @@ const rankingEstados = computed(() => {
 
         <hr class="border-gray-300 my-5" />
 
-        <div class="w-full flex flex-wrap justify-between gap-10">
-          <StatusGeralComponent class="lg:w-[48%] lg:h-64" :valuesList="valuesStatusGeral" />
-          <ProgressoAnalistaComponent class="lg:w-[48%] lg:h-64" :valuesData="valuesProgressoAnalista" />
+        <div v-if="loading" class="flex justify-center items-center py-4">
+          <span class="text-gray-600">Carregando dados...</span>
+        </div>
 
-          <label class="flex w-full justify-center lg:text-4xl text-2xl font-semibold text-gray-700">Produtividade
-            Média</label>
+        <div class="w-full flex flex-wrap justify-between gap-10 mt-10">
+          <div class="lg:w-[48%] lg:h-40 flex flex-col">
+            <StatusGeralComponent :valuesList="valuesStatusGeral" />
+          </div>
+
+          <div class="lg:w-[48%] h-36 lg:h-40 flex flex-col">
+            <ProgressoAnalistaComponent :valuesData="valuesProgressoAnalista" />
+          </div>
+
+          <label class="flex w-full justify-center lg:text-3xl text-2xl font-semibold text-gray-700">
+            Produtividade Média
+          </label>
           <div class="flex overflow-x-scroll lg:overflow-hidden h-50 lg:w-full lg:h-64">
             <ProdutividadePizzaComponent :valuesData="valuesCultura" />
             <ProdutividadePizzaComponent :valuesData="valuesEstado" />
             <ProdutividadePizzaComponent :valuesData="valuesSolo" />
           </div>
 
-          <div class="w-full flex flex-wrap gap-10">
+          <div class="w-full flex flex-wrap gap-5 p-2">
             <div class="bg-gray-100 p-4 rounded-lg shadow w-full sm:w-[48%] flex flex-col justify-center items-center ml-3">
               <p class="lg:text-3xl text-lg font-semibold text-gray-700 mb-2">
                 Cultura Mais Produtiva
@@ -92,7 +263,7 @@ const rankingEstados = computed(() => {
                 {{ culturaMaisProdutiva.nome }}
               </p>
               <p class="text-lg text-gray-600">
-                {{ culturaMaisProdutiva.valor.toLocaleString('pt-BR') }}
+                {{ culturaMaisProdutiva.valor.toLocaleString('pt-BR') }} sc/ha
               </p>
             </div>
 
@@ -101,17 +272,15 @@ const rankingEstados = computed(() => {
               <ul>
                 <li v-for="(estado, index) in rankingEstados" :key="index" class="flex justify-between border-b py-1">
                   <span>{{ estado.estado }}</span>
-                  <span>{{ estado.valor.toLocaleString('pt-BR') }}</span>
+                  <span>{{ estado.valor.toLocaleString('pt-BR') }} sc/ha</span>
                 </li>
               </ul>
             </div>
-
           </div>
 
+          <TempoMedioComponent :datasSelecionadas="dates" />
         </div>
-        <br>
       </div>
-      <br>
     </div>
   </div>
 </template>
