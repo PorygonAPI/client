@@ -153,10 +153,10 @@ const setChartOptions = () => {
 
             return [
               ``,
-              `Total de tarefas: ${data.total}`,
-              `Pendentes: ${data.pendentes} (${Math.round(data.pendentes/data.total*100 || 0)}%)`,
-              `Atribuídos: ${data.atribuidos} (${Math.round(data.atribuidos/data.total*100 || 0)}%)`,
-              `Aprovados: ${data.aprovados} (${Math.round(data.aprovados/data.total*100 || 0)}%)`
+              `Total de talhões: ${data.total} ${getUnidadeText(data.total)}`,
+              `Pendentes: ${data.pendentes} ${getUnidadeText(data.pendentes)} (${Math.round(data.pendentes/data.total*100 || 0)}%)`,
+              `Atribuídos: ${data.atribuidos} ${getUnidadeText(data.atribuidos)} (${Math.round(data.atribuidos/data.total*100 || 0)}%)`,
+              `Aprovados: ${data.aprovados} ${getUnidadeText(data.aprovados)} (${Math.round(data.aprovados/data.total*100 || 0)}%)`
             ];
           }
         }
@@ -223,6 +223,8 @@ watch(() => props.valuesData, (newData) => {
     chartOptions.value = setChartOptions();
   }
 }, { deep: true });
+
+const getUnidadeText = (count) => count === 1 ? 'unidade' : 'unidades';
 </script>
 
 <template>
