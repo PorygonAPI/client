@@ -36,6 +36,7 @@ const setChartData = () => {
     labels: props.valuesData.labels,
     datasets: [
       {
+        label:'Sacas p/ Hectare (sc/ha)',
         type: 'pie',
         data: props.valuesData.data,
         backgroundColor: colorPalette
