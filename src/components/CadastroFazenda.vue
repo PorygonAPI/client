@@ -275,15 +275,19 @@ const cadastrarOuAtualizarFazenda = async () => {
 
     const formData = new FormData();
 
-    // Agrupa os dados em um objeto JSON
-    const dados = {
-      nomeFazenda: nomeFazenda.value.trim(),
-      estado: estadoSelecionado.value,
-      cidadeNome: cidadeSelecionada.value,
-    };
+    // // Agrupa os dados em um objeto JSON
+    // const dados = {
+    //   nomeFazenda: nomeFazenda.value.trim(),
+    //   estado: estadoSelecionado.value,
+    //   cidadeNome: cidadeSelecionada.value,
+    // };
 
     // Adiciona o objeto JSON como uma parte chamada 'dados'
-    formData.append('dados', JSON.stringify(dados));
+    formData.append('nomeFazenda', nomeFazenda.value.trim());
+    formData.append('estado', estadoSelecionado.value);
+    formData.append('cidadeNome', cidadeSelecionada.value);
+
+
 
     // Adiciona os arquivos sem converter para Blob
     if (geojsonFile.value instanceof File) {
