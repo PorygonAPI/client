@@ -96,7 +96,7 @@ const setChartOptions = () => {
     plugins: {
       title: {
         display: true,
-        text: "Progresso por Analistas",
+        text: "Progresso por Analista",
         font: {
           size: 25,
           weight: 'bold'

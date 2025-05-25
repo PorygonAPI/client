@@ -42,7 +42,7 @@ const setChartOptions = () => {
         plugins: {
             title:{
               display: true,
-              text: "Status Geral",
+              text: "Talhões",
               font:{
                 size:25,
                 weight:'bold',
