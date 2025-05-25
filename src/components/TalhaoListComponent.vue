@@ -1,21 +1,19 @@
 <script setup>
-import { DataTable,Column, Button, InputText, Tag, Toast  } from 'primevue';
-import { FilterMatchMode } from  '@primevue/core/api';
-import { ref, defineProps, computed, onMounted } from 'vue';
-import { RouterLink } from 'vue-router';
+import { DataTable, Column, Button, InputText, Tag, Toast } from 'primevue';
+import { FilterMatchMode } from '@primevue/core/api';
+import { ref, defineProps, computed } from 'vue';
 import Dialog from 'primevue/dialog';
 import { useRouter } from 'vue-router';
 
-const editarTalhao = (idFazenda,id) => {
 
-  router.push({ path: '/areasagro/cadastrotalhao', query: { idFazenda: idFazenda , id:id} });
+const editarTalhao = (idFazenda, id) => {
+
+  router.push({ path: '/areasagro/cadastrotalhao', query: { idFazenda: idFazenda, id: id } });
 };
 
 const TOKEN = localStorage.getItem('token');
 
 const router = useRouter();
-
-
 
 const props = defineProps({
   talhao: {
@@ -23,20 +21,6 @@ const props = defineProps({
     required: true
   }
 });
-
-const visualizarExcluir = ref(false);
-const visualizarEditar = ref(false);
-
-const verifyRole = (role) =>{
-  if (role == "Administrador"){
-    visualizarExcluir.value = true;
-    visualizarEditar.value=true;
-  }
-  else{
-    visualizarExcluir.value=false;
-    visualizarEditar.value=false
-  }
-}
 
 const filtros = ref({
   global: { value: null, matchMode: FilterMatchMode.CONTAINS }
@@ -47,10 +31,10 @@ const talhaoSelecionado = ref(null);
 
 const nomeTalhaoSelecionada = computed(() => talhaoSelecionado.value?.nome);
 
-const abrirDialog = (data) => {
-  talhaoSelecionado.value = data
-  visibleExcluir.value = true
-};
+// const abrirDialog = (data) => {
+//   talhaoSelecionado.value = data
+//   visibleExcluir.value = true
+// };
 
 const confirmarExclusao = async () => {
   try {
@@ -76,98 +60,81 @@ const confirmarExclusao = async () => {
 };
 
 const getStatusSeverity = (status) => {
-  switch (status) {
-    case 'Aprovada':
-      return 'success'
-    case 'Pendente':
-      return 'danger'
-    case 'Em análise':
-      return 'warn'
+  switch (status.toLowerCase()) {
+    case 'aprovado':
+      return 'success';
+    case 'pendente':
+      return 'danger';
+    case 'atribuido':
+      return 'warn';
     default:
-      return 'info'
+      return 'info';
   }
-}
+};
 
 const visualizarImagem = (id) => {
   localStorage.setItem('id_visualizacao', id);
   router.push({ path: '/visualizartalhao' });
 }
 
-onMounted(()=>{
-  const role = localStorage.getItem('role');
-  verifyRole(role)
-})
 
 </script>
 
 <template>
-<Toast/>
-<div class="bg-white rounded-xl shadow p-5 flex flex-col gap-3">
+  <Toast />
+  <div class="bg-white rounded-xl shadow p-5 flex flex-col gap-3">
 
-  <div class="flex justify-between ">
-    <InputText
-    class="p-1 flex gap-2 items-center border border-gray-300 rounded-lg w-44 lg:w-96 focus-within:ring focus-within:ring-orange-400"
-    placeholder="Pesquisar"
-    type="text"
-    v-model="filtros['global'].value"
-    />
+    <div class="flex justify-between ">
+      <InputText
+        class="p-1 flex gap-2 items-center border border-gray-300 rounded-lg w-44 lg:w-96 focus-within:ring focus-within:ring-orange-400"
+        placeholder="Pesquisar" type="text" v-model="filtros['global'].value" />
 
-  </div>
+    </div>
 
-  <div>
-  <DataTable
-  v-model:filters="filtros"
-  :value="props.talhao"
-  removableSort
-  paginator
-  :rows="10"
-  stripedRows
-  class="p-datatable-gridlines"
-  :global-filter-fields="['nome','cultura','produtividade','area','cidade','estado','status','solo']"
-  >
+    <div>
+      <DataTable v-model:filters="filtros" :value="props.talhao" removableSort paginator :rows="10" stripedRows
+        class="p-3 min-w-[6rem] text-center"
+        :global-filter-fields="['nome', 'cultura', 'produtividade', 'area', 'cidade', 'estado', 'status', 'solo']">
 
-  <Column field="nome" header="Nome" sortable class="p-1 min-w-40 max-w-40"/>
-  <Column field="cultura" header="Cultura" sortable class="p-1"/>
-  <!-- <Column field="produtividade" header="Produtividade" sortable class="p-1"/> -->
-  <Column field="area" header="Área" sortable class="p-1"/>
-  <Column field="solo" header="Solo" sortable class="p-1"/>
-  <Column field="cidade" header="Cidade" sortable class="p-1"/>
-  <Column field="estado" header="Estado" sortable class="p-1"/>
+        <Column field="nome" header="Nome" sortable class="p-1 min-w-40 max-w-40" />
+        <Column field="cultura" header="Cultura" sortable class="p-1" />
+        <Column field="produtividade" header="Produtividade" sortable class="p-1" />
+        <Column field="area" header="Área" sortable class="p-1" />
+        <Column field="solo" header="Solo" sortable class="p-1" />
+        <Column field="cidade" header="Cidade" sortable class="p-1" />
+        <Column field="estado" header="Estado" sortable class="p-1" />
+        <Column field="ano" header="Ano" sortable class="p-1"/>
 
-  <Column field="status" header="Status" sortable class="p-1">
-    <template #body="{ data }">
-      <div class="flex justify-center">
-        <Tag :value="data.status" :severity="getStatusSeverity(data.status)" class="p-1" />
-      </div>
-    </template>
-  </Column>
-
-  <Column field="imagem" header="Imagem" class="p-1">
-    <template #body="{ data }" >
-      <div class="flex justify-center">
-        <Button
-        @click="() => visualizarImagem(data.id)"
-        class="hover:text-gray-600 cursor-pointer p-1 m-1 px-2 bg-gray-400 text-white border-0 rounded shadow hover:bg-gray-300 transition">
-        Visualizar
-      </Button>
-      </div>
-    </template>
-  </Column>
+        <Column field="status" header="Status" sortable class="p-1">
+          <template #body="{ data }">
+            <div class="flex justify">
+              <Tag :value="data.status" :severity="getStatusSeverity(data.status)" class="p-1" />
+            </div>
+          </template>
+        </Column>
 
 
-  <Column v-if="visualizarEditar" field="editar" header="Editar" class="p-1">
-    <template #body="{ data }">
-      <div class="flex justify-center">
-        <Button
-        @click="editarTalhao(data.idFazenda,data.id)"
-        class="hover:text-gray-600 cursor-pointer p-1 m-1 px-2 bg-gray-400 text-white border-0 rounded shadow hover:bg-gray-300 transition">
-          Editar
-        </Button>
-      </div>
-    </template>
-  </Column>
+        <Column field="imagem" header="" class="p-1">
+          <template #body="{ data }">
+            <div @click="() => visualizarImagem(data.idFazenda)"
+              class="w-12 h-12 flex items-center justify-center rounded-full bg-blue-100 hover:bg-blue-200 cursor-pointer transition"
+              title="Visualizar Imagem">
+              <i class="pi pi-image text-blue-600" style="font-size: 1.8rem;"></i>
+            </div>
+          </template>
+        </Column>
 
-  <Column v-if="visualizarExcluir" field="excluir" header="Excluir" class="p-1">
+        <Column field="Editar Usuário" header="" class="p-1">
+        <template #body="{ data }">
+          <div @click="editarTalhao(data.idFazenda, data.id)"
+            class="w-12 h-12 flex items-center justify-center rounded-full bg-blue-100 hover:bg-blue-200 cursor-pointer transition"
+            title="Editar Talhão">
+            <i class="pi pi-pen-to-square text-blue-600" style="font-size: 1.8rem;"></i>
+          </div>
+        </template>
+      </Column>
+
+        <!-- <Column field="excluir" header="Excluir" class="p-1">
     <template #body="{ data }">
       <div class="flex justify-center">
         <Button
@@ -178,20 +145,21 @@ onMounted(()=>{
         </Button>
       </div>
     </template>
-  </Column>
+  </Column> -->
 
-  </DataTable>
+      </DataTable>
 
-  <Dialog v-model:visible="visibleExcluir" modal header="Confirmar Exclusão" class="w-72 lg:w-96 p-1">
-      <hr class="border-gray-200 mb-2">
-      <span class="block mb-5 p-0.5">Tem certeza que deseja excluir este Talhão da <b>{{nomeTalhaoSelecionada}}</b>?</span>
-      <div class="flex justify-end gap-2">
-        <Button class="p-1" label="Cancelar" severity="secondary" @click="visibleExcluir = false" />
-        <Button class="p-1" label="Confirmar" severity="danger" @click="confirmarExclusao" />
-      </div>
-  </Dialog>
+      <Dialog v-model:visible="visibleExcluir" modal header="Confirmar Exclusão" class="w-72 lg:w-96 p-1">
+        <hr class="border-gray-200 mb-2">
+        <span class="block mb-5 p-0.5">Tem certeza que deseja excluir este Talhão da
+          <b>{{ nomeTalhaoSelecionada }}</b>?</span>
+        <div class="flex justify-end gap-2">
+          <Button class="p-1" label="Cancelar" severity="secondary" @click="visibleExcluir = false" />
+          <Button class="p-1" label="Confirmar" severity="danger" @click="confirmarExclusao" />
+        </div>
+      </Dialog>
+
+    </div>
 
   </div>
-
-</div>
 </template>

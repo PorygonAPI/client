@@ -5,6 +5,8 @@ import { ref, defineProps, computed, defineEmits } from 'vue';
 import { useRouter } from 'vue-router';
 import Dialog from 'primevue/dialog';
 import { useToast } from 'primevue/usetoast';
+import Botao from './Botao.vue';
+import Tooltip from 'primevue/tooltip'
 
 const props = defineProps({
   talhao: {
@@ -96,7 +98,7 @@ const confirmarAtribuicao = async () => {
     if (!response.ok) {
       let errorMessage = `Erro ${response.status}`;
       try {
-        const text = await response.text(); // Pegar o texto bruto primeiro
+        const text = await response.text();
 
         if (text && text.trim().length > 0) {
           try {
@@ -140,15 +142,15 @@ const confirmarAtribuicao = async () => {
 };
 
 const getStatusSeverity = (status) => {
-  switch (status) {
-    case 'APROVADO':
-      return 'success'
-    case 'PENDENTE':
-      return 'warn'
-    case 'EM_ANALISE':
-      return 'info'
+  switch (status.toLowerCase()) {
+    case 'aprovado':
+      return 'success';
+    case 'pendente':
+      return 'danger';
+    case 'atribuido':
+      return 'warn';
     default:
-      return 'secondary'
+      return 'info';
   }
 };
 
@@ -179,124 +181,103 @@ const editarTalhao = (id) => {
         <div class="relative">
           <i v-if="!isSearchFocused && !searchById"
             class="pi pi-search absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400"></i>
-          <InputText
-            id="searchById"
-            v-model="searchById"
-            @input="handleIdInput"
-            @focus="isSearchFocused = true"
+          <InputText id="searchById" v-model="searchById" @input="handleIdInput" @focus="isSearchFocused = true"
             @blur="isSearchFocused = false"
-            class="p-1 pl-3 border border-gray-300 rounded-lg w-40 focus-within:ring focus-within:ring-orange-400 focus:outline-none"
-            pattern="[0-9]*"
-            inputmode="numeric"
-            placeholder=""
-          />
+            class="p-1 pl-8 border border-gray-300 rounded-lg w-40 focus-within:ring focus-within:ring-orange-400 focus:outline-none"
+            pattern="[0-9]*" inputmode="numeric" placeholder="Buscar por ID" />
         </div>
       </div>
     </div>
 
     <div>
-      <DataTable
-        v-model:filters="filtros"
-        :value="filteredTalhoes"
-        removableSort
-        paginator
-        :rows="10"
-        stripedRows
-        class="p-datatable-gridlines"
-        :global-filter-fields="['id', 'nomeFazenda', 'cultura', 'produtividade', 'area', 'tipoSolo', 'cidade', 'estado', 'status']"
-      >
-        <Column field="id" header="ID Talhão" sortable class="p-1 w-24"/>
-        <Column field="nomeFazenda" header="Nome Fazenda" sortable class="p-1 min-w-40"/>
-        <Column field="cultura" header="Cultura" sortable class="p-1"/>
+      <DataTable v-model:filters="filtros" :value="filteredTalhoes" removableSort paginator :rows="10" stripedRows
+        class="p-3 min-w-[6rem] text-center"
+        :global-filter-fields="['id', 'nomeFazenda', 'cultura', 'produtividade', 'area', 'tipoSolo', 'cidade', 'estado', 'status']">
+        <Column field="id" header="ID" sortable class="p-1 w-24" />
+        <Column field="nomeFazenda" header="Nome Fazenda" sortable class="p-1 min-w-40" />
+        <Column field="cultura" header="Cultura" sortable class="p-1" />
         <Column field="produtividade" header="Produtividade" sortable class="p-1">
           <template #body="{ data }">
             {{ formatNumber(data.produtividade) }}
           </template>
         </Column>
-        <Column field="area" header="Área" sortable class="p-1"/>
-        <Column field="tipoSolo" header="Tipo de Solo" sortable class="p-1"/>
-        <Column field="cidade" header="Cidade" sortable class="p-1"/>
-        <Column field="estado" header="Estado" sortable class="p-1"/>
+        <Column field="area" header="Área" sortable class="p-1" />
+        <Column field="tipoSolo" header="Tipo de Solo" sortable class="p-1" />
+        <Column field="cidade" header="Cidade" sortable class="p-1" />
+        <Column field="estado" header="Estado" sortable class="p-1" />
 
         <Column field="status" header="Status" sortable class="p-1">
           <template #body="{ data }">
-            <div class="flex justify-center">
+            <div class="flex justify">
               <Tag :value="formatStatus(data.status)" :severity="getStatusSeverity(data.status)" class="p-1" />
             </div>
           </template>
         </Column>
 
-        <Column field="imagem" header="Imagem" class="p-1">
+        <Column field="imagem" header="" class="p-1">
           <template #body="slotProps">
-            <div class="flex justify-center">
-              <Button
-                @click="() => visualizarTalhao(slotProps.data.id)"
-                class="hover:text-gray-600 cursor-pointer p-1 m-1 px-2 bg-gray-400 text-white border-0 rounded shadow hover:bg-gray-300 transition">
-                Visualizar
-              </Button>
+
+            <div @click="() => visualizarTalhao(slotProps.data.id)"
+              class="w-12 h-12 flex items-center justify-center rounded-full bg-blue-100 hover:bg-blue-200 cursor-pointer transition" title="Visualizar Imagem">
+              <i class="pi pi-image text-blue-600" style="font-size: 1.8rem;"></i>
             </div>
+
           </template>
         </Column>
 
-        <Column field="atribuir" header="Atribuir" class="p-1">
+        <Column field="atribuir" header="" class="p-1">
           <template #body="slotProps">
-            <div class="flex justify-center">
-              <Button
-                @click="() => abrirDialogAtribuir(slotProps.data)"
-                class="hover:text-gray-600 cursor-pointer p-2 m-1 bg-gray-400 text-white border-0 rounded-full shadow hover:bg-gray-300 transition"
-                icon="pi pi-user-plus"
-                aria-label="Atribuir para mim"
-                tooltip="Atribuir para mim"
-              />
+            <div @click="() => abrirDialogAtribuir(slotProps.data)"
+              class="w-12 h-12 flex items-center justify-center rounded-full bg-green-100 hover:bg-green-200 cursor-pointer transition"
+              title="Atribuir">
+              <i class="pi pi-user-plus text-green-600" style="font-size: 1.8rem;"></i>
             </div>
-          </template>
-        </Column>
 
-        <Column field="editar" header="Editar" class="p-1">
-          <template #body="slotProps">
-            <div class="flex justify-center">
-              <Button
-                @click="() => editarTalhao(slotProps.data.id)"
-                class="hover:text-gray-600 cursor-pointer p-1 m-1 px-2 bg-gray-400 text-white border-0 rounded shadow hover:bg-gray-300 transition">
-                Editar
-              </Button>
-            </div>
           </template>
         </Column>
       </DataTable>
     </div>
 
-    <Dialog v-model:visible="confirmarAtribuirDialog" modal header="Atribuir Talhão" class="w-80 lg:w-96 p-1">
-      <hr class="border-gray-200 mb-2">
-      <div class="flex flex-col gap-3 mb-4">
-        <div class="field">
-          <label class="font-semibold block mb-1">ID do Talhão:</label>
-          <span class="block pl-2">{{ talhaoSelecionado?.id }}</span>
-        </div>
+    <Dialog
+  v-model:visible="confirmarAtribuirDialog"
+  modal
+  dismissableMask="false"
+  :closeOnEscape="false"
+  header="Atribuir Talhão"
+  class="custom-dialog w-96 lg:w-[30rem] p-6 rounded-lg shadow-lg bg-white max-h-[90vh] overflow-y-auto overflow-x-hidden"
+>
+  <div class="dialog-content space-y-6">
+    <div class="field flex justify-between items-center">
+      <label class="font-semibold text-gray-700 w-40">ID do Talhão:</label>
+      <span class="text-gray-900 font-medium truncate">{{ talhaoSelecionado?.id }}</span>
+    </div>
 
-        <div class="field">
-          <label class="font-semibold block mb-1">Nome da Fazenda:</label>
-          <span class="block pl-2">{{ talhaoSelecionado?.nomeFazenda }}</span>
-        </div>
+    <div class="field flex justify-between items-center">
+      <label class="font-semibold text-gray-700 w-40">Nome da Fazenda:</label>
+      <span class="text-gray-900 font-medium truncate">{{ talhaoSelecionado?.nomeFazenda }}</span>
+    </div>
 
-        <div class="field">
-          <label class="font-semibold block mb-1">Atribuir para:</label>
-          <span class="block pl-2">{{ currentUserName }} (ID: {{ currentUserId }})</span>
-        </div>
-      </div>
+    <div class="field flex justify-between items-center">
+      <label class="font-semibold text-gray-700 w-40">Atribuir para:</label>
+      <span class="text-gray-900 font-medium truncate">{{ currentUserName }} (ID: {{ currentUserId }})</span>
+    </div>
 
-      <div class="flex justify-end gap-2">
-        <Button class="p-1" label="Cancelar" severity="secondary" @click="confirmarAtribuirDialog = false" :disabled="loading"/>
-        <Button
-          class="p-1"
-          label="Confirmar"
-          :loading="loading"
-          severity="success"
-          @click="confirmarAtribuicao"
-          :disabled="loading"
-        />
-      </div>
-    </Dialog>
+    <div class="flex justify-end gap-6 mt-8">
+      <Botao @click="confirmarAtribuirDialog = false"
+        :disabled="loading" tipo="exclusao">Cancelar</Botao>
+      <Botao label="Confirmar"
+        :loading="loading"
+        severity="success"
+        @click="confirmarAtribuicao"
+        :disabled="loading" tipo="primario">Confirmar</Botao>
+    </div>
+  </div>
+</Dialog>
+
+
+
+
+
   </div>
 </template>
 
@@ -307,5 +288,64 @@ const editarTalhao = (id) => {
 
 .field {
   margin-bottom: 0.75rem;
+}
+
+.custom-dialog {
+  border-radius: 1rem !important;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1) !important;
+  background-color: #fff !important;
+  padding: 2rem !important;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  color: #333;
+}
+
+.custom-dialog .p-dialog-header {
+  font-weight: 700 !important;
+  font-size: 1.5rem !important;
+  border-bottom: 2px solid #f0a500 !important;
+  padding-bottom: 0.75rem !important;
+  color: #f97316 !important;
+}
+
+.dialog-content {
+  margin-top: 1rem;
+  font-size: 1rem;
+  line-height: 1.5;
+}
+
+.dialog-content .field label {
+  color: #555;
+  font-weight: 600;
+}
+
+.dialog-content .field span {
+  padding-left: 0.5rem;
+  color: #222;
+}
+
+.cancel-btn {
+  background-color: #e5e7eb;
+  /* cinza claro */
+  color: #374151;
+  border-radius: 0.5rem;
+  padding: 0.5rem 1.25rem;
+  font-weight: 600;
+  transition: background-color 0.3s ease;
+}
+
+.cancel-btn:hover:not(:disabled) {
+  background-color: #d1d5db;
+  color: #1f2937;
+}
+
+.confirm-btn {
+  border-radius: 0.5rem;
+  padding: 0.5rem 1.5rem;
+  font-weight: 700;
+  text-transform: uppercase;
+}
+
+.confirm-btn:hover:not(:disabled) {
+  filter: brightness(1.1);
 }
 </style>

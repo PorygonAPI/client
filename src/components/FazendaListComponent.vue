@@ -4,6 +4,7 @@ import { FilterMatchMode } from '@primevue/core/api';
 import { ref, defineProps, computed } from 'vue';
 import Dialog from 'primevue/dialog';
 import { useRouter } from 'vue-router';
+import Botao from './Botao.vue';
 
 const TOKEN = localStorage.getItem('token');
 
@@ -47,12 +48,7 @@ const visualizarImagem = (id) => {
 
 const nomeFazendaSelecionada = computed(() => fazendaSelecionada.value?.nome);
 
-const abrirDialog = (data) => {
-  fazendaSelecionada.value = data
-  visibleExcluir.value = true
-};
-
-  const confirmarExclusao = async () => {
+const confirmarExclusao = async () => {
   try {
     const response = await fetch(`/api/areas-agricolas/${fazendaSelecionada.value.id}`, {
       method: 'DELETE',
@@ -67,8 +63,8 @@ const abrirDialog = (data) => {
       console.log('Fazenda excluída com sucesso');
       window.location.reload();
     } else {
-      visibleExcluir.value=false;
-      mostrarAlerta( 'Não é possível excluir fazendas com talhões associados.', 'error');
+      visibleExcluir.value = false;
+      mostrarAlerta('Não é possível excluir fazendas com talhões associados.', 'error');
     }
   } catch (error) {
     console.error('Erro ao chamar a API de exclusão:', error);
@@ -93,87 +89,51 @@ const mostrarAlerta = (mensagem, tipo = 'success') => {
 <template>
   <div class="bg-white rounded-xl shadow p-5 flex flex-col gap-3">
 
-    <div v-if="alertaVisivel" :class="['fixed top-5 right-5 z-50 px-4 py-2 rounded shadow-lg text-white', alertaTipo === 'success' ? 'bg-green-500' : 'bg-red-500']">
-    {{ alertaMensagem }}
+    <div v-if="alertaVisivel"
+      :class="['fixed top-5 right-5 z-50 px-4 py-2 rounded shadow-lg text-white', alertaTipo === 'success' ? 'bg-green-500' : 'bg-red-500']">
+      {{ alertaMensagem }}
     </div>
 
     <div class="flex justify-between">
       <InputText
         class="p-1 gap-2 border border-gray-300 rounded-lg w-44 lg:w-96 focus-within:ring focus-within:ring-orange-400"
-        placeholder="Pesquisar"
-        type="text"
-        v-model="filtros['global'].value"
-      />
-
-      <Button @click="cadastrarOuEditarFazenda(null)" class="md:text-base text-sm p-1 px-2 rounded-lg shadow text-white border-gray-300 bg-gray-400 hover:text-gray-600 hover:bg-gray-300 transition">
-          <span class="block md:hidden">Cadastrar</span>
-          <span class="hidden md:block">Cadastrar Fazendas</span>
-      </Button>
+        placeholder="Pesquisar" type="text" v-model="filtros['global'].value" />
+      <Botao @click="cadastrarOuEditarFazenda(null)" tipo="primario">Cadastrar Fazendas</Botao>
     </div>
 
-    <DataTable
-      v-model:filters="filtros"
-      :value="props.fazendas"
-      removableSort
-      paginator
-      :rows="10"
-      stripedRows
-      class="p-datatable-gridlines"
-      :global-filter-fields="['nome', 'cidade', 'estado', 'status']"
-    >
-      <Column field="nome" header="Nome" sortable class="p-1 min-w-40 max-w-40"/>
-      <Column field="cidade" header="Cidade" sortable class="p-1"/>
-      <Column field="estado" header="Estado" sortable class="p-1"/>
+    <DataTable v-model:filters="filtros" :value="props.fazendas" removableSort paginator :rows="10" stripedRows
+      class="p-3 min-w-[6rem] text-center" :global-filter-fields="['nome', 'cidade', 'estado', 'status']">
+      <Column field="nome" header="Nome" sortable class="p-1 min-w-40 max-w-40" />
+      <Column field="cidade" header="Cidade" sortable class="p-1" />
+      <Column field="estado" header="Estado" sortable class="p-1" />
 
-      <Column field="status" header="Status" sortable class="p-1">
+      <Column field="imagem" header="" class="p-1">
         <template #body="{ data }">
-          <div class="flex justify-center">
-            <Tag :value="data.status" :severity="getStatusSeverity(data.status)" class="p-1" />
+          <div @click="() => visualizarImagem(data.id)"
+            class="w-12 h-12 flex items-center justify-center rounded-full bg-blue-100 hover:bg-blue-200 cursor-pointer transition"
+            title="Visualizar Imagem">
+            <i class="pi pi-image text-blue-600" style="font-size: 1.8rem;"></i>
           </div>
         </template>
       </Column>
 
-      <Column field="imagem" header="Imagem" class="p-1">
+
+      <Column field="Editar Usuário" header="" class="p-1">
         <template #body="{ data }">
-          <div class="flex justify-center">
-            <Button  @click="() => visualizarImagem(data.id)"
-            class=" hover:text-gray-600 cursor-pointer p-1 m-1 px-2 bg-gray-400 text-white border-0 rounded shadow hover:bg-gray-300 transition">
-              Visualizar
-            </Button>
+          <div @click="cadastrarOuEditarFazenda(data.id)"
+            class="w-12 h-12 flex items-center justify-center rounded-full bg-blue-100 hover:bg-blue-200 cursor-pointer transition"
+            title="Editar Fazenda">
+            <i class="pi pi-pen-to-square text-blue-600" style="font-size: 1.8rem;"></i>
           </div>
         </template>
       </Column>
 
-      <Column field="editar" header="Editar" class="p-1">
-        <template #body="dataBody">
-          <div class="flex justify-center">
-            <Button
-            class="hover:text-gray-600 cursor-pointer p-1 m-1 px-2 bg-gray-400 text-white border-0 rounded shadow hover:bg-gray-300 transition"
-            @click="cadastrarOuEditarFazenda(dataBody.data.id)">
-              Editar
-            </Button>
-          </div>
-        </template>
-      </Column>
-
-      <Column field="excluir" header="Excluir" class="p-1">
-        <template #body="{ data }">
-          <div class="flex justify-center">
-            <Button
-              class="cursor-pointer p-1 m-1 px-2 bg-orange-400 text-white border-0 rounded shadow hover:text-orange-500 hover:bg-orange-300 transition"
-              @click="() => { abrirDialog(data) }"
-            >
-              Excluir
-            </Button>
-          </div>
-        </template>
-      </Column>
     </DataTable>
-
 
     <Dialog v-model:visible="visibleExcluir" modal header="Confirmar Exclusão" class="w-80 lg:w-96 p-1">
       <hr class="border-gray-200 mb-2">
-      <span class="block mb-5 p-0.5">Tem certeza que deseja excluir a fazenda <b>{{ nomeFazendaSelecionada }}</b>?</span>
+      <span class="block mb-5 p-0.5">Tem certeza que deseja excluir a fazenda <b>{{ nomeFazendaSelecionada
+          }}</b>?</span>
       <div class="flex justify-end gap-2">
         <Button class="p-1" label="Cancelar" severity="secondary" @click="visibleExcluir = false" />
         <Button class="p-1" label="Confirmar" severity="danger" @click="confirmarExclusao" />

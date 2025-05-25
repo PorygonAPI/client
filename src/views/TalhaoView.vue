@@ -3,6 +3,7 @@ import AnalistaTalhaoComponent from '@/components/AnalistaTalhaoComponent.vue';
 import { ref, onMounted } from 'vue';
 import { useToast } from 'primevue/usetoast';
 import Toast from 'primevue/toast';
+import Titulo from '@/components/Titulo.vue';
 
 const talhoesPendentes = ref([]);
 const loading = ref(true);
@@ -12,7 +13,7 @@ const toast = useToast();
 const fetchTalhoesPendentes = async () => {
   loading.value = true;
   try {
-    const response = await fetch('/api/talhoes/pendentes', {
+    const response = await fetch('/api/safras/pendentes', {
       headers: {
         'Accept': 'application/json',
         'Content-Type': 'application/json',
@@ -88,14 +89,10 @@ onMounted(() => {
 
 <template>
   <Toast />
-  <div class="h-full w-[90%] ml-[5%] mr-[5%]">
+<div class="h-full w-[90%] mx-auto">
     <div class="flex flex-col">
 
-      <div class="text-center p-2 mt-4 lg:mb-3 mb-1">
-        <p class="text-4xl font-semibold text-gray-800">Talhões</p>
-      </div>
-
-      <hr class="border-gray-300 mb-4"/>
+      <Titulo title="Talhões"></Titulo>
       <div>
         <div v-if="loading" class="flex justify-center items-center p-8">
           <div class="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-orange-500"></div>
@@ -103,17 +100,14 @@ onMounted(() => {
 
         <div v-else-if="error" class="p-4 bg-red-50 text-red-600 rounded-lg text-center">
           {{ error }}
-          <button @click="fetchTalhoesPendentes" class="ml-4 px-4 py-2 bg-orange-400 text-white rounded hover:bg-orange-500">
+          <button @click="fetchTalhoesPendentes"
+            class="ml-4 px-4 py-2 bg-orange-400 text-white rounded hover:bg-orange-500">
             Tentar novamente
           </button>
         </div>
 
-        <AnalistaTalhaoComponent
-          v-else
-          :talhao="talhoesPendentes"
-          @talhao-atribuido="handleTalhaoAtribuido"
-          @error="handleError"
-        />
+        <AnalistaTalhaoComponent v-else :talhao="talhoesPendentes" @talhao-atribuido="handleTalhaoAtribuido"
+          @error="handleError" />
       </div>
 
     </div>

@@ -60,8 +60,8 @@ const filteredTalhoesAprovados = computed(() => {
   );
 });
 
-const editarTalhao = (id) => {
-  router.push(`/talhao/editar/${id}`);
+const editarTalhao = (talhaoId, safraId) => {
+  router.push(`/talhao/editar/${talhaoId}/${safraId}`);
 };
 
 onMounted(() => {
@@ -70,20 +70,22 @@ onMounted(() => {
 </script>
 
 <template>
-  <div class="edicao-talhoes-container p-4 md:p-6">
-    <h1 class="text-2xl md:text-3xl font-semibold text-gray-800 mb-4">Edição de Talhões</h1>
+<div class="h-full w-[90%] mx-auto mt-23">
 
     <div v-if="isLoading" class="text-center py-8">
       <i class="pi pi-spin pi-spinner text-4xl text-orange-400"></i>
       <p class="mt-2 text-gray-600">Carregando talhões...</p>
     </div>
 
+    <div v-else-if="error"class="flex items-center gap-4 p-2 mt-4 lg:mb-3 mb-1">
+        <i @click="goBack" class="pi pi-angle-left text-gray-600 hover:text-gray-800 cursor-pointer"
+          style="font-size: 2.5rem"></i>
+        <p class="text-3xl font-semibold text-gray-800">Visualizador de Talhão</p>
+      </div>
+
     <div v-else-if="error" class="bg-red-50 border border-red-200 text-red-700 p-4 rounded-lg mb-6">
       <p class="font-medium">{{ error }}</p>
-      <button
-        @click="fetchData"
-        class="mt-2 text-sm text-red-600 hover:text-red-800 underline"
-      >
+      <button @click="fetchData" class="mt-2 text-sm text-red-600 hover:text-red-800 underline">
         Tentar novamente
       </button>
     </div>
@@ -92,6 +94,7 @@ onMounted(() => {
       <div class="controls-section bg-white p-4 rounded-lg shadow-md mb-6">
         <div class="flex flex-col md:flex-row md:justify-between md:items-center gap-4">
           <div class="date-display text-gray-700">
+            <h1 class="text-2xl md:text-3xl font-semibold mb-4" style="color: #475764;">Edição de Talhões</h1>
             <i class="pi pi-calendar mr-2"></i>
             <span>{{ currentDate }}</span>
           </div>
@@ -100,17 +103,13 @@ onMounted(() => {
             <span class="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500">
               <i class="pi pi-search"></i>
             </span>
-            <input
-              type="text"
-              v-model="searchQuery"
-              placeholder="Pesquisar talhões..."
-              class="pl-10 pr-4 py-2 border border-gray-300 rounded-lg w-full md:w-80 focus:outline-none focus:ring-2 focus:ring-orange-300"
-            />
+            <input type="text" v-model="searchQuery" placeholder="Pesquisar talhões..."
+              class="pl-10 pr-4 py-2 border border-gray-300 rounded-lg w-full md:w-80 focus:outline-none focus:ring-2 focus:ring-orange-300" />
           </div>
         </div>
       </div>
 
-      <div class="count-cards grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+       <div class="count-cards grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
         <div class="count-card bg-white p-4 rounded-lg shadow-md border-l-4 border-blue-500">
           <h3 class="text-lg font-medium text-gray-700">Talhões Atribuídos</h3>
           <p class="text-3xl font-bold text-blue-600">{{ counts.atribuidos }}</p>
@@ -132,12 +131,16 @@ onMounted(() => {
             <div v-for="talhao in filteredTalhoesAtribuidos" :key="talhao.id" class="talhao-card border border-gray-200 rounded-lg p-3">
               <div class="flex justify-between items-start">
                 <div>
+                  <div class="mb-2">
+                    <span class="inline-block bg-blue-100 text-blue-800 text-xs font-semibold px-2 py-1 rounded">Safra #{{ talhao.safraId }}</span>
+                    <span class="inline-block bg-gray-100 text-gray-800 text-xs font-semibold px-2 py-1 rounded ml-1">Talhão #{{ talhao.id }}</span>
+                  </div>
                   <h4 class="font-medium text-gray-800">{{ talhao.fazenda }}</h4>
-                  <p class="text-sm text-gray-600">Talhão #{{ talhao.numero }}</p>
-                  <p class="text-sm text-gray-600">{{ talhao.cultura }}</p>
+                  <p class="text-sm text-gray-600">Cultura: {{ talhao.cultura }}</p>
+                  <p class="text-sm text-gray-600">Ano: {{ talhao.anoSafra }}</p>
                 </div>
                 <button
-                  @click="editarTalhao(talhao.id)"
+                  @click="editarTalhao(talhao.id, talhao.safraId)"
                   class="bg-gray-100 hover:bg-gray-200 p-2 rounded-md"
                   title="Editar talhão"
                 >
@@ -162,12 +165,16 @@ onMounted(() => {
             <div v-for="talhao in filteredTalhoesAprovados" :key="talhao.id" class="talhao-card border border-gray-200 rounded-lg p-3">
               <div class="flex justify-between items-start">
                 <div>
+                  <div class="mb-2">
+                    <span class="inline-block bg-green-100 text-green-800 text-xs font-semibold px-2 py-1 rounded">Safra #{{ talhao.safraId }}</span>
+                    <span class="inline-block bg-gray-100 text-gray-800 text-xs font-semibold px-2 py-1 rounded ml-1">Talhão #{{ talhao.id }}</span>
+                  </div>
                   <h4 class="font-medium text-gray-800">{{ talhao.fazenda }}</h4>
-                  <p class="text-sm text-gray-600">Talhão #{{ talhao.numero }}</p>
-                  <p class="text-sm text-gray-600">{{ talhao.cultura }}</p>
+                  <p class="text-sm text-gray-600">Cultura: {{ talhao.cultura }}</p>
+                  <p class="text-sm text-gray-600">Ano: {{ talhao.anoSafra }}</p>
                 </div>
                 <button
-                  @click="editarTalhao(talhao.id)"
+                  @click="editarTalhao(talhao.id, talhao.safraId)"
                   class="bg-gray-100 hover:bg-gray-200 p-2 rounded-md"
                   title="Editar talhão"
                 >

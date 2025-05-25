@@ -2,40 +2,43 @@
   <Toast />
   <div class="register-container">
     <div class="register-card">
-      <div class="card-header">
-        <button class="back-button" type="button" @click="retornar">
-          <span>&larr;</span>
-        </button>
-        <h2>Cadastro de Usuário</h2>
+      <div class="mb-6 flex items-center gap-2">
+        <div class="flex items-start gap-3">
+          <i @click="retornar"
+            class="pi pi-angle-left text-3xl text-gray-600 cursor-pointer hover:text-gray-800 transition" />
+          <h1 class="text-2xl font-semibold text-gray-800">Cadastrar Usuário </h1>
+        </div>
       </div>
-      <form @submit.prevent="handleRegister">
+      <div class="card-header">
+      </div>
+      <form @submit.prevent="handleRegister" novalidate>
         <div class="form-group">
           <label for="fullName">Nome completo:</label>
-          <input type="text" id="fullName" v-model="formData.nome" required />
+          <input type="text" id="fullName" v-model="formData.nome" required autocomplete="name" />
         </div>
 
         <div class="form-group">
           <label for="email">E-mail:</label>
-          <input type="email" id="email" v-model="formData.email" required />
+          <input type="email" id="email" v-model="formData.email" required autocomplete="email" />
         </div>
 
         <div v-if="flagSenha" class="form-group">
           <label for="password">Senha:</label>
-          <input type="password" id="password" v-model="formData.senha" required />
+          <input type="password" id="password" v-model="formData.senha" required autocomplete="new-password" />
         </div>
 
         <div class="form-group">
           <label for="role">Cargo:</label>
           <select id="role" v-model="formData.cargo" required>
             <option value="" disabled selected>Selecione um cargo</option>
-            <option value="1"> Consultor</option>
-            <option value="2"> Analista</option>
-            <option value="3"> Administrador</option>
+            <option value="1">Consultor</option>
+            <option value="2">Analista</option>
+            <option value="3">Administrador</option>
           </select>
         </div>
 
         <div class="button-container">
-          <button type="submit" class="register-button"> {{ btnLabel }}</button>
+          <button type="submit" class="register-button">{{ btnLabel }}</button>
         </div>
       </form>
     </div>
@@ -43,10 +46,10 @@
 </template>
 
 <script>
-import axios from 'axios'
 import { useToast } from "primevue/usetoast";
 import Toast from 'primevue/toast';
 import { ref } from 'vue';
+import Botao from "./Botao.vue";
 
 const TOKEN = localStorage.getItem('token')
 
@@ -68,7 +71,6 @@ export default {
     }
   },
   mounted() {
-
     const fetchData = async () => {
       try {
         const response = await fetch('api/usuarios/' + this.$route.query.id, {
@@ -80,36 +82,33 @@ export default {
         });
         this.formData = await response.json();
       } catch (error) {
-        error.value = 'Erro ao carregar os dados';
+        // Pode exibir erro no toast ou log
+        console.error('Erro ao carregar os dados', error);
       }
     };
 
     if (this.$route.query.id > 0) {
-      fetchData()
-      this.flagSenha = false
-      this.btnLabel = 'Editar'
+      fetchData();
+      this.flagSenha = false;
+      this.btnLabel = 'Editar';
     }
 
     this.$toast = useToast();
-
   },
   methods: {
     retornar() {
-      this.$router.push('/usuario')
+      this.$router.push('/usuario');
     },
 
     showToast(strSeverity, strMensagem) {
-      this.$toast.add({ severity: strSeverity, summary: 'Informando:', detail: strMensagem, life: 5000 })
+      this.$toast.add({ severity: strSeverity, summary: 'Informando:', detail: strMensagem, life: 5000 });
     },
 
     handleRegister() {
-      console.log('Form data submitted:', this.formData)
-
       if (this.$route.query.id > 0) {
-        this.alterarUsuario()
-      }
-      else {
-        this.inserirUsuario()
+        this.alterarUsuario();
+      } else {
+        this.inserirUsuario();
       }
     },
 
@@ -125,26 +124,22 @@ export default {
           },
           method: 'POST',
           body: JSON.stringify(this.formData)
-        }).then((response) => {
+        });
 
-          if (response.status == 200) {
-            this.showToast('success', 'Cadastro realizado com sucesso')
-            this.formData.cargoId = '',
-              this.formData.email = '',
-              this.formData.senha = '',
-              this.formData.nome = ''
-          }
-          else {
-            this.showToast('error', 'Erro ao cadastrar os dados')
-          }
-        }).catch((response) => {
-          this.showToast('error', 'Erro ao cadastrar os dados')
-        })
-
+        if (response.status == 200) {
+          this.showToast('success', 'Cadastro realizado com sucesso');
+          // Limpa formulário
+          this.formData = { nome: '', email: '', senha: '', cargo: '' };
+          // Volta para página anterior
+          this.$router.push('/usuario');
+        } else {
+          this.showToast('error', 'Erro ao cadastrar os dados');
+        }
       } catch (error) {
-        error.value = 'Erro ao cadastrar os dados';
+        this.showToast('error', 'Erro ao cadastrar os dados');
       }
     },
+
     async alterarUsuario() {
       try {
         const response = await fetch('/api/usuarios/' + this.$route.query.id, {
@@ -157,19 +152,16 @@ export default {
           },
           method: 'PUT',
           body: JSON.stringify(this.formData)
-        }).then((response) => {
-          if (response.status == 200) {
-            this.showToast('success', 'Atualização realizada com sucesso')
-          }
-          else {
-            this.showToast('error', 'Erro ao atualizar os dados')
-          }
+        });
 
-        }).catch((response) => {
-          this.showToast('error', 'Erro ao atualizar os dados')
-        })
+        if (response.status == 200) {
+          this.showToast('success', 'Atualização realizada com sucesso');
+          this.$router.push('/usuario');
+        } else {
+          this.showToast('error', 'Erro ao atualizar os dados');
+        }
       } catch (error) {
-        error.value = 'Erro ao atualizar os dados';
+        this.showToast('error', 'Erro ao atualizar os dados');
       }
     }
   }
@@ -182,75 +174,88 @@ export default {
   justify-content: center;
   align-items: flex-start;
   min-height: 100vh;
-  padding: 1rem;
-  background-color: white;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
 }
 
 .register-card {
-  background-color: white;
-  border-radius: 0;
-  box-shadow: none;
-  padding: 2rem;
+  background: #ffffff;
+  border-radius: 12px;
+  box-shadow: 0 12px 24px rgba(0, 0, 0, 0.1);
+  padding: 2.5rem 3rem;
   width: 100%;
-  max-width: 600px;
+  max-width: 480px;
+  transition: transform 0.3s ease;
+  margin-top: 7rem;
 }
 
 .card-header {
   position: relative;
-  margin-bottom: 2rem;
+  margin-bottom: 2.5rem;
   display: flex;
-  flex-direction: column;
+  justify-content: center;
   align-items: center;
 }
 
 .back-button {
   position: absolute;
   left: 0;
-  top: 0;
-  background: none;
+  top: 50%;
+  transform: translateY(-50%);
+  background: transparent;
   border: none;
-  font-size: 1.5rem;
+  font-size: 1.6rem;
   cursor: pointer;
-  color: #555;
-  padding: 0;
+  color: #3b82f6;
+  transition: color 0.2s ease;
+}
+
+.back-button:hover {
+  color: #2563eb;
 }
 
 .register-card h2 {
-  text-align: center;
-  margin-bottom: 1rem;
-  color: #333;
-  font-size: 1.8rem;
+  font-weight: 700;
+  font-size: 2rem;
+  color: #111827;
+  margin: 0;
 }
 
 .form-group {
-  margin-bottom: 1.5rem;
+  margin-bottom: 1.8rem;
   display: flex;
   flex-direction: column;
-  align-items: flex-start;
   width: 100%;
 }
 
 .form-group label {
-  display: block;
-  margin-bottom: 0.5rem;
-  font-weight: bold;
-  color: #555;
-  width: 100%;
+  font-weight: 600;
+  color: #374151;
+  margin-bottom: 0.6rem;
+  font-size: 1rem;
 }
 
 .form-group input,
 .form-group select {
-  width: 100%;
-  padding: 0.6rem;
-  border: 1px solid #333;
-  border-radius: 4px;
+  padding: 0.75rem 1rem;
   font-size: 1rem;
-  height: 40px;
-  box-sizing: border-box;
+  border: 1.8px solid #d1d5db;
+  border-radius: 8px;
+  transition: border-color 0.3s ease, box-shadow 0.3s ease;
+  outline-offset: 2px;
+}
+
+.form-group input:focus,
+.form-group select:focus {
+  border-color: #3b82f6;
+  box-shadow: 0 0 8px rgba(59, 130, 246, 0.4);
+  outline: none;
+  background: #fff;
 }
 
 .form-group select {
-  background-color: white;
+  background-color: #fff;
+  appearance: none;
+  cursor: pointer;
 }
 
 .button-container {
@@ -260,18 +265,29 @@ export default {
 }
 
 .register-button {
-  width: 25%;
-  padding: 0.8rem;
-  background-color: #777777;
-  color: white;
+  width: 100%;
+  max-width: 160px;
+  padding: 0.85rem 0;
+  font-weight: 700;
+  font-size: 1.1rem;
+  color: #fff;
+  background-color: #3b82f6;
   border: none;
-  border-radius: 4px;
-  font-size: 1rem;
+  border-radius: 10px;
   cursor: pointer;
-  transition: background-color 0.3s;
+  transition: background-color 0.3s ease, box-shadow 0.3s ease;
+  box-shadow: 0 6px 12px rgba(59, 130, 246, 0.3);
 }
 
 .register-button:hover {
-  background-color: #555555;
+  background-color: #2563eb;
+  box-shadow: 0 8px 18px rgba(37, 99, 235, 0.5);
+}
+
+/* Responsividade */
+@media (max-width: 480px) {
+  .register-card {
+    padding: 2rem 1.5rem;
+  }
 }
 </style>
