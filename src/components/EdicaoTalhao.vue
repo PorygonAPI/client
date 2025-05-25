@@ -189,15 +189,15 @@ export default defineComponent({
 
       map.addLayer(drawnFeatures);
 
-      
-        let finalDaninhaInput = (finalDaninhaGeometry ? finalDaninhaGeometry : daninhaGeometry)
 
-        let finalDaninhaLayer = L.geoJSON(finalDaninhaInput, {
-          style: { color: DaninhaFinalColor }
-        })
+      let finalDaninhaInput = (finalDaninhaGeometry ? finalDaninhaGeometry : daninhaGeometry)
 
-        // Função que configura os polígonos para serem editados
-        transformGeoJsonIntoEditableLayer(finalDaninhaLayer, drawnFeatures)
+      let finalDaninhaLayer = L.geoJSON(finalDaninhaInput, {
+        style: { color: DaninhaFinalColor }
+      })
+
+      // Função que configura os polígonos para serem editados
+      transformGeoJsonIntoEditableLayer(finalDaninhaLayer, drawnFeatures)
 
       overlayMaps["Imagem Editada"] = L.layerGroup([drawnFeatures]).addTo(map)
 
@@ -241,11 +241,26 @@ export default defineComponent({
         const layerType = layer.toGeoJSON().geometry.type.toLowerCase()
 
         if (layerType == "multipolygon") {
+          
           layer.toGeoJSON().geometry.coordinates.forEach(function (coordinateArray) {
 
             revertCoordinates(coordinateArray)
             let newPolygon = L.polygon(coordinateArray, { color: DaninhaFinalColor })
             polyLayers.push(newPolygon)
+          })
+        }
+        else if (layerType == "geometrycollection") {
+         
+          layer.toGeoJSON().geometry.geometries.forEach(function (geometry) {
+
+            geometry.coordinates.forEach(function (coordinateArray) {
+              
+              let idk = []
+              idk.push(coordinateArray)
+              revertCoordinates(idk)
+              let newPolygon = L.polygon(coordinateArray, { color: DaninhaFinalColor })
+              polyLayers.push(newPolygon)
+            })
           })
         }
         else {
@@ -269,62 +284,26 @@ export default defineComponent({
     }
 
     const generateUpdatedGeoJson = () => {
-      
-      let outputGeoJson = null
-      let newCoordinates = null
+
       let out = '{"type": "FeatureCollection", "features": [[]]}'
       let feature = ''
-   
-      // drawnFeatures.eachLayer(function (layer) {
-      //   console.log("layer.toGeoJSON(): ",layer.toGeoJSON())
-      //   if (outputGeoJson == null) {
-      //     outputGeoJson = layer.toGeoJSON()
-      //   }
 
-      //   if (newCoordinates == null) {
-      //     newCoordinates = layer.toGeoJSON().geometry.coordinates[0]
-      //   }
-      //   else {
-      //     var newLayer = layer.toGeoJSON().geometry.coordinates[0]
-      //     newLayer.forEach(coordinate => {
-      //       newCoordinates.push(coordinate)
-      //     });
-      //   }
-      // });
-
-      // outputGeoJson.geometry.coordinates = newCoordinates
-
-       drawnFeatures.eachLayer(function (layer) {
-        console.log("layer.toGeoJSON(): ",layer.toGeoJSON())
-        feature += JSON.stringify( layer.toGeoJSON() )
+      drawnFeatures.eachLayer(function (layer) {
+        console.log("layer.toGeoJSON(): ", layer.toGeoJSON())
+        feature += JSON.stringify(layer.toGeoJSON())
         feature += ','
       });
 
-      out = out.replace('[]',feature)
-      // console.log("feature: ", feature)
-      // console.log('replace: ', out)
+      out = out.replace('[]', feature)
 
       let ajuste = out.slice(-3)
-      out = out.replace(ajuste,']}')
-      
-      // console.log('idk: ', out)
-      
-      // outputGeoJson.geometry.coordinates = newCoordinates
-
-      // return outputGeoJson
+      out = out.replace(ajuste, ']}')
       return out
     }
 
     const atualizarAprovarSafra = async (endpoint) => {
       try {
         mostrarModal.value = false
-        // const updatedGeoJson = generateUpdatedGeoJson()
-
-        // console.log('generateUpdatedGeoJson: ', JSON.stringify(updatedGeoJson))
-
-        // let geoJsonTemplate = '{ "type": "FeatureCollection", "features": [{"type": "Feature", "properties": {}, "geometry": {"coordinates": [ [] ],"type": "MultiPolygon" }    } ]}'
-
-        // let finalgeoJson = geoJsonTemplate.replace('[]', JSON.stringify(updatedGeoJson.geometry.coordinates))
 
         let finalgeoJson = generateUpdatedGeoJson()
         let filename = 'finalgeoJson.geojson';
