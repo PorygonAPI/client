@@ -96,7 +96,7 @@ const setChartOptions = () => {
     plugins: {
       title: {
         display: true,
-        text: "Progresso por Analistas",
+        text: "Progresso por Analista",
         font: {
           size: 25,
           weight: 'bold'
@@ -133,14 +133,9 @@ const setChartOptions = () => {
         displayColors: true,
         callbacks: {
           label: function(context) {
-            let label = context.dataset.label || '';
-            if (label) {
-              label += ': ';
-            }
-            if (context.parsed.x !== null) {
-              label += context.parsed.x;
-            }
-            return label;
+            const labelName = context.dataset.label || '';
+            const value = context.parsed.x;
+            return `${labelName}: ${value} ${getUnidadeText(value)}`;
           },
           title: function(context) {
             return context[0].label;
@@ -153,10 +148,10 @@ const setChartOptions = () => {
 
             return [
               ``,
-              `Total de tarefas: ${data.total}`,
-              `Pendentes: ${data.pendentes} (${Math.round(data.pendentes/data.total*100 || 0)}%)`,
-              `Atribuídos: ${data.atribuidos} (${Math.round(data.atribuidos/data.total*100 || 0)}%)`,
-              `Aprovados: ${data.aprovados} (${Math.round(data.aprovados/data.total*100 || 0)}%)`
+              `Total de talhões: ${data.total} ${getUnidadeText(data.total)}`,
+              `Pendentes: ${data.pendentes} ${getUnidadeText(data.pendentes)} (${Math.round(data.pendentes/data.total*100 || 0)}%)`,
+              `Atribuídos: ${data.atribuidos} ${getUnidadeText(data.atribuidos)} (${Math.round(data.atribuidos/data.total*100 || 0)}%)`,
+              `Aprovados: ${data.aprovados} ${getUnidadeText(data.aprovados)} (${Math.round(data.aprovados/data.total*100 || 0)}%)`
             ];
           }
         }
@@ -223,6 +218,8 @@ watch(() => props.valuesData, (newData) => {
     chartOptions.value = setChartOptions();
   }
 }, { deep: true });
+
+const getUnidadeText = (count) => count === 1 ? 'unidade' : 'unidades';
 </script>
 
 <template>
@@ -237,7 +234,7 @@ watch(() => props.valuesData, (newData) => {
         <div class="tooltip-content" v-if="analystDataMap.get(name)">
           <strong>{{ name }}</strong>
           <div class="tooltip-details">
-            <div>Total: {{ analystDataMap.get(name).total }}</div>
+            <div>Total: {{ analystDataMap.get(name).total }} {{ getUnidadeText(analystDataMap.get(name).total) }}</div>
             <div class="pendentes">Pendentes: {{ analystDataMap.get(name).pendentes }}</div>
             <div class="atribuidos">Atribuídos: {{ analystDataMap.get(name).atribuidos }}</div>
             <div class="aprovados">Aprovados: {{ analystDataMap.get(name).aprovados }}</div>
