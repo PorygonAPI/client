@@ -96,6 +96,7 @@ export default defineComponent({
     const toast = useToast();
     const mostrarModal = ref(false)
     const operacao = ref(null)
+    const flag = ref(false)
 
     const voltar = () => {
       router.push('/analista/edicao-talhoes')
@@ -143,6 +144,7 @@ export default defineComponent({
         if (data.length > 6) {
           arquivoFinalDaninha = data[4].substring(data[4].indexOf('{"type":'))
           finalDaninhaGeometry = JSON.parse(arquivoFinalDaninha)//.geometries[0]
+          flag.value = true
         }
 
         createMapLayer(fazendaGeometry, daninhaGeometry, finalDaninhaGeometry)
@@ -239,9 +241,7 @@ export default defineComponent({
       geoJson.eachLayer(function (layer) {
 
         const layerType = layer.toGeoJSON().geometry.type.toLowerCase()
-
         if (layerType == "multipolygon") {
-          
           layer.toGeoJSON().geometry.coordinates.forEach(function (coordinateArray) {
 
             revertCoordinates(coordinateArray)
@@ -250,14 +250,20 @@ export default defineComponent({
           })
         }
         else if (layerType == "geometrycollection") {
-         
+    
           layer.toGeoJSON().geometry.geometries.forEach(function (geometry) {
 
             geometry.coordinates.forEach(function (coordinateArray) {
-              
-              let idk = []
-              idk.push(coordinateArray)
-              revertCoordinates(idk)
+
+              if (flag.value) {
+                let idk = []
+                idk.push(coordinateArray)
+                revertCoordinates(idk)
+              }
+              else {
+                revertCoordinates(coordinateArray)
+              }
+
               let newPolygon = L.polygon(coordinateArray, { color: DaninhaFinalColor })
               polyLayers.push(newPolygon)
             })
