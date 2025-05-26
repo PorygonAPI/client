@@ -260,42 +260,47 @@ const cadastrarOuAtualizarFazenda = async () => {
     // Validações iniciais
     if (!nomeFazenda.value?.trim()) {
       toast.add({ severity: 'error', summary: 'Erro', detail: 'Nome da fazenda é obrigatório', life: 3000 });
+      loading.value = false;
       return;
     }
 
     if (!estadoSelecionado.value || !cidadeSelecionada.value) {
       toast.add({ severity: 'error', summary: 'Erro', detail: 'Estado e cidade são obrigatórios', life: 3000 });
+      loading.value = false;
       return;
     }
 
     if (!isEditing.value && (!geojsonFile.value || !imageFile.value)) {
       toast.add({ severity: 'error', summary: 'Erro', detail: 'Os arquivos são obrigatórios', life: 3000 });
+      loading.value = false;
       return;
     }
 
     const formData = new FormData();
 
-    // // Agrupa os dados em um objeto JSON
-    // const dados = {
-    //   nomeFazenda: nomeFazenda.value.trim(),
-    //   estado: estadoSelecionado.value,
-    //   cidadeNome: cidadeSelecionada.value,
-    // };
+    // Cria o objeto dados e adiciona ao FormData
+    const dados = {
+      nomeFazenda: nomeFazenda.value.trim(),
+      estado: estadoSelecionado.value,
+      cidadeNome: cidadeSelecionada.value,
+    };
 
-    // Adiciona o objeto JSON como uma parte chamada 'dados'
-    formData.append('nomeFazenda', nomeFazenda.value.trim());
-    formData.append('estado', estadoSelecionado.value);
-    formData.append('cidadeNome', cidadeSelecionada.value);
+    // Adiciona o objeto dados como string JSON
+    formData.append('dados', JSON.stringify(dados));
 
-
-
-    // Adiciona os arquivos sem converter para Blob
+    // Adiciona os arquivos
     if (geojsonFile.value instanceof File) {
       formData.append('arquivoFazenda', geojsonFile.value);
     }
 
     if (imageFile.value instanceof File) {
       formData.append('arquivoErvaDaninha', imageFile.value);
+    }
+
+    // Para debug - verifica se todos os campos necessários estão presentes
+    console.log('Campos no FormData:');
+    for (let pair of formData.entries()) {
+      console.log(pair[0], pair[1]);
     }
 
     const response = await fetch(
