@@ -84,6 +84,7 @@ const produtividadePorAno = ref('');
 const ano = ref('');
 const tipoSolo = ref('');
 const area = ref('');
+const imagemDaninha = ref(null);
 
 const retornoPagina = () => {
   router.push({ path: '/areasagro' });
@@ -175,46 +176,96 @@ onMounted(() => {
 });
 
 const cadastrarTalhao = async () => {
-  if (!validarCampos()) return;
-
   try {
+    if (!validarCampos()) return;
+
     const formData = new FormData();
-    formData.append('idTalhao', talhaoId || '');
-    formData.append('anoSafra', ano.value);
-    formData.append('culturaNome', cultura.value);
-    formData.append('produtividadeAno', produtividadePorAno.value);
-    formData.append('tipoSoloNome', tipoSolo.value);
-    formData.append('area', area.value);
+
+    // Cria o objeto dados no formato esperado pelo backend
+    const dados = {
+      area: parseFloat(area.value),
+      tipoSoloNome: tipoSolo.value,
+      areaAgricola: fazendaSelecionada.value,
+      culturaNome: cultura.value,
+      ano: parseInt(ano.value),
+      status: "Pendente",
+      produtividadeAno: parseFloat(produtividadePorAno.value) // Adicionando o campo produtividadeAno
+    };
+
+    formData.append('dados', JSON.stringify(dados));
 
     if (imagemDaninha.value instanceof File) {
       formData.append('arquivoDaninha', imagemDaninha.value);
     }
 
-    const response = await fetch('/api/talhoes', {
-      method: 'POST',
+    const url = talhaoId ? `/api/talhoes/${talhaoId}` : '/api/talhoes';
+    const method = talhaoId ? 'PUT' : 'POST';
+
+    const response = await fetch(url, {
+      method: method,
       headers: {
         'Authorization': `Bearer ${localStorage.getItem('token')}`
       },
       body: formData
     });
 
-    if (!response.ok) throw new Error('Erro ao cadastrar talhão');
+    if (!response.ok) {
+      const errorData = await response.json().catch(() => null);
+      throw new Error(errorData?.message || `Erro ${response.status}: ${response.statusText}`);
+    }
 
     toast.add({
       severity: 'success',
       summary: 'Sucesso',
-      detail: 'Talhão cadastrado!',
-      life: 3000,
+      detail: talhaoId ? 'Talhão atualizado!' : 'Talhão cadastrado!',
+      life: 3000
     });
+
+    // Usando a função retornoPagina ao invés do router.push direto
     retornoPagina();
+
   } catch (error) {
-    console.error(error);
+    console.error('Erro ao cadastrar/atualizar talhão:', error);
     toast.add({
       severity: 'error',
       summary: 'Erro',
-      detail: 'Falha ao cadastrar talhão.',
-      life: 3000,
+      detail: error.message || 'Falha ao cadastrar/atualizar talhão.',
+      life: 3000
     });
   }
+};
+
+const validarCampos = () => {
+  if (!fazendaSelecionada.value) {
+    toast.add({
+      severity: 'error',
+      summary: 'Erro',
+      detail: 'Selecione uma fazenda',
+      life: 3000
+    });
+    return false;
+  }
+
+  if (!area.value || !tipoSolo.value || !cultura.value || !ano.value || !produtividadePorAno.value) {
+    toast.add({
+      severity: 'error',
+      summary: 'Erro',
+      detail: 'Preencha todos os campos obrigatórios',
+      life: 3000
+    });
+    return false;
+  }
+
+  if (!imagemDaninha.value && !talhaoId) {
+    toast.add({
+      severity: 'error',
+      summary: 'Erro',
+      detail: 'Arquivo GeoJSON é obrigatório',
+      life: 3000
+    });
+    return false;
+  }
+
+  return true;
 };
 </script>
