@@ -21,9 +21,9 @@ const setChartData = () => {
                 label: 'Unidades',
                 data: valuesLista.value,
                 backgroundColor: [
-                    '#F97316',
-                    '#3B82F6',
-                    '#10B981'
+                    '#3b82f6',
+                    '#34d399',
+                    '#a78bfa'
                 ],
                 borderWidth: 1
             }
