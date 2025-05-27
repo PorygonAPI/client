@@ -46,29 +46,29 @@ const setChartData = () => {
       {
         type: 'bar',
         label: 'Pendentes',
-        backgroundColor: '#F97316',
+        backgroundColor: '#3b82f6',
+        hoverBackgroundColor: '#2563eb',
         data: valuesPendentes.value,
         borderRadius: 4,
         stack: 'Stack 0',
-        hoverBackgroundColor: '#f05e03',
       },
       {
         type: 'bar',
         label: 'Atribuídos',
-        backgroundColor: '#3B82F6',
+        backgroundColor: '#34d399',
+        hoverBackgroundColor: '#15803d',
         data: valuesAtribuidos.value,
         borderRadius: 4,
         stack: 'Stack 0',
-        hoverBackgroundColor: '#2563eb',
       },
       {
         type: 'bar',
         label: 'Aprovados',
-        backgroundColor: '#10B981',
+        backgroundColor: '#a78bfa',
+        hoverBackgroundColor: '#7c3aed',
         data: valuesAprovados.value,
         borderRadius: 4,
         stack: 'Stack 0',
-        hoverBackgroundColor: '#059669',
       }
     ]
   };
